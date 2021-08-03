@@ -11,7 +11,7 @@ phases:
       - echo $SETTINGS > maven-deploy-settings.xml
       - cat maven-deploy-settings.xml
       - export REPOSITORY_TOKEN=$( aws codeartifact get-authorization-token --domain $REPOSITORY_DOMAIN --query authorizationToken --output text )
-      - ./mvnw deploy
+      - ./mvnw --settings maven-deploy-settings.xml deploy
 artifacts:
   files:
     - 'dist/**'
