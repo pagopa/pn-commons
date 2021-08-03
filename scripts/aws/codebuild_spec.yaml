@@ -3,7 +3,7 @@ phases:
   build:
     commands:
       - echo "Build"
-      - ./mnvw clean install
+      - ./mvnw clean install
       - ls target
   post_build:
     commands:
