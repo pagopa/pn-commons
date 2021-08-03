@@ -166,7 +166,24 @@ Resources:
       ServiceRole: !GetAtt CodeBuildRole.Arn
       Source: 
         Type: CODEPIPELINE
-        BuildSpec: scripts/aws/codebuild_spec.yaml
+        BuildSpec: |
+          version: 0.2
+          phases:
+            build:
+              commands:
+                - echo "Build"
+                - ./mvnw clean install
+                - ls target
+            post_build:
+              commands:
+                - echo "Deploy"
+                - echo $SETTINGS > maven-deploy-settings.xml
+                - cat maven-deploy-settings.xml
+                - export REPOSITORY_TOKEN=$( aws codeartifact get-authorization-token --domain $REPOSITORY_DOMAIN --query authorizationToken --output text )
+                - ./mvnw --settings maven-deploy-settings.xml deploy
+          artifacts:
+            files:
+              - 'target/**'
       Artifacts:
         Type: CODEPIPELINE
       Environment:
