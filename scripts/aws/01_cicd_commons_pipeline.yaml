@@ -1,0 +1,255 @@
+#  Copyright 2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with
+#  the License. A copy of the License is located at
+#      http://aws.amazon.com/apache2.0/
+#  or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+#  CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and
+#  limitations under the License.
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CodePipeline for pn-commons
+Parameters:
+  ProductName:
+    Description: Name of the Project
+    Type: String
+    Default: pn
+  BranchName:
+    Description: Name of the Project
+    Type: String
+    Default: main
+  CommonsRepoName:
+    Description: Name of the Github Repository infra
+    Type: String
+    Default: pagopa/pn-commons
+  CrossAccountCondition:
+    Description: Conditionally creates the resources for cross account access
+    Type: String
+    Default: false
+  
+Conditions:
+  AddCodeBuildResource: !Equals [ !Ref CrossAccountCondition, true ]
+
+
+Resources:
+  PnCodeArtifactDomain:
+    Type: 'AWS::CodeArtifact::Domain'
+    Properties:
+      DomainName: "pn"
+  
+  #PnCodeArtifactUpstreamRepository:
+  #  Type: 'AWS::CodeArtifact::Repository'
+  #  Properties:
+  #    RepositoryName: "pn-upstream-repo"
+  #    DomainName: !GetAtt PnCodeArtifactDomain.Name
+  #    ExternalConnections:
+  #      - public:maven-central
+  
+  PnCodeArtifactRepository:
+    Type: 'AWS::CodeArtifact::Repository'
+    Properties:
+      RepositoryName: "pn"
+      DomainName: !GetAtt PnCodeArtifactDomain.Name
+      #Upstreams:
+      #  - !GetAtt PnCodeArtifactUpstreamRepository.Name
+
+  PipeLineRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${ProductName}-${BranchName}-commons-pipeline-role
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          -
+            Effect: Allow
+            Principal:
+              Service:
+                - codepipeline.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+  PipelinePolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: !Sub ${ProductName}-${BranchName}-commons-pipeline-policy
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          -
+            Effect: Allow
+            Action:
+              - codepipeline:*
+              - codebuild:BatchGetBuilds
+              - codebuild:StartBuild
+              - s3:ListAllMyBuckets
+              - s3:GetBucketLocation
+            Resource:
+              - "*"
+          -
+            Effect: Allow
+            Action:
+              - kms:Decrypt
+            Resource: { "Fn::ImportValue": {"Fn::Sub": "${ProductName}-${BranchName}-CMK-arn"}}
+          -
+            Effect: Allow
+            Action:
+              - s3:PutObject
+              - s3:GetBucketPolicy
+              - s3:GetObject
+              - s3:ListBucket
+            Resource:
+             - !Join ['',['arn:aws:s3:::', { "Fn::ImportValue": {"Fn::Sub": "${ProductName}-${BranchName}-build-artifacts-buket-name"}}, '/*']]
+             - !Join ['',['arn:aws:s3:::', { "Fn::ImportValue": {"Fn::Sub": "${ProductName}-${BranchName}-build-artifacts-buket-name"}} ]]
+          -
+            Effect: Allow
+            Action:
+              - sts:AssumeRole
+            Resource:
+              - !Sub arn:aws:iam::${AWS::AccountId}:role/${ProductName}-${BranchName}-from-github-to-s3-role
+      Roles:
+        -
+          !Ref PipeLineRole
+  
+  CodeBuildRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${ProductName}-${BranchName}-commons-codebuild-role
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - 
+            Effect: Allow
+            Principal:
+              Service:
+                - "codebuild.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+  CodeBuildPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: !Sub ${ProductName}-${BranchName}-commons-codebuild-policy
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          -
+            Effect: Allow
+            Action:
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+              - codebuild:BatchGetBuilds
+              - codebuild:StartBuild
+              - "*"
+            Resource:
+              - "*"
+          -
+            Effect: Allow
+            Action:
+              - kms:Decrypt
+            Resource: { "Fn::ImportValue": {"Fn::Sub": "${ProductName}-${BranchName}-CMK-arn"}}
+          -
+            Effect: Allow
+            Action:
+              - s3:PutObject
+              - s3:GetBucketPolicy
+              - s3:GetObject
+              - s3:ListBucket
+            Resource:
+             - !Join ['',['arn:aws:s3:::', { "Fn::ImportValue": {"Fn::Sub": "${ProductName}-${BranchName}-build-artifacts-buket-name"}}, '/*']]
+             - !Join ['',['arn:aws:s3:::', { "Fn::ImportValue": {"Fn::Sub": "${ProductName}-${BranchName}-build-artifacts-buket-name"}} ]]
+      Roles:
+        - !Ref CodeBuildRole
+  
+  CodeBuildProject:
+    Type: 'AWS::CodeBuild::Project'
+    Properties:
+      Name: !Sub ${ProductName}-${BranchName}-commons
+      ServiceRole: !GetAtt CodeBuildRole.Arn
+      Source: 
+        Type: CODEPIPELINE
+        BuildSpec: scripts/aws/codebuild_spec.yaml
+      Artifacts:
+        Type: CODEPIPELINE
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Type: LINUX_CONTAINER
+        Image: "aws/codebuild/amazonlinux2-x86_64-standard:3.0"
+        EnvironmentVariables: 
+          - Name: SETTINGS
+            Type: PLAINTEXT
+            Value: |
+              <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                        xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+                        http://maven.apache.org/xsd/settings-1.0.0.xsd">
+                <profiles>
+                  <profile>
+                    <id>pn-pn</id>
+                    <activation>
+                      <activeByDefault>true</activeByDefault>
+                    </activation>
+                    <repositories>
+                      <repository>
+                        <id>pn-pn</id>
+                        <url>https://pn-911845998067.d.codeartifact.eu-central-1.amazonaws.com/maven/pn/</url>
+                      </repository>
+                    </repositories>
+                  </profile>
+                </profiles>
+
+                <servers>
+                  <server>
+                    <id>pn-pn</id>
+                    <username>aws</username>
+                    <password>${env.REPOSITORY_TOKEN}</password>
+                  </server>
+                </servers>
+              </settings>
+
+  CommonsPipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      RoleArn: !GetAtt PipeLineRole.Arn
+      Name: !Sub '${ProductName}-${BranchName}-commons'
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: AppCode
+              ActionTypeId:
+                Category: Source
+                Owner: AWS
+                Version: 1
+                Provider: CodeStarSourceConnection
+              Configuration:
+                ConnectionArn: { "Fn::ImportValue": {"Fn::Sub": "${ProductName}-${BranchName}-github-connection"}} 
+                FullRepositoryId: !Ref CommonsRepoName
+                BranchName: !Ref BranchName
+              OutputArtifacts:
+                - Name: SCCheckoutArtifact
+              RunOrder: 1
+              #RoleArn: !Sub arn:aws:iam::${DevAccount}:role/ToolsAcctCodePipelineCodeCommitRole
+              RoleArn:
+                  Fn::If:
+                  - AddCodeBuildResource
+                  - !Sub arn:aws:iam::${AWS::AccountId}:role/${ProductName}-${BranchName}-from-github-to-s3-role
+                  - !Ref AWS::NoValue
+        - Name: BuildAndDeployToMavenRepository
+          Actions:
+            - Name: CodeBuildCommons
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Version: 1
+                Provider: CodeBuild
+              Configuration:
+                ProjectName: !Ref CodeBuildProject
+                PrimarySource: SCCheckoutArtifact
+              InputArtifacts:
+                - Name: SCCheckoutArtifact
+              RunOrder: 1
+      ArtifactStore:
+        Type: S3
+        Location: { "Fn::ImportValue": {"Fn::Sub": "${ProductName}-${BranchName}-build-artifacts-buket-name"}}
+        EncryptionKey:
+          Id:  { "Fn::ImportValue": {"Fn::Sub": "${ProductName}-${BranchName}-CMK-arn"}}
+          Type: KMS
+

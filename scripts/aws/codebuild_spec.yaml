@@ -1,0 +1,14 @@
+version: 0.2
+phases:
+  build:
+    commands:
+      - echo "Build"
+      - ./mnvw clean install
+      - ls target
+  post_build:
+    commands:
+      - echo "Deploy"
+      - echo $SETTINGS
+artifacts:
+  files:
+    - 'dist/**'

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>it.pagopa.pn</groupId>
+	<artifactId>pn-commons</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>pn-commons</name>
+	<description>Common Utilities</description>
+	<properties>
+		<java.version>11</java.version>
+	</properties>
+
+	<distributionManagement>
+		<repository>
+		  <id>pn-pn</id>
+		  <name>pn-pn</name>
+		  <url>https://pn-911845998067.d.codeartifact.eu-central-1.amazonaws.com/maven/pn/</url>
+		</repository>
+	  </distributionManagement>
+	  
+	 
+
+</project>
