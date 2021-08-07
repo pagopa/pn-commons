@@ -207,18 +207,18 @@ Resources:
         BuildSpec: |
           version: 0.2
           phases:
+            pre_build:
+              commands:
+                - echo $SETTINGS > maven-deploy-settings.xml
+                - cat maven-deploy-settings.xml
+                - export REPOSITORY_TOKEN=$( aws codeartifact get-authorization-token --domain $CODEARTIFACT_DOMAIN_NAME --query authorizationToken --output text )
             build:
               commands:
                 - echo "Build"
-                - ./mvnw clean install
+                - ./mvnw --settings maven-deploy-settings.xml clean install
                 - ls target
-            post_build:
-              commands:
                 - echo "Deploy"
-                - echo $SETTINGS > maven-deploy-settings.xml
-                - cat maven-deploy-settings.xml
-                - export REPOSITORY_TOKEN=$( aws codeartifact get-authorization-token --domain $REPOSITORY_DOMAIN --query authorizationToken --output text )
-                - ./mvnw --settings maven-deploy-settings.xml -Durl=https://${CODEARTIFACT_DOMAIN}/maven/${CODEARTIFACT_REPO}/ deploy
+                - ./mvnw --settings maven-deploy-settings.xml -DaltDeploymentRepository=pn-codeartifact::default::https://${CODEARTIFACT_DOMAIN_FULL}/maven/${CODEARTIFACT_REPO}/ deploy
           artifacts:
             files:
               - 'target/**'
@@ -229,7 +229,11 @@ Resources:
         Type: LINUX_CONTAINER
         Image: "aws/codebuild/amazonlinux2-x86_64-standard:3.0"
         EnvironmentVariables: 
-          - Name: CODEARTIFACT_DOMAIN 
+          - Name: CODEARTIFACT_DOMAIN_NAME
+            Type: PLAINTEXT 
+            Value:
+              Fn::ImportValue: !Sub "${CodeArtifactDeploymentStackName}-CodeArtifactDomainName"
+          - Name: CODEARTIFACT_DOMAIN_FULL
             Type: PLAINTEXT 
             Value:
               Fn::Join:
@@ -249,14 +253,14 @@ Resources:
                         http://maven.apache.org/xsd/settings-1.0.0.xsd">
                 <profiles>
                   <profile>
-                    <id>pn-pn</id>
+                    <id>pn-codeartifact</id>
                     <activation>
                       <activeByDefault>true</activeByDefault>
                     </activation>
                     <repositories>
                       <repository>
-                        <id>pn-pn</id>
-                        <url>https://${env.CODEARTIFACT_DOMAIN}/maven/${env.CODEARTIFACT_REPO}/</url>
+                        <id>pn-codeartifact</id>
+                        <url>https://${env.CODEARTIFACT_DOMAIN_FULL}/maven/${env.CODEARTIFACT_REPO}/</url>
                       </repository>
                     </repositories>
                   </profile>
@@ -264,7 +268,7 @@ Resources:
 
                 <servers>
                   <server>
-                    <id>pn-pn</id>
+                    <id>pn-codeartifact</id>
                     <username>aws</username>
                     <password>${env.REPOSITORY_TOKEN}</password>
                   </server>
