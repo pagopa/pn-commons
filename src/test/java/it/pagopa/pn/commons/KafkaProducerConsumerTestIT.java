@@ -44,7 +44,7 @@ class KafkaProducerConsumerTestIT {
 	public void test() throws InterruptedException {
 
 		// - Given
-		NewNotificationEvent bean = new NewNotificationEvent( NewNotificationEvent.<StandardEventHeader, NewNotificationEvent.Payload>builder()
+		NewNotificationEvent bean = NewNotificationEvent.<StandardEventHeader, NewNotificationEvent.Payload>builder()
 				.header( StandardEventHeader.builder()
 						.iun( IUN )
 						.build()
@@ -53,7 +53,7 @@ class KafkaProducerConsumerTestIT {
 						.paId( PA_ID )
 						.build()
 				)
-				.build() );
+				.build();
 
 		// - When
 		producer.push( bean );
@@ -62,7 +62,7 @@ class KafkaProducerConsumerTestIT {
 		// - Then
 		Assertions.assertTrue( receivedBeans.size() > 0, "Ricevuto almeno un messaggio");
 		NewNotificationEvent lastReceived = receivedBeans.get( receivedBeans.size() - 1 );
-		Assertions.assertEquals( bean, lastReceived, "Sended and received messages differs");
+		Assertions.assertEquals( bean.getHeader().getEventId(), lastReceived.getHeader().getEventId(), "Sended and received messages differs");
 	}
 
 }

@@ -197,10 +197,10 @@ Resources:
             build:
               commands:
                 - echo "Build"
-                - ./mvnw --settings maven-deploy-settings.xml clean install
+                - ./mvnw --settings maven-deploy-settings.xml -DskipITs clean install
                 - ls target
                 - echo "Deploy"
-                - ./mvnw --settings maven-deploy-settings.xml -DaltDeploymentRepository=pn-codeartifact::default::https://${CODEARTIFACT_DOMAIN_FULL}/maven/${CODEARTIFACT_REPO}/ deploy
+                - ./mvnw --settings maven-deploy-settings.xml -DskipITs -DaltDeploymentRepository=pn-codeartifact::default::https://${CODEARTIFACT_DOMAIN_FULL}/maven/${CODEARTIFACT_REPO}/ deploy
           artifacts:
             files:
               - 'target/**'
