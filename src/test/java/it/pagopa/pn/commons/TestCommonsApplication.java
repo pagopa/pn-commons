@@ -1,4 +1,4 @@
-package it.pagopa.pn.commons.abstractions.impl;
+package it.pagopa.pn.commons;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 

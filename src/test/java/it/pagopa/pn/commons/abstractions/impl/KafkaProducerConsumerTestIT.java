@@ -1,6 +1,6 @@
 package it.pagopa.pn.commons.abstractions.impl;
 
-import it.pagopa.pn.api.dto.events.NewNotificationEvent;
+import it.pagopa.pn.api.dto.events.PnDeliveryNewNotificationEvent;
 import it.pagopa.pn.api.dto.events.StandardEventHeader;
 import it.pagopa.pn.commons.abstractions.MomConsumer;
 import it.pagopa.pn.commons.abstractions.MomProducer;
@@ -26,10 +26,10 @@ class KafkaProducerConsumerTestIT {
 	public static final String PA_ID = "paId";
 
 	@Autowired
-	private MomProducer<NewNotificationEvent> producer;
+	private MomProducer<PnDeliveryNewNotificationEvent> producer;
 
 	@Autowired
-	private MomConsumer<NewNotificationEvent> consumer;
+	private MomConsumer<PnDeliveryNewNotificationEvent> consumer;
 
 
 	@BeforeAll
@@ -41,15 +41,15 @@ class KafkaProducerConsumerTestIT {
 	}
 
 	@Test
-	public void test() throws InterruptedException {
+	void successPushAndPullToKafka() throws InterruptedException {
 
 		// - Given
-		NewNotificationEvent bean = NewNotificationEvent.<StandardEventHeader, NewNotificationEvent.Payload>builder()
+		PnDeliveryNewNotificationEvent bean = PnDeliveryNewNotificationEvent.builder()
 				.header( StandardEventHeader.builder()
 						.iun( IUN )
 						.build()
 				)
-				.payload(NewNotificationEvent.Payload.builder()
+				.payload(PnDeliveryNewNotificationEvent.Payload.builder()
 						.paId( PA_ID )
 						.build()
 				)
@@ -57,11 +57,11 @@ class KafkaProducerConsumerTestIT {
 
 		// - When
 		producer.push( bean );
-		List<NewNotificationEvent> receivedBeans = consumer.poll( Duration.ofSeconds(10) );
+		List<PnDeliveryNewNotificationEvent> receivedBeans = consumer.poll( Duration.ofSeconds(10) );
 
 		// - Then
 		Assertions.assertTrue( receivedBeans.size() > 0, "Ricevuto almeno un messaggio");
-		NewNotificationEvent lastReceived = receivedBeans.get( receivedBeans.size() - 1 );
+		PnDeliveryNewNotificationEvent lastReceived = receivedBeans.get( receivedBeans.size() - 1 );
 		Assertions.assertEquals( bean.getHeader().getEventId(), lastReceived.getHeader().getEventId(), "Sended and received messages differs");
 	}
 

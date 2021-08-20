@@ -26,7 +26,7 @@ class CassandraKeyValueStoreTestIT {
 	private TestCassandraKeyValueStore kvStore;
 
 	@Test
-	public void test() throws InterruptedException {
+	public void successPutAndGetToCassandra() throws InterruptedException {
 
 		kvStore.delete( BEAN_ID );
 

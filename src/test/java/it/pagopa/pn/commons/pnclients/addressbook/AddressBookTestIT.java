@@ -13,6 +13,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.Optional;
+
 @ExtendWith(SpringExtension.class)
 @TestPropertySource("classpath:/application-test.properties")
 @EnableConfigurationProperties(value = MicroserviceClientsConfigs.class)
@@ -29,14 +31,17 @@ public class AddressBookTestIT {
     }
     
     @Test
-    void testKnownTaxId() {
+    void successWithPlatformAndGenralDigitalAddresses() {
         // GIVEN
         String taxId = "CGNNMO80A02H501R";
 
         // WHEN
-        AddressBookEntry ab = client.getAddresses( taxId );
+        Optional<AddressBookEntry> response = client.getAddresses( taxId );
 
         // THEN
+        Assertions.assertTrue( response.isPresent() );
+        AddressBookEntry ab = response.get();
+
         Assertions.assertEquals( taxId, ab.getTaxId() );
         Assertions.assertNotNull( ab.getDigitalAddresses() );
         Assertions.assertNotNull( ab.getDigitalAddresses().getPlatform() );
@@ -47,17 +52,15 @@ public class AddressBookTestIT {
     }
 
     @Test
-    void testUnknownTaxId() {
+    void entryWithoutAddresses() {
         // GIVEN
         String taxId = "IsNotATaxId";
 
         // WHEN
-        AddressBookEntry ab = client.getAddresses( taxId );
+        Optional<AddressBookEntry> response = client.getAddresses( taxId );
 
         // THEN
-        Assertions.assertNotNull( ab.getDigitalAddresses() );
-        Assertions.assertNull( ab.getDigitalAddresses().getPlatform() );
-        Assertions.assertNull( ab.getDigitalAddresses().getGeneral() );
+        Assertions.assertTrue( response.isEmpty() );
     }
 
 }

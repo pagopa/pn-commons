@@ -6,6 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Optional;
+
 @Component
 public class AddressBookImpl implements AddressBook {
 
@@ -17,7 +19,7 @@ public class AddressBookImpl implements AddressBook {
         restTemplate = new RestTemplate();
     }
 
-    public AddressBookEntry getAddresses(String taxId ) {
+    public Optional<AddressBookEntry> getAddresses(String taxId ) {
         String addressBookGetUrl = configs.getAddressBookBaseUrl() + "/" + taxId;
 
         ResponseEntity<AddressBookEntry> response;
@@ -29,16 +31,13 @@ public class AddressBookImpl implements AddressBook {
         }
 
         AddressBookEntry responseBody = response.getBody();
-        if( responseBody == null ) {
-            responseBody = new AddressBookEntry();
+
+        // - Less null checking for callers
+        if( responseBody != null && responseBody.getDigitalAddresses() == null ) {
+            responseBody = null;
         }
 
-        if( responseBody.getDigitalAddresses() == null ) {
-            responseBody = responseBody.toBuilder()
-                    .digitalAddresses( new DigitalAddresses() )
-                    .build();
-        }
-
-        return responseBody;
+        return Optional.ofNullable( responseBody );
     }
+
 }
