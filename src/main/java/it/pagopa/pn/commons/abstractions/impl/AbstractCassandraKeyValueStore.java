@@ -7,6 +7,8 @@ import org.springframework.data.cassandra.core.CassandraOperations;
 import org.springframework.data.cassandra.core.EntityWriteResult;
 import org.springframework.data.cassandra.core.InsertOptions;
 
+import java.util.Optional;
+
 public abstract class AbstractCassandraKeyValueStore<K, V> implements KeyValueStore<K, V> {
 
     private static final InsertOptions INSERT_OPTIONS = InsertOptions.builder()
@@ -40,8 +42,9 @@ public abstract class AbstractCassandraKeyValueStore<K, V> implements KeyValueSt
     }
 
     @Override
-    public V get(K key) {
-        return cassandraTemplate.selectOneById( key, entityClass );
+    public Optional<V> get(K key) {
+        V entity = cassandraTemplate.selectOneById( key, entityClass );
+        return Optional.ofNullable( entity );
     }
 
     @Override
