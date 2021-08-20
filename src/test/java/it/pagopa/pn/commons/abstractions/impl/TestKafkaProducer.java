@@ -1,8 +1,9 @@
-package it.pagopa.pn.commons;
+package it.pagopa.pn.commons.abstractions.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.api.dto.events.NewNotificationEvent;
 import it.pagopa.pn.commons.abstractions.impl.AbstractKafkaMomProducer;
+import it.pagopa.pn.commons.abstractions.impl.KafkaProducerConsumerTestIT;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
