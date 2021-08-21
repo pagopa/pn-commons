@@ -67,6 +67,7 @@ public class AbstractKafkaMomConsumer<T> implements MomConsumer<T>, AutoCloseabl
         try {
             msg = receivedMessages.poll(remainingMillis, TimeUnit.MILLISECONDS );
         } catch (InterruptedException exc) {
+            Thread.currentThread().interrupt();
             throw new IllegalStateException( exc );
         }
         return msg;
@@ -79,17 +80,17 @@ public class AbstractKafkaMomConsumer<T> implements MomConsumer<T>, AutoCloseabl
             KafkaListenerContainerFactory<MessageListenerContainer> listenerContainerFactory,
             BlockingQueue<T> messageBuffer
         ) {
-        MessageListenerContainer listenerContainer = listenerContainerFactory.createContainer(topic);
-        ContainerProperties containerProperties = listenerContainer.getContainerProperties();
+        MessageListenerContainer lsnrContainer = listenerContainerFactory.createContainer(topic);
+        ContainerProperties containerProperties = lsnrContainer.getContainerProperties();
 
         containerProperties.setGroupId(groupId);
-        containerProperties.setMessageListener( new MessageListenerImpl<T>( messageBuffer, objectReader ) );
-        listenerContainer.start();
-        return listenerContainer;
+        containerProperties.setMessageListener( new MessageListenerImpl<>( messageBuffer, objectReader ) );
+        lsnrContainer.start();
+        return lsnrContainer;
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         this.listenerContainer.stop();
     }
 
@@ -104,10 +105,10 @@ public class AbstractKafkaMomConsumer<T> implements MomConsumer<T>, AutoCloseabl
         }
 
         @Override
-        public void onMessage(ConsumerRecord<String, String> record) {
+        public void onMessage(ConsumerRecord<String, String> messageRecord) {
             try {
 
-                String jsonMsg = record.value();
+                String jsonMsg = messageRecord.value();
                 T msg = objectReader.readValue( jsonMsg );
                 this.receivedMessages.add( msg );
 

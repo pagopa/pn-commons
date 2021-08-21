@@ -41,7 +41,7 @@ class KafkaProducerConsumerTestIT {
 	}
 
 	@Test
-	void successPushAndPullToKafka() throws InterruptedException {
+	void successPushAndPullToKafka() {
 
 		// - Given
 		PnDeliveryNewNotificationEvent bean = PnDeliveryNewNotificationEvent.builder()

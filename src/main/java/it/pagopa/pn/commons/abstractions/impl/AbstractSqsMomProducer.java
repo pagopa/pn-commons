@@ -17,12 +17,10 @@ public abstract class AbstractSqsMomProducer<T extends GenericEvent> implements 
 
     private final SqsClient sqsClient;
     private final ObjectWriter objectWriter;
-    private final String topic;
     private final String queueUrl;
 
     protected AbstractSqsMomProducer(SqsClient sqsClient, String topic, ObjectMapper objectMapper, Class<T> msgClass) {
         this.sqsClient = sqsClient;
-        this.topic = topic;
         this.objectWriter = objectMapper.writerFor( msgClass );
 
         this.queueUrl = getQueueUrl(sqsClient, topic);
@@ -36,6 +34,7 @@ public abstract class AbstractSqsMomProducer<T extends GenericEvent> implements 
     @Override
     public void push( List<T> msges) {
 
+        // FIXME: gestire gli header
         sqsClient.sendMessageBatch( SendMessageBatchRequest.builder()
                 .queueUrl( this.queueUrl )
                 .entries( msges.stream()
@@ -57,16 +56,4 @@ public abstract class AbstractSqsMomProducer<T extends GenericEvent> implements 
         }
     }
 
-    // FIXME: gestire gli id
-    private void effectiveSend(List<String> messagesStrings) {
-        sqsClient.sendMessageBatch( SendMessageBatchRequest.builder()
-                    .queueUrl( this.queueUrl )
-                    .entries( messagesStrings.stream()
-                            .map( jsonMsg -> SendMessageBatchRequestEntry.builder()
-                                    .messageBody( jsonMsg )
-                                    .build()
-                            )
-                            .collect(Collectors.toList()))
-                .build());
-    }
 }

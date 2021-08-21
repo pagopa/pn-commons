@@ -8,8 +8,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.platform.commons.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -18,7 +16,7 @@ import java.util.Optional;
 @ExtendWith(SpringExtension.class)
 @TestPropertySource("classpath:/application-test.properties")
 @EnableConfigurationProperties(value = MicroserviceClientsConfigs.class)
-public class AddressBookTestIT {
+class AddressBookTestIT {
 
     private AddressBook client;
 
@@ -31,7 +29,7 @@ public class AddressBookTestIT {
     }
     
     @Test
-    void successWithPlatformAndGenralDigitalAddresses() {
+    void successWithPlatformAndGeneralDigitalAddresses() {
         // GIVEN
         String taxId = "CGNNMO80A02H501R";
 

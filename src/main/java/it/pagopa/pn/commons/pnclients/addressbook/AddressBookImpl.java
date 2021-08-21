@@ -1,7 +1,7 @@
 package it.pagopa.pn.commons.pnclients.addressbook;
 
 import it.pagopa.pn.api.dto.addressbook.AddressBookEntry;
-import it.pagopa.pn.api.dto.addressbook.DigitalAddresses;
+import it.pagopa.pn.commons.exceptions.PnInternalException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -26,8 +26,7 @@ public class AddressBookImpl implements AddressBook {
         response = this.restTemplate.getForEntity( addressBookGetUrl, AddressBookEntry.class );
 
         if( response.getStatusCode().isError() ) {
-            // FIXME exception handling
-            throw new IllegalStateException("Error calling url " + addressBookGetUrl + " status "+ response.getStatusCodeValue() );
+            throw new PnInternalException("Error calling url " + addressBookGetUrl + " status "+ response.getStatusCodeValue() );
         }
 
         AddressBookEntry responseBody = response.getBody();

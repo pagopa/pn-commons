@@ -23,7 +23,7 @@ public abstract class AbstractCassandraKeyValueStore<K, V> implements KeyValueSt
     private final CassandraOperations cassandraTemplate;
     private final Class<V> entityClass;
 
-    public AbstractCassandraKeyValueStore( CassandraOperations cassandraTemplate, Class<V> entityClass ) {
+    protected AbstractCassandraKeyValueStore( CassandraOperations cassandraTemplate, Class<V> entityClass ) {
         this.cassandraTemplate = cassandraTemplate;
         this.entityClass = entityClass;
     }
