@@ -4,6 +4,7 @@ import it.pagopa.pn.commons.abstractions.FileStorage;
 import it.pagopa.pn.commons.configs.RuntimeMode;
 import it.pagopa.pn.commons.configs.aws.AwsConfigs;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.core.waiters.WaiterResponse;
@@ -17,7 +18,7 @@ import java.util.Optional;
 
 @Component
 @Slf4j
-//@ConditionalOnBean(S3Client.class) // FIXME rentrodurre
+@ConditionalOnBean( S3Client.class )
 public class AwsS3FileStorage implements FileStorage {
 
     private final S3Client s3;
@@ -27,7 +28,7 @@ public class AwsS3FileStorage implements FileStorage {
         this.s3 = s3;
         this.cfgs = cfgs;
 
-        log.info("Starting {} service for bucker {} with runtime mode {}", this.getClass(),getBucketName(), runtimeMode );
+        log.info("Starting {} service for bucket {} with runtime mode {}", this.getClass(),getBucketName(), runtimeMode );
         if( RuntimeMode.DEVELOPMENT.equals( runtimeMode ) ) {
             try {
                 createBucket();
@@ -95,8 +96,7 @@ public class AwsS3FileStorage implements FileStorage {
     }
 
     private String getBucketName() {
-        String bucketName = this.cfgs.getBucketName();
-        return bucketName;
+        return this.cfgs.getBucketName();
     }
 
 }
