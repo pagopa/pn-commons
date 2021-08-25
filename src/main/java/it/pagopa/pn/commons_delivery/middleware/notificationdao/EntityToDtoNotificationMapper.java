@@ -115,6 +115,8 @@ public class EntityToDtoNotificationMapper {
             throw new PnInternalException(" Notification entity with iun " + entity.getIun() + " hash different quantity of document versions and sha");
         }
 
+        // - Two different list with one information each instead of a list of object:
+        //   AWS keyspace do not support UDT
         List<NotificationAttachment> result = new ArrayList<>();
         for( int d = 0; d < length; d += 1 ) {
             NotificationAttachment notificationAttachment = NotificationAttachment.builder()

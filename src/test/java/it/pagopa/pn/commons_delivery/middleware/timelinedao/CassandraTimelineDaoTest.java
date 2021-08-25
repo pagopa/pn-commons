@@ -139,10 +139,10 @@ class CassandraTimelineDaoTest {
 
 
         @Override
-        public List<TimelineElementEntity> listByIun(String iun) {
+        public Set<TimelineElementEntity> findByIun(String iun) {
             return this.store.values().stream()
                     .filter( el -> iun.equals( el.getId().getIun()))
-                    .collect(Collectors.toList());
+                    .collect(Collectors.toSet());
         }
 
         @Override

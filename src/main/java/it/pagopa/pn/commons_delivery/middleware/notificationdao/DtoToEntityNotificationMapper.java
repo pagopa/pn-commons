@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+// FIXME: MapStruct do not play well with lombok. We have to find a solution.
 //@Mapper( componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.ERROR)
 @Component
 public class DtoToEntityNotificationMapper {
@@ -25,6 +26,7 @@ public class DtoToEntityNotificationMapper {
         this.recipientWriter = objMapper.writerFor(NotificationRecipient.class);
     }
 
+    // FIXME: MapStruct do not play well with lombok. We have to find a solution.
     //@Mapping( target = "iun", source = "iun")
     //@Mapping( target = "paNotificationId", source = "paNotificationId")
     //@Mapping( target = "subject", source = "subject")

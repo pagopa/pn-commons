@@ -11,7 +11,8 @@ import org.springframework.data.cassandra.core.query.Criteria;
 import org.springframework.data.cassandra.core.query.Query;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Component
 @ConditionalOnProperty( name = TimelineDao.IMPLEMENTATION_TYPE_PROPERTY_NAME, havingValue = MiddlewareTypes.CASSANDRA )
@@ -27,8 +28,8 @@ public class CassandraTimelineEntityDao
     }
 
     @Override
-    public List<TimelineElementEntity> listByIun( String iun ) {
-        return cassandraTemplate.select( queryByIun(iun), TimelineElementEntity.class );
+    public Set<TimelineElementEntity> findByIun(String iun ) {
+        return new HashSet<>( cassandraTemplate.select( queryByIun(iun), TimelineElementEntity.class ) );
     }
 
     @Override

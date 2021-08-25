@@ -35,6 +35,10 @@ public class NotificationEntity {
 
     private Map<String,String> recipientsJson;
 
+    // - Next two properties keep track of sha256 and versionId of the documents.
+    // We do not use only one list with a structured type because AWS keyspace lacks support
+    // for cassandra User Defined Type
+
     private List<String> documentsDigestsSha256;
 
     private List<String> documentsVersionIds;

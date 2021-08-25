@@ -54,7 +54,7 @@ public class DtoToEntityTimelineMapper {
     private ObjectWriter getObjectWriter( TimelineElementCategory timelineElementCategory ) {
         return this.objectWriters.computeIfAbsent(
                 timelineElementCategory,
-                // - generate reader of needed: objectWriter is thread safe, object mapper don't
+                // - generate reader of needed: objectWriter is thread safe, objectMapper isn't
                 category -> {
                     synchronized ( this.objectMapper ) {
                         return this.objectMapper.writerFor( category.getDetailsJavaClass() );

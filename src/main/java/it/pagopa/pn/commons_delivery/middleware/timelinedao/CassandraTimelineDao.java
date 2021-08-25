@@ -47,7 +47,7 @@ public class CassandraTimelineDao implements TimelineDao {
 
     @Override
     public Set<TimelineElement> getTimeline(String iun) {
-        return entityDao.listByIun( iun )
+        return entityDao.findByIun( iun )
                 .stream()
                 .map( entity2dto::entityToDto )
                 .collect(Collectors.toSet());
