@@ -91,7 +91,7 @@ public class EntityToDtoNotificationMapper {
         if ( StringUtils.isAllBlank( version, sha256 ) ) {
             result = null;
         }
-        else if ( StringUtils.isNotBlank( version ) && StringUtils.isNotBlank( sha256 ) ) {
+        else if ( version != null && StringUtils.isNotBlank( sha256 ) ) {
             result = NotificationAttachment.builder()
                     .savedVersionId( version )
                     .digests( NotificationAttachment.Digests.builder()
