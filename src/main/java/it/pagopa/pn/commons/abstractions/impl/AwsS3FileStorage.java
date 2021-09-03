@@ -18,7 +18,7 @@ import java.util.Optional;
 
 @Component
 @Slf4j
-@ConditionalOnBean( S3Client.class )
+//@ConditionalOnBean( S3Client.class )
 public class AwsS3FileStorage implements FileStorage {
 
     private final S3Client s3;
