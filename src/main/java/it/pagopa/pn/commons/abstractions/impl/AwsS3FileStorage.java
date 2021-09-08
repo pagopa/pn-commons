@@ -1,24 +1,24 @@
 package it.pagopa.pn.commons.abstractions.impl;
 
-import it.pagopa.pn.commons.abstractions.FileStorage;
-import it.pagopa.pn.commons.configs.RuntimeMode;
-import it.pagopa.pn.commons.configs.aws.AwsConfigs;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.stereotype.Component;
-import software.amazon.awssdk.core.sync.RequestBody;
-import software.amazon.awssdk.core.waiters.WaiterResponse;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.*;
-import software.amazon.awssdk.services.s3.waiters.S3Waiter;
-
 import java.io.InputStream;
 import java.util.Map;
 import java.util.Optional;
 
-@Component
+import it.pagopa.pn.commons.abstractions.FileStorage;
+import it.pagopa.pn.commons.configs.RuntimeMode;
+import it.pagopa.pn.commons.configs.aws.AwsConfigs;
+import lombok.extern.slf4j.Slf4j;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.core.waiters.WaiterResponse;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
+import software.amazon.awssdk.services.s3.model.HeadBucketRequest;
+import software.amazon.awssdk.services.s3.model.HeadBucketResponse;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.PutObjectResponse;
+import software.amazon.awssdk.services.s3.waiters.S3Waiter;
+
 @Slf4j
-//@ConditionalOnBean( S3Client.class )
 public class AwsS3FileStorage implements FileStorage {
 
     private final S3Client s3;
