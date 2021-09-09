@@ -44,9 +44,14 @@ class AddressBookTestIT {
         Assertions.assertNotNull( ab.getDigitalAddresses() );
         Assertions.assertNotNull( ab.getDigitalAddresses().getPlatform() );
         Assertions.assertNotNull( ab.getDigitalAddresses().getGeneral() );
+        Assertions.assertNotNull( ab.getCourtesyAddresses() );
+        Assertions.assertNotNull( ab.getCourtesyAddresses().get(0) );
+        Assertions.assertNotNull( ab.getCourtesyAddresses().get(1) );
 
         Assertions.assertTrue( StringUtils.isNotBlank( ab.getDigitalAddresses().getPlatform().getAddress() ));
         Assertions.assertTrue( StringUtils.isNotBlank( ab.getDigitalAddresses().getGeneral().getAddress() ));
+        Assertions.assertTrue( StringUtils.isNotBlank( ab.getCourtesyAddresses().get(0).getAddress() ));
+        Assertions.assertTrue( StringUtils.isNotBlank( ab.getCourtesyAddresses().get(1).getAddress() ));
     }
 
     @Test
