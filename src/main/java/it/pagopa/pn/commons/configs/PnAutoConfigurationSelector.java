@@ -17,7 +17,7 @@ public class PnAutoConfigurationSelector extends AutoConfigurationImportSelector
 
     private static final Map<String, List<String>> EXCLUSIONS_MAP = Map.ofEntries(
             Map.entry( MIDDLEWARE_DEACTIVATION_PREFIX + "cassandra",
-                Arrays.asList(
+                Collections.singletonList(
                     CassandraAutoConfiguration.class.getName()
                 )),
             Map.entry( MIDDLEWARE_DEACTIVATION_PREFIX + "kafka",

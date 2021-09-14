@@ -1,6 +1,5 @@
-package it.pagopa.pn.commons;
+package it.pagopa.pn.commons.abstractions.impl;
 
-import it.pagopa.pn.commons.abstractions.impl.AbstractCassandraKeyValueStore;
 import org.springframework.data.cassandra.core.CassandraOperations;
 import org.springframework.stereotype.Component;
 

@@ -1,4 +1,4 @@
-package it.pagopa.pn.commons;
+package it.pagopa.pn.commons.abstractions.impl;
 
 import it.pagopa.pn.commons.abstractions.IdConflictException;
 import lombok.Builder;
@@ -14,6 +14,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Optional;
 import java.util.Random;
 
 @SpringBootTest()
@@ -26,7 +27,7 @@ class CassandraKeyValueStoreTestIT {
 	private TestCassandraKeyValueStore kvStore;
 
 	@Test
-	public void test() throws InterruptedException {
+	void successPutAndGetToCassandra() {
 
 		kvStore.delete( BEAN_ID );
 
@@ -41,10 +42,11 @@ class CassandraKeyValueStoreTestIT {
 
 		// - When
 		kvStore.put( bean );
-		CassandraKeyValueStoreTestITTestBean receivedBean = kvStore.get( bean.getId() );
+		Optional<CassandraKeyValueStoreTestITTestBean> receivedBean = kvStore.get( bean.getId() );
 
 		// - Then
-		Assertions.assertEquals( bean, receivedBean, "Saved and loaded messages differs");
+		Assertions.assertTrue( receivedBean.isPresent(), "Saved bean not found");
+		Assertions.assertEquals( bean, receivedBean.get(), "Saved and loaded messages differs");
 
 		Assertions.assertThrows( IdConflictException.class, () -> {
 			CassandraKeyValueStoreTestITTestBean duplicatedBean = CassandraKeyValueStoreTestITTestBean.builder()

@@ -36,6 +36,7 @@ public class PnCassandraAutoConfiguration extends CassandraAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     @Scope("prototype")
+    @Override
     public CqlSessionBuilder cassandraSessionBuilder(CassandraProperties properties,
                                                      DriverConfigLoader driverConfigLoader, ObjectProvider<CqlSessionBuilderCustomizer> builderCustomizers) {
         log.info("Custom cassandra autoconfigurator");
