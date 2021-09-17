@@ -1,14 +1,20 @@
 package it.pagopa.pn.commons.abstractions.impl;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.core.io.InputStreamResource;
+
+import it.pagopa.pn.commons.abstractions.FileData;
 import it.pagopa.pn.commons.abstractions.FileStorage;
 import it.pagopa.pn.commons.configs.RuntimeMode;
 import it.pagopa.pn.commons.configs.aws.AwsConfigs;
+import it.pagopa.pn.commons.exceptions.PnInternalException;
 import lombok.extern.slf4j.Slf4j;
+import software.amazon.awssdk.core.Response;
 import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.core.waiters.WaiterResponse;
@@ -18,11 +24,8 @@ import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.HeadBucketRequest;
 import software.amazon.awssdk.services.s3.model.HeadBucketResponse;
-import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
-import software.amazon.awssdk.services.s3.model.ListObjectsResponse;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
-import software.amazon.awssdk.services.s3.model.S3Object;
 import software.amazon.awssdk.services.s3.waiters.S3Waiter;
 
 @Slf4j
@@ -107,25 +110,21 @@ public class AwsS3FileStorage implements FileStorage {
     }
 
 	@Override
-	public List<S3Object> getFilesByKeyPrefix(String keyPrefix) {		
-		ListObjectsResponse objectResponseList = s3.listObjects( ListObjectsRequest.builder()
-				.bucket( getBucketName() )
-				.prefix( keyPrefix )
-				.build() );
-
-		List<S3Object> s3ObjectList = objectResponseList.contents();
-		return s3ObjectList;
-	}
-
-	@Override
-	public ResponseInputStream<GetObjectResponse> getFileByKey(String key) {
+	public FileData getFileByKey(String key) {
 		GetObjectRequest s3ObjectRequest = GetObjectRequest.builder()
 				.bucket( getBucketName() )
 				.key( key )
 				.build();
 
 		ResponseInputStream<GetObjectResponse> s3Object = s3.getObject( s3ObjectRequest );
-		return s3Object;
+	    
+	    GetObjectResponse response = s3Object.response();
+	    
+	    return FileData.builder()
+	    				.content( s3Object )
+	    				.contentLength( response.contentLength() )
+	    				.metadata ( response.metadata() )
+	    				.build();
 	}
 
 }
