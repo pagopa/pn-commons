@@ -10,4 +10,6 @@ public interface FileStorage {
     InputStream getFileVersionBody(String key, String versionId);
 
     Map<String, String> getFileVersionMetadata(String key, String versionId);
+    
+    FileData getFileByKey(String key);
 }
