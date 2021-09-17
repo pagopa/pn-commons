@@ -31,6 +31,17 @@ public class CassandraTimelineDao implements TimelineDao {
 
     @Override
     public void addTimelineElement( TimelineElement dto ) {
+        // FIXME: PER LA GESTIONE DEL CAMBIO DI STATO
+        // - Caricare i metadati della notifica utilizzando CassandraNotificationEntityDao
+        // - Caricare la timeline corrente utilizzando il metodo getTimeline
+        // - Ordinarla temporalemnte
+        // - Calcolare lo stato corrente
+        // - aggiungere all'elenco della timeline il nuovo dto
+        // - Calcolare il nuovo stato
+        // - se i due stati differiscono
+        //   - utilizzare CassandraNotificationBySenderEntityDao per rimovere la entry con il vecchio stato
+        //   - utilizzare CassandraNotificationBySenderEntityDao per inserire la entry con il nuovo stato
+
         TimelineElementEntity entity = dto2entity.dtoToEntity( dto );
         entityDao.put( entity );
     }
