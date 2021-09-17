@@ -31,7 +31,7 @@ class CassandraNotificationDaoTest extends AbstractNotificationDaoTest {
         KeyValueStore<String, NotificationEntity> entityDao = new EntityDaoMock();
         KeyValueStore<String, NotificationBySenderEntity> notificationBySenderEntityDao = Mockito.mock(KeyValueStore.class);
         DtoToBySenderEntityMapper dto2BySenderEntityMapper = Mockito.mock(DtoToBySenderEntityMapper.class);
-        dao = new CassandraNotificationDao( entityDao, notificationBySenderEntityDao, dto2Entity , dto2BySenderEntityMapper, entity2dto );
+        dao = new CassandraNotificationDao(null, entityDao, notificationBySenderEntityDao, dto2Entity , dto2BySenderEntityMapper, entity2dto );
     }
 
     @Override

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Component
 public class DtoToBySenderEntityMapper {
@@ -41,7 +42,7 @@ public class DtoToBySenderEntityMapper {
                                         .recipientId(recipient.getTaxId())
                                         .build())
                                 .build())
-                .toList();
+                .collect(Collectors.toList());
 
     }
 
