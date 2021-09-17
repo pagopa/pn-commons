@@ -1,5 +1,6 @@
 package it.pagopa.pn.commons_delivery.middleware.notificationdao;
 
+import it.pagopa.pn.api.dto.NotificationSearchRow;
 import it.pagopa.pn.api.dto.notification.Notification;
 import it.pagopa.pn.api.dto.notification.status.NotificationStatus;
 import it.pagopa.pn.commons.abstractions.IdConflictException;
@@ -12,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,6 +54,14 @@ public class CassandraNotificationDao implements NotificationDao {
     public Optional<Notification> getNotificationByIun(String iun) {
         return notificationEntityDao.get(iun)
                 .map(entity2dtoMapper::entity2Dto);
+    }
+
+    @Override
+    public List<NotificationSearchRow> searchSentNotification(
+            String senderId, Instant startDate, Instant endDate,
+            String recipientId, NotificationStatus status, String subjectRegExp
+    ) {
+        return null;
     }
 
 }
