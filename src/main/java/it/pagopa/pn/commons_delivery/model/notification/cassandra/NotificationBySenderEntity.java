@@ -13,7 +13,7 @@ import java.util.Map;
 public class NotificationBySenderEntity {
 
     @PrimaryKey
-    private NotificationBySenderEntityId senderId;
+    private NotificationBySenderEntityId notificationBySenderId;
 
     private String paNotificationId;
     private Map<String,String> recipientsJson;

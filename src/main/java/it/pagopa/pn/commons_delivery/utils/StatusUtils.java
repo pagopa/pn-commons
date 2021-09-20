@@ -7,6 +7,7 @@ import it.pagopa.pn.api.dto.notification.timeline.TimelineElementCategory;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class StatusUtils {
 
@@ -20,8 +21,8 @@ public class StatusUtils {
         }
     }
 
-    public List<NotificationStatusHistoryElement> getTimelineHistory( //
-                                                                      List<TimelineElement> timelineElementList, //
+    public List<NotificationStatusHistoryElement> getStatusHistory( //
+                                                                      Set<TimelineElement> timelineElementList, //
                                                                       int numberOfRecipients, //
                                                                       Instant creationNotificationTimestamp //
     ) {
@@ -29,7 +30,10 @@ public class StatusUtils {
         NotificationStatus currentState = NotificationStatus.RECEIVED;
         List<TimelineElement> partialTimelineElementList = new ArrayList<>();
 
-        for (TimelineElement timelineElement : timelineElementList) {
+        final List<TimelineElement> timelineByTimestampSorted = timelineElementList.stream()
+                .sorted(Comparator.comparing(TimelineElement::getTimestamp))
+                .collect(Collectors.toList());
+        for (TimelineElement timelineElement : timelineByTimestampSorted) {
             partialTimelineElementList.add(timelineElement);
             TimelineElementCategory category = timelineElement.getCategory();
             NotificationStatus nextState = getNotificationStatus(currentState, category, partialTimelineElementList, numberOfRecipients);

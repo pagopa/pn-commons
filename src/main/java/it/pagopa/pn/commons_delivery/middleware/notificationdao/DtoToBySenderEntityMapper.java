@@ -38,7 +38,7 @@ public class DtoToBySenderEntityMapper {
         return dto.getRecipients().stream()
                 .map(recipient ->
                         builder
-                                .senderId(builderId
+                                .notificationBySenderId(builderId
                                         .recipientId(recipient.getTaxId())
                                         .build())
                                 .build())

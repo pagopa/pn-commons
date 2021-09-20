@@ -18,10 +18,7 @@ import org.springframework.data.cassandra.core.query.Query;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -72,33 +69,46 @@ public class CassandraNotificationDao implements NotificationDao {
             String senderId, Instant startDate, Instant endDate,
             String recipientId, NotificationStatus status, String subjectRegExp
     ) {
-        Predicate<String> matchSubject = buildRegexpPredicate( subjectRegExp );
+        Predicate<String> matchSubject = buildRegexpPredicate(subjectRegExp);
+        Predicate<String> matchRecipient = buildRecipientIdPredicate(recipientId);
 
         List<NotificationSearchRow> result;
-        if( status != null ) {
-            result = executeSentNotificationQuery( senderId, startDate, endDate, recipientId, status, subjectRegExp);
-        }
-        else {
+        if (status != null) {
+            result = executeSentNotificationQuery(senderId, startDate, endDate, recipientId, status, subjectRegExp);
+        } else {
             result = new ArrayList<>();
-            for( NotificationStatus oneStatus: NotificationStatus.values() ) {
+            for (NotificationStatus oneStatus : NotificationStatus.values()) {
                 List<NotificationSearchRow> oneStatusResult = executeSentNotificationQuery(
-                               senderId, startDate, endDate, recipientId, oneStatus, subjectRegExp);
-                result.addAll( oneStatusResult );
+                        senderId, startDate, endDate, recipientId, oneStatus, subjectRegExp);
+                result.addAll(oneStatusResult);
             }
         }
 
         return result.stream()
-                .filter( row -> matchSubject.test( row.getSubject() ))
-                .sorted(Comparator.comparing( NotificationSearchRow::getSentAt ))
+                .filter(row -> matchRecipient.test(row.getRecipientId()))
+                .filter(row -> matchSubject.test(row.getSubject()))
+                .sorted(Comparator.comparing(NotificationSearchRow::getSentAt))
                 .collect(Collectors.toList());
+
     }
 
-    private Predicate<String> buildRegexpPredicate(String subjectRegExp) {
+    Predicate<String> buildRegexpPredicate(String subjectRegExp) {
         Predicate<String> matchSubject;
-        if( subjectRegExp != null ) {
-            matchSubject = Pattern.compile(subjectRegExp).asMatchPredicate();
+        if (subjectRegExp != null) {
+            matchSubject = Objects::nonNull;
+            matchSubject = matchSubject.and(Pattern.compile("^"+subjectRegExp+"$").asMatchPredicate());
+        } else {
+            matchSubject = x -> true;
         }
-        else {
+        return matchSubject;
+    }
+
+
+    private Predicate<String> buildRecipientIdPredicate(String recipientId) {
+        Predicate<String> matchSubject;
+        if (recipientId != null) {
+            matchSubject = s -> recipientId.equals(s);
+        } else {
             matchSubject = x -> true;
         }
         return matchSubject;
@@ -109,15 +119,15 @@ public class CassandraNotificationDao implements NotificationDao {
             String recipientId, NotificationStatus status, String subjectRegExp
     ) {
         Query query = generateSearchSentNotificationQuery(
-                senderId, startDate, endDate, recipientId, status, subjectRegExp );
+                senderId, startDate, endDate, recipientId, status, subjectRegExp);
 
         return cassandraTemplate.select(query, NotificationBySenderEntity.class)
                 .stream().map(entity -> NotificationSearchRow.builder()
-                        .iun(entity.getSenderId().getIun())
-                        .sentAt(entity.getSenderId().getSentat())
-                        .senderId(entity.getSenderId().getSenderId())
-                        .notificationStatus(entity.getSenderId().getNotificationStatus())
-                        .recipientId(entity.getSenderId().getRecipientId())
+                        .iun(entity.getNotificationBySenderId().getIun())
+                        .sentAt(entity.getNotificationBySenderId().getSentat())
+                        .senderId(entity.getNotificationBySenderId().getSenderId())
+                        .notificationStatus(entity.getNotificationBySenderId().getNotificationStatus())
+                        .recipientId(entity.getNotificationBySenderId().getRecipientId())
                         .paNotificationId(entity.getPaNotificationId())
                         .subject(entity.getSubject())
                         .build()
@@ -129,16 +139,12 @@ public class CassandraNotificationDao implements NotificationDao {
             String senderId, Instant startDate, Instant endDate, String recipientId,
             NotificationStatus status, String subjectRegExp
     ) {
-        Query query = Query.query(
-                Criteria.where("senderId.notificationStatus").is( status ),
-                Criteria.where("senderId.senderId").is( senderId ),
-                Criteria.where("senderId.sentat").gte( startDate ),
-                Criteria.where("senderId.sentat").lte( endDate )
-            );
-        if(StringUtils.isNotBlank( recipientId )) {
-            query = query.and( Criteria.where("recipientId").is( recipientId) );
-        }
-        return query;
+        return Query.query(
+                Criteria.where("notificationBySenderId.notificationStatus").is(status),
+                Criteria.where("notificationBySenderId.senderId").is(senderId),
+                Criteria.where("notificationBySenderId.sentat").gte(startDate),
+                Criteria.where("notificationBySenderId.sentat").lte(endDate)
+        );
     }
 
 }

@@ -26,14 +26,13 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @ExtendWith(SpringExtension.class)
-@TestPropertySource( properties= {
+@TestPropertySource(properties = {
         NotificationDao.IMPLEMENTATION_TYPE_PROPERTY_NAME + "=" + MiddlewareTypes.CASSANDRA,
         "spring.data.cassandra.keyspace-name=pn_delivery_test",
         "spring.data.cassandra.cluster-name=cassandra",
@@ -43,7 +42,7 @@ import java.util.stream.Collectors;
         "spring.data.cassandra.password=cassandra",
         "spring.data.cassandra.schema-action=CREATE_IF_NOT_EXISTS"
 })
-@ContextConfiguration( classes = {
+@ContextConfiguration(classes = {
         CassandraNotificationDao.class,
         CassandraNotificationEntityDao.class,
         CassandraNotificationDaoSearchTestIT.TestContext.class,
@@ -70,43 +69,196 @@ public class CassandraNotificationDaoSearchTestIT {
 
         Notification n = Notification.builder()
                 .iun(UUID.randomUUID().toString())
-                .sentAt( Instant.EPOCH.plus( 1, ChronoUnit.MINUTES))
-                .sender( NotificationSender.builder().paId(senderId).build() )
-                .recipients( Collections.singletonList(
-                        NotificationRecipient.builder()
-                            .taxId("recipientId")
-                            .build()
+                .sentAt(Instant.EPOCH.plus(1, ChronoUnit.MINUTES))
+                .sender(NotificationSender.builder().paId(senderId).build())
+                .recipients(Collections.singletonList(
+                                NotificationRecipient.builder()
+                                        .taxId("recipientId")
+                                        .build()
                         )
                 )
-                .documents( Collections.singletonList(
+                .documents(Collections.singletonList(
                         NotificationAttachment.builder()
                                 .body("body")
-                                .digests( NotificationAttachment.Digests.builder()
+                                .digests(NotificationAttachment.Digests.builder()
                                         .sha256("aaaa")
                                         .build())
-                                .contentType("conent/type")
+                                .contentType("content/type")
                                 .savedVersionId("v1")
                                 .build()
                 ))
                 .build();
 
-        dao.addNotification( n );
+        dao.addNotification(n);
 
         List<NotificationSearchRow> result = dao.searchSentNotification(
                 senderId,
                 Instant.EPOCH,
-                Instant.EPOCH.plus( 1, ChronoUnit.MINUTES),
+                Instant.EPOCH.plus(1, ChronoUnit.MINUTES),
                 null,
                 null,
                 null
-            );
+        );
 
-        Set<String> senderIds = result.stream().map(row -> row.getSenderId() ).collect(Collectors.toSet());
-        Assertions.assertEquals( 1, senderIds.size() );
-        Assertions.assertTrue( senderIds.contains(senderId) );
+        Set<String> senderIds = result.stream()
+                .map(row -> row.getSenderId())
+                .collect(Collectors.toSet());
+        Assertions.assertEquals(1, senderIds.size());
+        Assertions.assertTrue(senderIds.contains(senderId));
+    }
+
+    @Test
+    void statusTest() throws IdConflictException {
+        String senderId = "pa1";
+
+        Notification n = Notification.builder()
+                .iun(UUID.randomUUID().toString())
+                .sentAt(Instant.EPOCH.plus(1, ChronoUnit.MINUTES))
+                .sender(NotificationSender.builder().paId(senderId).build())
+                .recipients(Collections.singletonList(
+                                NotificationRecipient.builder()
+                                        .taxId("recipientId")
+                                        .build()
+                        )
+                )
+                .documents(Collections.singletonList(
+                        NotificationAttachment.builder()
+                                .body("body")
+                                .digests(NotificationAttachment.Digests.builder()
+                                        .sha256("aaaa")
+                                        .build())
+                                .contentType("content/type")
+                                .savedVersionId("v1")
+                                .build()
+                ))
+                .build();
+
+        dao.addNotification(n);
+
+        List<NotificationSearchRow> result = dao.searchSentNotification(
+                senderId,
+                Instant.EPOCH,
+                Instant.EPOCH.plus(1, ChronoUnit.MINUTES),
+                null,
+                NotificationStatus.RECEIVED,
+                null
+        );
+
+        Set<String> senderIds = result.stream()
+                .map(row -> row.getSenderId())
+                .collect(Collectors.toSet());
+        Set<NotificationStatus> statuses = result.stream()
+                .map(row -> row.getNotificationStatus())
+                .collect(Collectors.toSet());
+        Assertions.assertEquals(1, senderIds.size());
+        Assertions.assertTrue(senderIds.contains(senderId));
+        Assertions.assertTrue(statuses.contains(NotificationStatus.RECEIVED));
     }
 
 
+    @Test
+    void recipientTest() throws IdConflictException {
+        String senderId = "pa1";
+        String recipientId = "CodiceFiscale1";
+
+        Notification n = Notification.builder()
+                .iun(UUID.randomUUID().toString())
+                .sentAt(Instant.EPOCH.plus(1, ChronoUnit.MINUTES))
+                .sender(NotificationSender.builder().paId(senderId).build())
+                .recipients(Collections.singletonList(
+                                NotificationRecipient.builder()
+                                        .taxId(recipientId)
+                                        .build()
+                        )
+                )
+                .documents(Collections.singletonList(
+                        NotificationAttachment.builder()
+                                .body("body")
+                                .digests(NotificationAttachment.Digests.builder()
+                                        .sha256("aaaa")
+                                        .build())
+                                .contentType("content/type")
+                                .savedVersionId("v1")
+                                .build()
+                ))
+                .build();
+
+        dao.addNotification(n);
+
+        List<NotificationSearchRow> result = dao.searchSentNotification(
+                senderId,
+                Instant.EPOCH,
+                Instant.EPOCH.plus(1, ChronoUnit.MINUTES),
+                recipientId,
+                NotificationStatus.RECEIVED,
+                null
+        );
+
+        Set<String> senderIds = result.stream()
+                .map(row -> row.getSenderId())
+                .collect(Collectors.toSet());
+        Set<String> recipients = result.stream()
+                .map(row -> row.getRecipientId())
+                .collect(Collectors.toSet());
+
+        Assertions.assertEquals(1, senderIds.size());
+        Assertions.assertTrue(senderIds.contains(senderId));
+
+        Assertions.assertEquals(1, recipients.size());
+        Assertions.assertTrue(recipients.contains(recipientId));
+
+    }
+
+    @Test
+    void subjectTest() throws IdConflictException {
+        String senderId = "pa1";
+        String subjectRegExp = ".*Test";
+
+        Notification n = Notification.builder()
+                .iun(UUID.randomUUID().toString())
+                .sentAt(Instant.EPOCH.plus(1, ChronoUnit.MINUTES))
+                .sender(NotificationSender.builder().paId(senderId).build())
+                .recipients(Collections.singletonList(
+                                NotificationRecipient.builder()
+                                        .taxId("recipientId")
+                                        .build()
+                        )
+                )
+                .subject("Subject Test")
+                .documents(Collections.singletonList(
+                        NotificationAttachment.builder()
+                                .body("body")
+                                .digests(NotificationAttachment.Digests.builder()
+                                        .sha256("aaaa")
+                                        .build())
+                                .contentType("content/type")
+                                .savedVersionId("v1")
+                                .build()
+                ))
+                .build();
+
+        dao.addNotification(n);
+
+        List<NotificationSearchRow> result = dao.searchSentNotification(
+                senderId,
+                Instant.EPOCH,
+                Instant.EPOCH.plus(1, ChronoUnit.MINUTES),
+                null,
+                NotificationStatus.RECEIVED,
+                subjectRegExp
+        );
+
+        Set<String> senderIds = result.stream()
+                .map(row -> row.getSenderId())
+                .collect(Collectors.toSet());
+        Set<String> subjects = result.stream()
+                .map(row -> row.getSubject())
+                .collect(Collectors.toSet());
+
+        Assertions.assertEquals(1, senderIds.size());
+        Assertions.assertTrue(senderIds.contains(senderId));
+        Assertions.assertTrue(subjects.stream().allMatch(s -> s.matches(subjectRegExp)));
+    }
 
 
     @Configuration
