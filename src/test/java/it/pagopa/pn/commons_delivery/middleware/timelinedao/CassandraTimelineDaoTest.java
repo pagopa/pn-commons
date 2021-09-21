@@ -13,23 +13,25 @@ import it.pagopa.pn.commons_delivery.middleware.NotificationDao;
 import it.pagopa.pn.commons_delivery.middleware.TimelineDao;
 import it.pagopa.pn.commons_delivery.middleware.notificationdao.CassandraNotificationBySenderEntityDao;
 import it.pagopa.pn.commons_delivery.middleware.notificationdao.CassandraNotificationEntityDao;
+import it.pagopa.pn.commons_delivery.model.notification.cassandra.NotificationEntity;
 import it.pagopa.pn.commons_delivery.model.notification.cassandra.TimelineElementEntity;
 import it.pagopa.pn.commons_delivery.model.notification.cassandra.TimelineElementEntityId;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.data.cassandra.core.CassandraOperations;
 
 import java.time.Instant;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 class CassandraTimelineDaoTest {
 
     private TimelineDao dao;
+    private CassandraNotificationEntityDao notificationEntityDao;
+    private CassandraNotificationBySenderEntityDao notificationBySenderEntityDao;
 
     @BeforeEach
     void instantiateDao() {
@@ -38,8 +40,8 @@ class CassandraTimelineDaoTest {
         EntityToDtoTimelineMapper entity2dto = new EntityToDtoTimelineMapper(objMapper);
 
         TimelineEntityDao entityDao = new TestMyTimelineEntityDao();
-        CassandraNotificationEntityDao notificationEntityDao = null; //TODO test CassandraTimelineDao
-        CassandraNotificationBySenderEntityDao notificationBySenderEntityDao = null; //TODO
+        notificationEntityDao = Mockito.mock(CassandraNotificationEntityDao.class);
+        notificationBySenderEntityDao = Mockito.mock(CassandraNotificationBySenderEntityDao.class);
         this.dao = new CassandraTimelineDao(entityDao, notificationEntityDao, notificationBySenderEntityDao, dto2Entity, entity2dto);
     }
 
@@ -47,7 +49,7 @@ class CassandraTimelineDaoTest {
     void successfullyInsertAndRetrieve() {
 
         // GIVEN
-        String iun = "iun1";
+        String iun = "202109-eb10750e-e876-4a5a-8762-c4348d679d35";
 
         String id1 = "sender_ack";
         TimelineElement row1 = TimelineElement.builder()
@@ -67,6 +69,11 @@ class CassandraTimelineDaoTest {
                 .build();
 
         // WHEN
+        Optional<NotificationEntity> notification = Optional.ofNullable(NotificationEntity.builder()
+                .iun(iun)
+                .recipientsOrder(Arrays.asList("CodiceFiscale"))
+                .build());
+        Mockito.when(notificationEntityDao.get(iun)).thenReturn(notification);
         dao.addTimelineElement(row1);
         dao.addTimelineElement(row2);
 
@@ -110,6 +117,11 @@ class CassandraTimelineDaoTest {
                 .build();
 
         // WHEN
+        Optional<NotificationEntity> notification = Optional.ofNullable(NotificationEntity.builder()
+                .iun(iun)
+                .recipientsOrder(Arrays.asList("CodiceFiscale"))
+                .build());
+        Mockito.when(notificationEntityDao.get(iun)).thenReturn(notification);
         dao.addTimelineElement(row1);
         dao.addTimelineElement(row2);
         dao.deleteTimeline(iun);
@@ -164,23 +176,5 @@ class CassandraTimelineDaoTest {
             }
         }
 
-    }
-
-    private static class TestMyCassandraNotificationEntityDao implements NotificationDao {
-
-        @Override
-        public void addNotification(Notification notification) throws IdConflictException {
-
-        }
-
-        @Override
-        public Optional<Notification> getNotificationByIun(String iun) {
-            return Optional.empty();
-        }
-
-        @Override
-        public List<NotificationSearchRow> searchSentNotification(String senderId, Instant startDate, Instant endDate, String recipientId, NotificationStatus status, String subjectRegExp) {
-            return null;
-        }
     }
 }

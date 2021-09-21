@@ -57,6 +57,10 @@ class StatusUtilsTest {
                 timelineElement4, timelineElement5, timelineElement6, timelineElement7);
 
         // creare List<NotificationStatusHistoryElement>
+        NotificationStatusHistoryElement historyElement = NotificationStatusHistoryElement.builder()
+                .status(NotificationStatus.RECEIVED)
+                .activeFrom(Instant.parse("2021-09-16T15:20:00.00Z"))
+                .build();
         NotificationStatusHistoryElement historyElement1 = NotificationStatusHistoryElement.builder()
                 .status(NotificationStatus.DELIVERING)
                 .activeFrom(Instant.parse("2021-09-16T15:25:00.00Z"))
@@ -73,14 +77,14 @@ class StatusUtilsTest {
                 .status(NotificationStatus.PAID)
                 .activeFrom(Instant.parse("2021-09-16T17:30:00.00Z"))
                 .build();
-        List<NotificationStatusHistoryElement> historyElementList = Arrays.asList(historyElement1,
-                historyElement4, historyElement5, historyElement6);
+        List<NotificationStatusHistoryElement> historyElementList = Arrays.asList(historyElement,
+                historyElement1, historyElement4, historyElement5, historyElement6);
 
 
         // chiamare metodo di test
         List<NotificationStatusHistoryElement> resHistoryElementList = statusUtils.getStatusHistory(
                 timelineElementList, 1,
-                Instant.now()
+                Instant.parse("2021-09-16T15:20:00.00Z")
         );
         // verificare che è risultato atteso
         Assertions.assertEquals(historyElementList, resHistoryElementList);
@@ -136,6 +140,10 @@ class StatusUtilsTest {
                 timelineElement5_1, timelineElement6, timelineElement7);
 
         // creare List<NotificationStatusHistoryElement>
+        NotificationStatusHistoryElement historyElement = NotificationStatusHistoryElement.builder()
+                .status(NotificationStatus.RECEIVED)
+                .activeFrom(Instant.parse("2021-09-16T15:20:00.00Z"))
+                .build();
         NotificationStatusHistoryElement historyElement1 = NotificationStatusHistoryElement.builder()
                 .status(NotificationStatus.DELIVERING)
                 .activeFrom(Instant.parse("2021-09-16T15:25:00.00Z"))
@@ -152,13 +160,13 @@ class StatusUtilsTest {
                 .status(NotificationStatus.PAID)
                 .activeFrom(Instant.parse("2021-09-16T17:30:00.00Z"))
                 .build();
-        List<NotificationStatusHistoryElement> historyElementList = Arrays.asList(
+        List<NotificationStatusHistoryElement> historyElementList = Arrays.asList(historyElement,
                 historyElement1, historyElement4_1, historyElement5, historyElement6);
 
         // chiamare metodo di test
         List<NotificationStatusHistoryElement> resHistoryElementList = statusUtils.getStatusHistory(
                 timelineElementList, 2,
-                Instant.now()
+                Instant.parse("2021-09-16T15:20:00.00Z")
         );
         // verificare che è risultato atteso
         Assertions.assertEquals(historyElementList, resHistoryElementList);
@@ -186,15 +194,15 @@ class StatusUtilsTest {
         // creare List<NotificationStatusHistoryElement>
         NotificationStatusHistoryElement historyElement1 = NotificationStatusHistoryElement.builder()
                 .status(NotificationStatus.RECEIVED)
-                .activeFrom(Instant.parse("2021-09-16T15:25:00.00Z"))
+                .activeFrom(Instant.parse("2021-09-16T15:24:00.00Z"))
                 .build();
 
-        List<NotificationStatusHistoryElement> historyElementList = Collections.emptyList();
+        List<NotificationStatusHistoryElement> historyElementList = Arrays.asList(historyElement1);
 
         // chiamare metodo di test
         List<NotificationStatusHistoryElement> resHistoryElementList = statusUtils.getStatusHistory(
                 timelineElementList, 2,
-                Instant.now()
+                Instant.parse("2021-09-16T15:24:00.00Z")
         );
         // verificare che è risultato atteso
         Assertions.assertEquals(historyElementList, resHistoryElementList);

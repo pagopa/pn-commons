@@ -10,8 +10,6 @@ import it.pagopa.pn.api.dto.notification.status.NotificationStatus;
 import it.pagopa.pn.commons.abstractions.IdConflictException;
 import it.pagopa.pn.commons.abstractions.impl.MiddlewareTypes;
 import it.pagopa.pn.commons_delivery.middleware.NotificationDao;
-import it.pagopa.pn.commons_delivery.model.notification.cassandra.NotificationBySenderEntity;
-import it.pagopa.pn.commons_delivery.model.notification.cassandra.NotificationBySenderEntityId;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,9 +26,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
-import java.util.function.Predicate;
-import java.util.regex.Pattern;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @ExtendWith(SpringExtension.class)
@@ -56,7 +55,7 @@ import java.util.stream.Collectors;
         CassandraDataAutoConfiguration.class
 })
 @EntityScan(basePackages = {"it.pagopa.pn"})
-public class CassandraNotificationDaoSearchTestIT {
+class CassandraNotificationDaoSearchTestIT {
 
     @Autowired
     private CassandraNotificationDao dao;
@@ -155,17 +154,6 @@ public class CassandraNotificationDaoSearchTestIT {
         Assertions.assertTrue(senderIds.contains(senderId));
         Assertions.assertTrue(statuses.contains(NotificationStatus.RECEIVED));
 
-        /*result.stream().forEach( resultRow -> {
-            cassandra.deleteById(NotificationBySenderEntityId.builder()
-                    .iun( resultRow.getIun() )
-                    .notificationStatus( resultRow.getNotificationStatus() )
-                    .recipientId( resultRow.getRecipientId() )
-                    .senderId( resultRow.getSenderId() )
-                    .sentat( resultRow.getSentAt() )
-                    .build(),
-                    NotificationBySenderEntity.class
-                );
-        });*/
     }
 
 
