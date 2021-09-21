@@ -4,12 +4,16 @@ import it.pagopa.pn.api.dto.notification.status.NotificationStatus;
 import it.pagopa.pn.api.dto.notification.status.NotificationStatusHistoryElement;
 import it.pagopa.pn.api.dto.notification.timeline.TimelineElement;
 import it.pagopa.pn.api.dto.notification.timeline.TimelineElementCategory;
+import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Component
 public class StatusUtils {
+
+    private static final NotificationStatus INITIAL_STATUS = NotificationStatus.RECEIVED;
 
     private final StateMap stateMap = new StateMap();
 
@@ -17,29 +21,45 @@ public class StatusUtils {
         if (!statusHistory.isEmpty()) {
             return statusHistory.get(statusHistory.size() - 1).getStatus();
         } else {
-            return NotificationStatus.RECEIVED;
+            return INITIAL_STATUS;
         }
     }
 
     public List<NotificationStatusHistoryElement> getStatusHistory( //
                                                                       Set<TimelineElement> timelineElementList, //
                                                                       int numberOfRecipients, //
-                                                                      Instant creationNotificationTimestamp //
+                                                                      Instant notificationCreatedAt //
     ) {
         List<NotificationStatusHistoryElement> timelineHistory = new ArrayList<>();
-        NotificationStatus currentState = NotificationStatus.RECEIVED;
-        List<TimelineElement> partialTimelineElementList = new ArrayList<>();
+        timelineHistory.add( NotificationStatusHistoryElement.builder()
+                .status( INITIAL_STATUS )
+                .activeFrom( notificationCreatedAt )
+                .build()
+            );
 
-        final List<TimelineElement> timelineByTimestampSorted = timelineElementList.stream()
+        NotificationStatus currentState = INITIAL_STATUS;
+        int numberOfEndedDigitalWorkflows = 0;
+
+
+        List<TimelineElement> timelineByTimestampSorted = timelineElementList.stream()
                 .sorted(Comparator.comparing(TimelineElement::getTimestamp))
                 .collect(Collectors.toList());
+
         for (TimelineElement timelineElement : timelineByTimestampSorted) {
-            partialTimelineElementList.add(timelineElement);
             TimelineElementCategory category = timelineElement.getCategory();
-            NotificationStatus nextState = getNotificationStatus(currentState, category, partialTimelineElementList, numberOfRecipients);
+
+            if( TimelineElementCategory.END_OF_DIGITAL_DELIVERY_WORKFLOW.equals( category ) ) {
+                numberOfEndedDigitalWorkflows += 1;
+            }
+
+            NotificationStatus nextState = computeStateAfterEvent(
+                        currentState, category, numberOfEndedDigitalWorkflows, numberOfRecipients);
 
             if (!Objects.equals(currentState, nextState)) {
-                NotificationStatusHistoryElement statusHistoryElement = new NotificationStatusHistoryElement(nextState, timelineElement.getTimestamp());
+                NotificationStatusHistoryElement statusHistoryElement = NotificationStatusHistoryElement.builder()
+                        .status( nextState )
+                        .activeFrom( timelineElement.getTimestamp() )
+                        .build();
                 timelineHistory.add(statusHistoryElement);
             }
             currentState = nextState;
@@ -48,34 +68,30 @@ public class StatusUtils {
         return timelineHistory;
     }
 
-    private NotificationStatus getNotificationStatus(  //
+    private NotificationStatus computeStateAfterEvent(  //
                                                        NotificationStatus currentState, //
                                                        TimelineElementCategory timelineElementCategory, //
-                                                       List<TimelineElement> timelineElementSubList, //
+                                                       int numberOfEndedDigitalWorkflows, //
                                                        int numberOfRecipients //
     ) {
         NotificationStatus nextState;
-        if (currentState.equals(NotificationStatus.DELIVERING) && timelineElementCategory.equals(TimelineElementCategory.END_OF_DIGITAL_DELIVERY_WORKFLOW)) {
-            nextState = computeTransitionToDelivered(currentState, timelineElementCategory, timelineElementSubList, numberOfRecipients, stateMap);
+        if (currentState.equals(NotificationStatus.DELIVERING)) {
+            if( timelineElementCategory.equals(TimelineElementCategory.END_OF_DIGITAL_DELIVERY_WORKFLOW) ) {
+                if( numberOfEndedDigitalWorkflows == numberOfRecipients ) {
+                    nextState = stateMap.getStateTransition(currentState, timelineElementCategory);
+                }
+                else {
+                    nextState = currentState;
+                }
+            }
+            else {
+                nextState = stateMap.getStateTransition(currentState, timelineElementCategory);
+            }
         } else {
             nextState = stateMap.getStateTransition(currentState, timelineElementCategory);
         }
         return nextState;
 
-    }
-
-    private NotificationStatus computeTransitionToDelivered(NotificationStatus currentState, TimelineElementCategory timelineElementCategory, List<TimelineElement> timelineElementSubList, int numberOfRecipients, StateMap stateMap) {
-        NotificationStatus nextState;
-        long numberOfEndedDelivery = timelineElementSubList
-                .stream()
-                .filter(tl -> TimelineElementCategory.END_OF_DIGITAL_DELIVERY_WORKFLOW.equals(tl.getCategory()))
-                .count();
-        if (numberOfEndedDelivery == numberOfRecipients) {
-            nextState = stateMap.getStateTransition(currentState, timelineElementCategory);
-        } else {
-            nextState = NotificationStatus.DELIVERING;
-        }
-        return nextState;
     }
 
 }

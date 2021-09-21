@@ -53,7 +53,7 @@ class StatusUtilsTest {
                 .build();
 
         // creare List<TimelineElement>
-        List<TimelineElement> timelineElementList = Arrays.asList(timelineElement1, timelineElement2, timelineElement3,
+        Set<TimelineElement> timelineElementList = Set.of(timelineElement1, timelineElement2, timelineElement3,
                 timelineElement4, timelineElement5, timelineElement6, timelineElement7);
 
         // creare List<NotificationStatusHistoryElement>
@@ -78,7 +78,7 @@ class StatusUtilsTest {
 
 
         // chiamare metodo di test
-        List<NotificationStatusHistoryElement> resHistoryElementList = statusUtils.getTimelineHistory(
+        List<NotificationStatusHistoryElement> resHistoryElementList = statusUtils.getStatusHistory(
                 timelineElementList, 1,
                 Instant.now()
         );
@@ -131,7 +131,7 @@ class StatusUtilsTest {
                 .build();
 
         // creare List<TimelineElement>
-        List<TimelineElement> timelineElementList = Arrays.asList(timelineElement1, timelineElement2,
+        Set<TimelineElement> timelineElementList = Set.of(timelineElement1, timelineElement2,
                 timelineElement3, timelineElement4, timelineElement5, timelineElement3_1, timelineElement4_1,
                 timelineElement5_1, timelineElement6, timelineElement7);
 
@@ -156,7 +156,7 @@ class StatusUtilsTest {
                 historyElement1, historyElement4_1, historyElement5, historyElement6);
 
         // chiamare metodo di test
-        List<NotificationStatusHistoryElement> resHistoryElementList = statusUtils.getTimelineHistory(
+        List<NotificationStatusHistoryElement> resHistoryElementList = statusUtils.getStatusHistory(
                 timelineElementList, 2,
                 Instant.now()
         );
@@ -180,8 +180,7 @@ class StatusUtilsTest {
                 .category(TimelineElementCategory.PAYMENT)
                 .build();
 
-        // creare List<TimelineElement>
-        List<TimelineElement> timelineElementList = Arrays.asList(timelineElement1,
+        Set<TimelineElement> timelineElementList = Set.of(timelineElement1,
                 timelineElement2, timelineElement3);
 
         // creare List<NotificationStatusHistoryElement>
@@ -193,7 +192,7 @@ class StatusUtilsTest {
         List<NotificationStatusHistoryElement> historyElementList = Collections.emptyList();
 
         // chiamare metodo di test
-        List<NotificationStatusHistoryElement> resHistoryElementList = statusUtils.getTimelineHistory(
+        List<NotificationStatusHistoryElement> resHistoryElementList = statusUtils.getStatusHistory(
                 timelineElementList, 2,
                 Instant.now()
         );
@@ -222,10 +221,10 @@ class StatusUtilsTest {
                 .category(TimelineElementCategory.SEND_DIGITAL_DOMICILE)
                 .build();
 
-        List<TimelineElement> timelineElementList = Arrays.asList(timelineElement1,
+        Set<TimelineElement> timelineElementList = Set.of(timelineElement1,
                 timelineElement2, timelineElement3);
 
-        List<NotificationStatusHistoryElement> resHistoryElementList = statusUtils.getTimelineHistory(
+        List<NotificationStatusHistoryElement> resHistoryElementList = statusUtils.getStatusHistory(
                 timelineElementList, 1, Instant.now());
 
 

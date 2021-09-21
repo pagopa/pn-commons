@@ -5,6 +5,7 @@ import it.pagopa.pn.commons.abstractions.IdConflictException;
 import it.pagopa.pn.commons.abstractions.KeyValueStore;
 import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.commons_delivery.model.notification.cassandra.NotificationBySenderEntity;
+import it.pagopa.pn.commons_delivery.model.notification.cassandra.NotificationBySenderEntityId;
 import it.pagopa.pn.commons_delivery.model.notification.cassandra.NotificationEntity;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,7 +33,7 @@ class CassandraNotificationDaoTest extends AbstractNotificationDaoTest {
         entity2dto = new EntityToDtoNotificationMapper( objMapper );
 
         KeyValueStore<String, NotificationEntity> entityDao = new EntityDaoMock();
-        KeyValueStore<String, NotificationBySenderEntity> notificationBySenderEntityDao = Mockito.mock(KeyValueStore.class);
+        KeyValueStore<NotificationBySenderEntityId, NotificationBySenderEntity> notificationBySenderEntityDao = Mockito.mock(KeyValueStore.class);
         DtoToBySenderEntityMapper dto2BySenderEntityMapper = Mockito.mock(DtoToBySenderEntityMapper.class);
         specificDao = new CassandraNotificationDao(null, entityDao, notificationBySenderEntityDao, dto2Entity , dto2BySenderEntityMapper, entity2dto );
         dao = specificDao;

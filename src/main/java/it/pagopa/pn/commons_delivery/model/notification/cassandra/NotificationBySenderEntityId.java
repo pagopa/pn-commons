@@ -12,7 +12,7 @@ import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
 import java.io.Serializable;
 import java.time.Instant;
 
-@Builder
+@Builder( toBuilder = true )
 @Getter
 @PrimaryKeyClass
 @EqualsAndHashCode

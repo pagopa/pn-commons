@@ -15,7 +15,6 @@ import it.pagopa.pn.commons_delivery.middleware.notificationdao.CassandraNotific
 import it.pagopa.pn.commons_delivery.middleware.notificationdao.CassandraNotificationEntityDao;
 import it.pagopa.pn.commons_delivery.model.notification.cassandra.TimelineElementEntity;
 import it.pagopa.pn.commons_delivery.model.notification.cassandra.TimelineElementEntityId;
-import it.pagopa.pn.commons_delivery.utils.StatusUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

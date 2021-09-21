@@ -8,9 +8,9 @@ import it.pagopa.pn.commons.abstractions.KeyValueStore;
 import it.pagopa.pn.commons.abstractions.impl.MiddlewareTypes;
 import it.pagopa.pn.commons_delivery.middleware.NotificationDao;
 import it.pagopa.pn.commons_delivery.model.notification.cassandra.NotificationBySenderEntity;
+import it.pagopa.pn.commons_delivery.model.notification.cassandra.NotificationBySenderEntityId;
 import it.pagopa.pn.commons_delivery.model.notification.cassandra.NotificationEntity;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.cassandra.core.CassandraOperations;
 import org.springframework.data.cassandra.core.query.Criteria;
@@ -30,14 +30,15 @@ public class CassandraNotificationDao implements NotificationDao {
 
     private final CassandraOperations cassandraTemplate;
     private final KeyValueStore<String, NotificationEntity> notificationEntityDao;
-    private final KeyValueStore<String, NotificationBySenderEntity> notificationBySenderEntityDao;
+    private final KeyValueStore<NotificationBySenderEntityId, NotificationBySenderEntity> notificationBySenderEntityDao;
     private final DtoToEntityNotificationMapper dto2entityMapper;
     private final DtoToBySenderEntityMapper dto2BySenderEntityMapper;
     private final EntityToDtoNotificationMapper entity2dtoMapper;
 
     public CassandraNotificationDao(
-            CassandraOperations cassandraTemplate, KeyValueStore<String, NotificationEntity> notificationEntityDao,
-            KeyValueStore<String, NotificationBySenderEntity> notificationBySenderEntityDao,
+            CassandraOperations cassandraTemplate,
+            KeyValueStore<String, NotificationEntity> notificationEntityDao,
+            KeyValueStore<NotificationBySenderEntityId, NotificationBySenderEntity> notificationBySenderEntityDao,
             DtoToEntityNotificationMapper dto2entityMapper,
             DtoToBySenderEntityMapper dto2BySenderEntityMapper,
             EntityToDtoNotificationMapper entity2dtoMapper) {

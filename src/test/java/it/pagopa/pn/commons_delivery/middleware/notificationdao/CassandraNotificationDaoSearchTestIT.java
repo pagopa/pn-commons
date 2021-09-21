@@ -10,6 +10,8 @@ import it.pagopa.pn.api.dto.notification.status.NotificationStatus;
 import it.pagopa.pn.commons.abstractions.IdConflictException;
 import it.pagopa.pn.commons.abstractions.impl.MiddlewareTypes;
 import it.pagopa.pn.commons_delivery.middleware.NotificationDao;
+import it.pagopa.pn.commons_delivery.model.notification.cassandra.NotificationBySenderEntity;
+import it.pagopa.pn.commons_delivery.model.notification.cassandra.NotificationBySenderEntityId;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -51,8 +53,7 @@ import java.util.stream.Collectors;
         DtoToEntityNotificationMapper.class,
         EntityToDtoNotificationMapper.class,
         CassandraAutoConfiguration.class,
-        CassandraDataAutoConfiguration.class,
-
+        CassandraDataAutoConfiguration.class
 })
 @EntityScan(basePackages = {"it.pagopa.pn"})
 public class CassandraNotificationDaoSearchTestIT {
@@ -153,6 +154,18 @@ public class CassandraNotificationDaoSearchTestIT {
         Assertions.assertEquals(1, senderIds.size());
         Assertions.assertTrue(senderIds.contains(senderId));
         Assertions.assertTrue(statuses.contains(NotificationStatus.RECEIVED));
+
+        /*result.stream().forEach( resultRow -> {
+            cassandra.deleteById(NotificationBySenderEntityId.builder()
+                    .iun( resultRow.getIun() )
+                    .notificationStatus( resultRow.getNotificationStatus() )
+                    .recipientId( resultRow.getRecipientId() )
+                    .senderId( resultRow.getSenderId() )
+                    .sentat( resultRow.getSentAt() )
+                    .build(),
+                    NotificationBySenderEntity.class
+                );
+        });*/
     }
 
 
@@ -247,6 +260,8 @@ public class CassandraNotificationDaoSearchTestIT {
                 NotificationStatus.RECEIVED,
                 subjectRegExp
         );
+
+
 
         Set<String> senderIds = result.stream()
                 .map(row -> row.getSenderId())

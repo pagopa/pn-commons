@@ -9,7 +9,7 @@ import java.util.Map;
 
 @Table("iun_by_senderid")
 @Getter
-@Builder
+@Builder( toBuilder = true )
 public class NotificationBySenderEntity {
 
     @PrimaryKey
