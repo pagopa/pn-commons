@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.InputStreamResource;
 
 import it.pagopa.pn.commons.abstractions.FileData;
@@ -71,13 +72,22 @@ public class AwsS3FileStorage implements FileStorage {
     }
 
     @Override
-    public InputStream getFileVersionBody(String key, String versionId) {
-        throw new UnsupportedOperationException("NOT YET IMPL");
-    }
+    public FileData getFileVersion(String key, String versionId) {
+        GetObjectRequest s3ObjectRequest = GetObjectRequest.builder()
+                .bucket( getBucketName() )
+                .key( key )
+                .versionId( StringUtils.isNotBlank( versionId) ? versionId : null )
+                .build();
 
-    @Override
-    public Map<String, String> getFileVersionMetadata(String key, String versionId) {
-        throw new UnsupportedOperationException("NOT YET IMPL");
+        ResponseInputStream<GetObjectResponse> s3Object = s3.getObject( s3ObjectRequest );
+
+        GetObjectResponse response = s3Object.response();
+
+        return FileData.builder()
+                .content( s3Object )
+                .contentLength( response.contentLength() )
+                .metadata ( response.metadata() )
+                .build();
     }
 
     private void createBucket() {
@@ -108,23 +118,5 @@ public class AwsS3FileStorage implements FileStorage {
     private String getBucketName() {
         return this.cfgs.getBucketName();
     }
-
-	@Override
-	public FileData getFileByKey(String key) {
-		GetObjectRequest s3ObjectRequest = GetObjectRequest.builder()
-				.bucket( getBucketName() )
-				.key( key )
-				.build();
-
-		ResponseInputStream<GetObjectResponse> s3Object = s3.getObject( s3ObjectRequest );
-	    
-	    GetObjectResponse response = s3Object.response();
-	    
-	    return FileData.builder()
-	    				.content( s3Object )
-	    				.contentLength( response.contentLength() )
-	    				.metadata ( response.metadata() )
-	    				.build();
-	}
 
 }
