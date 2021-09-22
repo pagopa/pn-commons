@@ -1,6 +1,7 @@
 package it.pagopa.pn.commons.abstractions;
 
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 
 public interface FileStorage {
@@ -9,4 +10,5 @@ public interface FileStorage {
 
     FileData getFileVersion(String key, String versionId);
 
+    List<String> getDocumentsByPrefix(String prefix);
 }
