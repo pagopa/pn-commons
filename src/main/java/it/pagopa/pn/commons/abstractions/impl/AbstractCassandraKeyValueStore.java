@@ -4,6 +4,7 @@ import com.datastax.oss.driver.api.core.ConsistencyLevel;
 import it.pagopa.pn.commons.abstractions.IdConflictException;
 import it.pagopa.pn.commons.abstractions.KeyValueStore;
 import org.springframework.data.cassandra.core.CassandraOperations;
+import org.springframework.data.cassandra.core.DeleteOptions;
 import org.springframework.data.cassandra.core.EntityWriteResult;
 import org.springframework.data.cassandra.core.InsertOptions;
 
@@ -12,6 +13,10 @@ import java.util.Optional;
 public abstract class AbstractCassandraKeyValueStore<K, V> implements KeyValueStore<K, V> {
 
     private static final InsertOptions INSERT_OPTIONS = InsertOptions.builder()
+            .consistencyLevel(ConsistencyLevel.LOCAL_QUORUM)
+            .build();
+
+    private static final DeleteOptions DELETE_OPTIONS = DeleteOptions.builder()
             .consistencyLevel(ConsistencyLevel.LOCAL_QUORUM)
             .build();
 
@@ -49,6 +54,8 @@ public abstract class AbstractCassandraKeyValueStore<K, V> implements KeyValueSt
 
     @Override
     public void delete(K key) {
-        cassandraTemplate.deleteById( key, entityClass );
+        this.get( key ).ifPresent( entity -> {
+            cassandraTemplate.delete( entity, DELETE_OPTIONS );
+        });
     }
 }

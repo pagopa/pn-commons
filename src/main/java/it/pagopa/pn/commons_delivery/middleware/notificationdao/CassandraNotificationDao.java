@@ -1,5 +1,6 @@
 package it.pagopa.pn.commons_delivery.middleware.notificationdao;
 
+import com.datastax.oss.driver.api.core.ConsistencyLevel;
 import it.pagopa.pn.api.dto.NotificationSearchRow;
 import it.pagopa.pn.api.dto.notification.Notification;
 import it.pagopa.pn.api.dto.notification.status.NotificationStatus;
@@ -13,6 +14,7 @@ import it.pagopa.pn.commons_delivery.model.notification.cassandra.NotificationEn
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.cassandra.core.CassandraOperations;
+import org.springframework.data.cassandra.core.cql.QueryOptions;
 import org.springframework.data.cassandra.core.query.Criteria;
 import org.springframework.data.cassandra.core.query.Query;
 import org.springframework.stereotype.Component;
@@ -145,7 +147,10 @@ public class CassandraNotificationDao implements NotificationDao {
                 Criteria.where("notificationBySenderId.senderId").is(senderId),
                 Criteria.where("notificationBySenderId.sentat").gte(startDate),
                 Criteria.where("notificationBySenderId.sentat").lte(endDate)
-        );
+        ).queryOptions( QueryOptions.builder()
+                .consistencyLevel( ConsistencyLevel.LOCAL_QUORUM)
+                .build()
+            );
     }
 
 }
