@@ -22,5 +22,4 @@ public interface NotificationDao {
             String recipientId, NotificationStatus status, String subjectRegExp
     );
 
-
 }
