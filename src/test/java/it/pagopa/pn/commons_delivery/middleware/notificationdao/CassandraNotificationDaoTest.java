@@ -4,21 +4,27 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.commons.abstractions.IdConflictException;
 import it.pagopa.pn.commons.abstractions.KeyValueStore;
 import it.pagopa.pn.commons.exceptions.PnInternalException;
+import it.pagopa.pn.commons_delivery.model.notification.cassandra.NotificationBySenderEntity;
+import it.pagopa.pn.commons_delivery.model.notification.cassandra.NotificationBySenderEntityId;
 import it.pagopa.pn.commons_delivery.model.notification.cassandra.NotificationEntity;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
+import org.mockito.Mockito;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
+import java.util.regex.Pattern;
 
 class CassandraNotificationDaoTest extends AbstractNotificationDaoTest {
 
     private EntityToDtoNotificationMapper entity2dto;
+    private CassandraNotificationDao specificDao;
 
     @BeforeEach
     void instantiateDao() {
@@ -27,7 +33,10 @@ class CassandraNotificationDaoTest extends AbstractNotificationDaoTest {
         entity2dto = new EntityToDtoNotificationMapper( objMapper );
 
         KeyValueStore<String, NotificationEntity> entityDao = new EntityDaoMock();
-        dao = new CassandraNotificationDao( entityDao, dto2Entity , entity2dto );
+        KeyValueStore<NotificationBySenderEntityId, NotificationBySenderEntity> notificationBySenderEntityDao = Mockito.mock(KeyValueStore.class);
+        DtoToBySenderEntityMapper dto2BySenderEntityMapper = Mockito.mock(DtoToBySenderEntityMapper.class);
+        specificDao = new CassandraNotificationDao(null, entityDao, notificationBySenderEntityDao, dto2Entity , dto2BySenderEntityMapper, entity2dto );
+        dao = specificDao;
     }
 
     @Override
@@ -135,6 +144,22 @@ class CassandraNotificationDaoTest extends AbstractNotificationDaoTest {
 
         // THEN
         Assertions.assertThrows( PnInternalException.class,  todo );
+    }
+
+    @Test
+    void regExpMatchTest(){
+
+        Predicate<String> predicate = this.specificDao.buildRegexpPredicate("Test");
+        //boolean b = Pattern.compile("^Test$").matcher("Subject Test").matches();
+
+        Assertions.assertTrue(predicate.test("Test"));
+        Assertions.assertFalse(predicate.test("Subject Test"));
+
+        Predicate<String> predicate2 = this.specificDao.buildRegexpPredicate(".*Test");
+
+        Assertions.assertTrue(predicate2.test("Test"));
+        Assertions.assertTrue(predicate2.test("Subject Test"));
+
     }
 
 

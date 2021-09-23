@@ -1,17 +1,28 @@
 package it.pagopa.pn.commons.abstractions.impl;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.core.io.InputStreamResource;
+
+import it.pagopa.pn.commons.abstractions.FileData;
 import it.pagopa.pn.commons.abstractions.FileStorage;
 import it.pagopa.pn.commons.configs.RuntimeMode;
 import it.pagopa.pn.commons.configs.aws.AwsConfigs;
+import it.pagopa.pn.commons.exceptions.PnInternalException;
 import lombok.extern.slf4j.Slf4j;
+import software.amazon.awssdk.core.Response;
+import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.core.waiters.WaiterResponse;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.HeadBucketRequest;
 import software.amazon.awssdk.services.s3.model.HeadBucketResponse;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
@@ -61,13 +72,22 @@ public class AwsS3FileStorage implements FileStorage {
     }
 
     @Override
-    public InputStream getFileVersionBody(String key, String versionId) {
-        throw new UnsupportedOperationException("NOT YET IMPL");
-    }
+    public FileData getFileVersion(String key, String versionId) {
+        GetObjectRequest s3ObjectRequest = GetObjectRequest.builder()
+                .bucket( getBucketName() )
+                .key( key )
+                .versionId( StringUtils.isNotBlank( versionId) ? versionId : null )
+                .build();
 
-    @Override
-    public Map<String, String> getFileVersionMetadata(String key, String versionId) {
-        throw new UnsupportedOperationException("NOT YET IMPL");
+        ResponseInputStream<GetObjectResponse> s3Object = s3.getObject( s3ObjectRequest );
+
+        GetObjectResponse response = s3Object.response();
+
+        return FileData.builder()
+                .content( s3Object )
+                .contentLength( response.contentLength() )
+                .metadata ( response.metadata() )
+                .build();
     }
 
     private void createBucket() {

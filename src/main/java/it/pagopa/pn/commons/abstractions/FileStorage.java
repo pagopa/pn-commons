@@ -7,7 +7,6 @@ public interface FileStorage {
 
     String putFileVersion(String key, InputStream body, long contentLength, Map<String, String> metadata);
 
-    InputStream getFileVersionBody(String key, String versionId);
+    FileData getFileVersion(String key, String versionId);
 
-    Map<String, String> getFileVersionMetadata(String key, String versionId);
 }
