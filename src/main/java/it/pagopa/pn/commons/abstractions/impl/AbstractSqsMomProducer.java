@@ -9,9 +9,15 @@ import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.GetQueueUrlRequest;
 import software.amazon.awssdk.services.sqs.model.SendMessageBatchRequest;
 import software.amazon.awssdk.services.sqs.model.SendMessageBatchRequestEntry;
+import static it.pagopa.pn.api.dto.events.StandardEventHeader.*;
+import it.pagopa.pn.api.dto.events.StandardEventHeader;
+        
+import java.util.HashMap;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+import software.amazon.awssdk.services.sqs.model.MessageAttributeValue;
 
 public abstract class AbstractSqsMomProducer<T extends GenericEvent> implements MomProducer<T> {
 
@@ -21,7 +27,7 @@ public abstract class AbstractSqsMomProducer<T extends GenericEvent> implements 
 
     protected AbstractSqsMomProducer(SqsClient sqsClient, String topic, ObjectMapper objectMapper, Class<T> msgClass) {
         this.sqsClient = sqsClient;
-        this.objectWriter = objectMapper.writerFor( msgClass );
+        this.objectWriter = objectMapper.writerFor(msgClass);
 
         this.queueUrl = getQueueUrl(sqsClient, topic);
     }
@@ -30,30 +36,47 @@ public abstract class AbstractSqsMomProducer<T extends GenericEvent> implements 
         return sqsClient.getQueueUrl(GetQueueUrlRequest.builder().queueName(topic).build()).queueUrl();
     }
 
-
     @Override
-    public void push( List<T> msges) {
-
-        // FIXME: gestire gli header
-        sqsClient.sendMessageBatch( SendMessageBatchRequest.builder()
-                .queueUrl( this.queueUrl )
-                .entries( msges.stream()
-                        .map( msg -> SendMessageBatchRequestEntry.builder()
-                                .messageBody( toJson( msg ) )
-                                .id( msg.getHeader().getEventId() )
-                                .build()
+    public void push(List<T> msges) {
+        
+        sqsClient.sendMessageBatch(SendMessageBatchRequest.builder()
+                .queueUrl(this.queueUrl)
+                .entries(msges.stream()
+                        .map(msg -> SendMessageBatchRequestEntry.builder()
+                        .messageBody(toJson(msg))
+                        .id(msg.getHeader().getEventId())
+                        .messageAttributes(getSqSHeader(msg.getHeader()))
+                        .build()
                         )
                         .collect(Collectors.toList()))
                 .build());
 
     }
 
-    private String toJson( T msg ) {
+    private String toJson(T msg) {
         try {
-            return objectWriter.writeValueAsString( msg );
+            return objectWriter.writeValueAsString(msg);
         } catch (JsonProcessingException exc) {
-            throw new IllegalStateException( exc );
+            throw new IllegalStateException(exc);
         }
     }
 
+    private Map<String, MessageAttributeValue> getSqSHeader(StandardEventHeader header) {
+               
+        Map<String, MessageAttributeValue> map = new HashMap<>();
+        
+        map.put(PN_EVENT_HEADER_IUN, 
+                MessageAttributeValue.builder().stringValue(header.getIun()).build());
+        map.put(PN_EVENT_HEADER_EVENT_ID, 
+                MessageAttributeValue.builder().stringValue(header.getEventId()).build());
+        map.put(PN_EVENT_HEADER_EVENT_TYPE, 
+                MessageAttributeValue.builder().stringValue(header.getEventType()).build());
+        map.put(PN_EVENT_HEADER_CREATED_AT, 
+                MessageAttributeValue.builder().stringValue(header.getCreatedAt().toString()).build());
+        map.put(PN_EVENT_HEADER_PUBLISHER, 
+                MessageAttributeValue.builder().stringValue(header.getPublisher()).build());
+       
+        return map;
+
+    }
 }
