@@ -43,10 +43,10 @@ public abstract class AbstractSqsMomProducer<T extends GenericEvent> implements 
                 .queueUrl(this.queueUrl)
                 .entries(msges.stream()
                         .map(msg -> SendMessageBatchRequestEntry.builder()
-                        .messageBody(toJson(msg))
-                        .id(msg.getHeader().getEventId())
-                        .messageAttributes(getSqSHeader(msg.getHeader()))
-                        .build()
+                            .messageBody(toJson(msg))
+                            .id(msg.getHeader().getEventId())
+                            .messageAttributes(getSqSHeader(msg.getHeader()))
+                            .build()
                         )
                         .collect(Collectors.toList()))
                 .build());
@@ -65,18 +65,19 @@ public abstract class AbstractSqsMomProducer<T extends GenericEvent> implements 
                
         Map<String, MessageAttributeValue> map = new HashMap<>();
         
-        map.put(PN_EVENT_HEADER_IUN, 
-                MessageAttributeValue.builder().stringValue(header.getIun()).build());
-        map.put(PN_EVENT_HEADER_EVENT_ID, 
-                MessageAttributeValue.builder().stringValue(header.getEventId()).build());
-        map.put(PN_EVENT_HEADER_EVENT_TYPE, 
-                MessageAttributeValue.builder().stringValue(header.getEventType()).build());
-        map.put(PN_EVENT_HEADER_CREATED_AT, 
-                MessageAttributeValue.builder().stringValue(header.getCreatedAt().toString()).build());
-        map.put(PN_EVENT_HEADER_PUBLISHER, 
-                MessageAttributeValue.builder().stringValue(header.getPublisher()).build());
+        map.put(PN_EVENT_HEADER_IUN, newStringAttributeValue(header.getIun()));
+        map.put(PN_EVENT_HEADER_EVENT_ID, newStringAttributeValue(header.getEventId()));
+        map.put(PN_EVENT_HEADER_EVENT_TYPE, newStringAttributeValue(header.getEventType()));
+        map.put(PN_EVENT_HEADER_CREATED_AT, newStringAttributeValue(header.getCreatedAt().toString()));
+        map.put(PN_EVENT_HEADER_PUBLISHER, newStringAttributeValue(header.getPublisher()));
        
         return map;
+    }
 
+    private MessageAttributeValue newStringAttributeValue(String value) {
+        return MessageAttributeValue.builder()
+                .dataType("String")
+                .stringValue(value)
+                .build();
     }
 }
