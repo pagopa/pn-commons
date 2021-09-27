@@ -1,21 +1,18 @@
 package it.pagopa.pn.commons.abstractions.impl;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.core.io.InputStreamResource;
 
 import it.pagopa.pn.commons.abstractions.FileData;
 import it.pagopa.pn.commons.abstractions.FileStorage;
 import it.pagopa.pn.commons.configs.RuntimeMode;
 import it.pagopa.pn.commons.configs.aws.AwsConfigs;
-import it.pagopa.pn.commons.exceptions.PnInternalException;
 import lombok.extern.slf4j.Slf4j;
-import software.amazon.awssdk.core.Response;
 import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.core.waiters.WaiterResponse;
@@ -25,8 +22,11 @@ import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.HeadBucketRequest;
 import software.amazon.awssdk.services.s3.model.HeadBucketResponse;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
+import software.amazon.awssdk.services.s3.model.S3Object;
 import software.amazon.awssdk.services.s3.waiters.S3Waiter;
 
 @Slf4j
@@ -89,7 +89,24 @@ public class AwsS3FileStorage implements FileStorage {
                 .metadata ( response.metadata() )
                 .build();
     }
-
+    
+    @Override
+    public List<String> getDocumentsByPrefix(String prefix) {
+    	List<String> documents = new ArrayList<>();
+    	
+        ListObjectsV2Response result = s3.listObjectsV2(ListObjectsV2Request.builder()
+        													.bucket( getBucketName() )
+        													.prefix( prefix )
+        													.build());
+        List<S3Object> objects = result.contents();
+        
+        for ( S3Object s3Object : objects ) {
+        	documents.add( s3Object.key() );
+        }
+        
+        return documents;
+    }
+    
     private void createBucket() {
         String bucketName = getBucketName();
         log.info("Creating bucket {}", bucketName);
