@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import it.pagopa.pn.api.dto.notification.Notification;
 import it.pagopa.pn.api.dto.notification.NotificationRecipient;
 import it.pagopa.pn.api.dto.notification.status.NotificationStatus;
+import it.pagopa.pn.commons_delivery.model.notification.cassandra.NotificationByRecipientEntity;
+import it.pagopa.pn.commons_delivery.model.notification.cassandra.NotificationByRecipientEntityId;
 import it.pagopa.pn.commons_delivery.model.notification.cassandra.NotificationBySenderEntity;
 import it.pagopa.pn.commons_delivery.model.notification.cassandra.NotificationBySenderEntityId;
 import org.springframework.stereotype.Component;
@@ -16,15 +18,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Component
-public class DtoToBySenderEntityMapper {
+public class DtoToSearchEntityMapper {
 
     private final ObjectWriter objectWriter;
 
-    public DtoToBySenderEntityMapper(ObjectMapper objMapper) {
+    public DtoToSearchEntityMapper(ObjectMapper objMapper) {
         this.objectWriter = objMapper.writerFor(NotificationRecipient.class);
     }
 
-    public List<NotificationBySenderEntity> dto2Entity(Notification dto, NotificationStatus status) {
+    public List<NotificationBySenderEntity> dto2SenderEntity(Notification dto, NotificationStatus status) {
         NotificationBySenderEntity.NotificationBySenderEntityBuilder builder = NotificationBySenderEntity.builder()
                 .paNotificationId(dto.getPaNotificationId())
                 .recipientsJson(recipientList2json(dto.getRecipients()))
@@ -39,6 +41,29 @@ public class DtoToBySenderEntityMapper {
                 .map(recipient ->
                         builder
                                 .notificationBySenderId(builderId
+                                        .recipientId(recipient.getTaxId())
+                                        .build())
+                                .build())
+                .collect(Collectors.toList());
+
+    }
+
+    public List<NotificationByRecipientEntity> dto2RecipientEntity(Notification dto, NotificationStatus status) {
+
+        NotificationByRecipientEntity.NotificationByRecipientEntityBuilder builder = NotificationByRecipientEntity.builder()
+                .paNotificationId(dto.getPaNotificationId())
+                .recipientsJson(recipientList2json(dto.getRecipients()))
+                .subject(dto.getSubject());
+        NotificationByRecipientEntityId.NotificationByRecipientEntityIdBuilder builderId = NotificationByRecipientEntityId.builder()
+                .senderId(dto.getSender().getPaId())
+                .iun(dto.getIun())
+                .sentat(dto.getSentAt())
+                .notificationStatus(status);
+
+        return dto.getRecipients().stream()
+                .map(recipient ->
+                        builder
+                                .notificationByRecipientId(builderId
                                         .recipientId(recipient.getTaxId())
                                         .build())
                                 .build())

@@ -48,7 +48,8 @@ import java.util.stream.Collectors;
         CassandraNotificationEntityDao.class,
         CassandraNotificationDaoSearchTestIT.TestContext.class,
         CassandraNotificationBySenderEntityDao.class,
-        DtoToBySenderEntityMapper.class,
+        CassandraNotificationByRecipientEntityDao.class,
+        DtoToSearchEntityMapper.class,
         DtoToEntityNotificationMapper.class,
         EntityToDtoNotificationMapper.class,
         CassandraAutoConfiguration.class,
@@ -66,6 +67,7 @@ class CassandraNotificationDaoSearchTestIT {
     @Test
     void testSimple() throws IdConflictException {
         String senderId = "pa1";
+        String recipientId = "recipient1";
 
         Notification n = Notification.builder()
                 .iun(UUID.randomUUID().toString())
@@ -73,7 +75,7 @@ class CassandraNotificationDaoSearchTestIT {
                 .sender(NotificationSender.builder().paId(senderId).build())
                 .recipients(Collections.singletonList(
                                 NotificationRecipient.builder()
-                                        .taxId("recipientId")
+                                        .taxId(recipientId)
                                         .build()
                         )
                 )
@@ -91,8 +93,19 @@ class CassandraNotificationDaoSearchTestIT {
 
         dao.addNotification(n);
 
-        List<NotificationSearchRow> result = dao.searchSentNotification(
+        List<NotificationSearchRow> result = dao.searchNotification(
+                true,
                 senderId,
+                Instant.EPOCH,
+                Instant.EPOCH.plus(1, ChronoUnit.MINUTES),
+                null,
+                null,
+                null
+        );
+
+        List<NotificationSearchRow> resultByRecipient = dao.searchNotification(
+                false,
+                recipientId,
                 Instant.EPOCH,
                 Instant.EPOCH.plus(1, ChronoUnit.MINUTES),
                 null,
@@ -105,11 +118,18 @@ class CassandraNotificationDaoSearchTestIT {
                 .collect(Collectors.toSet());
         Assertions.assertEquals(1, senderIds.size());
         Assertions.assertTrue(senderIds.contains(senderId));
+
+        Set<String> recipientIds = resultByRecipient.stream()
+                .map(row -> row.getRecipientId())
+                .collect(Collectors.toSet());
+        Assertions.assertEquals(1, recipientIds.size());
+        Assertions.assertTrue(recipientIds.contains(recipientId));
     }
 
     @Test
     void statusTest() throws IdConflictException {
         String senderId = "pa1";
+        String recipientId = "recipient1";
 
         Notification n = Notification.builder()
                 .iun(UUID.randomUUID().toString())
@@ -117,7 +137,7 @@ class CassandraNotificationDaoSearchTestIT {
                 .sender(NotificationSender.builder().paId(senderId).build())
                 .recipients(Collections.singletonList(
                                 NotificationRecipient.builder()
-                                        .taxId("recipientId")
+                                        .taxId(recipientId)
                                         .build()
                         )
                 )
@@ -135,8 +155,19 @@ class CassandraNotificationDaoSearchTestIT {
 
         dao.addNotification(n);
 
-        List<NotificationSearchRow> result = dao.searchSentNotification(
+        List<NotificationSearchRow> result = dao.searchNotification(
+                true,
                 senderId,
+                Instant.EPOCH,
+                Instant.EPOCH.plus(1, ChronoUnit.MINUTES),
+                null,
+                NotificationStatus.RECEIVED,
+                null
+        );
+
+        List<NotificationSearchRow> resultByRecipient = dao.searchNotification(
+                false,
+                recipientId,
                 Instant.EPOCH,
                 Instant.EPOCH.plus(1, ChronoUnit.MINUTES),
                 null,
@@ -153,6 +184,16 @@ class CassandraNotificationDaoSearchTestIT {
         Assertions.assertEquals(1, senderIds.size());
         Assertions.assertTrue(senderIds.contains(senderId));
         Assertions.assertTrue(statuses.contains(NotificationStatus.RECEIVED));
+
+        Set<String> recipientIds = resultByRecipient.stream()
+                .map(row -> row.getRecipientId())
+                .collect(Collectors.toSet());
+        Set<NotificationStatus> statusesByRecipient = resultByRecipient.stream()
+                .map(row -> row.getNotificationStatus())
+                .collect(Collectors.toSet());
+        Assertions.assertEquals(1, recipientIds.size());
+        Assertions.assertTrue(recipientIds.contains(recipientId));
+        Assertions.assertTrue(statusesByRecipient.contains(NotificationStatus.RECEIVED));
 
     }
 
@@ -186,7 +227,8 @@ class CassandraNotificationDaoSearchTestIT {
 
         dao.addNotification(n);
 
-        List<NotificationSearchRow> result = dao.searchSentNotification(
+        List<NotificationSearchRow> result = dao.searchNotification(
+                true,
                 senderId,
                 Instant.EPOCH,
                 Instant.EPOCH.plus(1, ChronoUnit.MINUTES),
@@ -240,7 +282,8 @@ class CassandraNotificationDaoSearchTestIT {
 
         dao.addNotification(n);
 
-        List<NotificationSearchRow> result = dao.searchSentNotification(
+        List<NotificationSearchRow> result = dao.searchNotification(
+                true,
                 senderId,
                 Instant.EPOCH,
                 Instant.EPOCH.plus(1, ChronoUnit.MINUTES),
@@ -248,7 +291,6 @@ class CassandraNotificationDaoSearchTestIT {
                 NotificationStatus.RECEIVED,
                 subjectRegExp
         );
-
 
 
         Set<String> senderIds = result.stream()
