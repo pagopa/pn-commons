@@ -11,6 +11,7 @@ import it.pagopa.pn.api.dto.notification.timeline.TimelineElementCategory;
 import it.pagopa.pn.commons.abstractions.IdConflictException;
 import it.pagopa.pn.commons_delivery.middleware.NotificationDao;
 import it.pagopa.pn.commons_delivery.middleware.TimelineDao;
+import it.pagopa.pn.commons_delivery.middleware.notificationdao.CassandraNotificationByRecipientEntityDao;
 import it.pagopa.pn.commons_delivery.middleware.notificationdao.CassandraNotificationBySenderEntityDao;
 import it.pagopa.pn.commons_delivery.middleware.notificationdao.CassandraNotificationEntityDao;
 import it.pagopa.pn.commons_delivery.model.notification.cassandra.NotificationEntity;
@@ -32,6 +33,7 @@ class CassandraTimelineDaoTest {
     private TimelineDao dao;
     private CassandraNotificationEntityDao notificationEntityDao;
     private CassandraNotificationBySenderEntityDao notificationBySenderEntityDao;
+    private CassandraNotificationByRecipientEntityDao notificationByRecipientEntityDao;
 
     @BeforeEach
     void instantiateDao() {
@@ -42,7 +44,8 @@ class CassandraTimelineDaoTest {
         TimelineEntityDao entityDao = new TestMyTimelineEntityDao();
         notificationEntityDao = Mockito.mock(CassandraNotificationEntityDao.class);
         notificationBySenderEntityDao = Mockito.mock(CassandraNotificationBySenderEntityDao.class);
-        this.dao = new CassandraTimelineDao(entityDao, notificationEntityDao, notificationBySenderEntityDao, dto2Entity, entity2dto);
+        notificationByRecipientEntityDao = Mockito.mock(CassandraNotificationByRecipientEntityDao.class);
+        this.dao = new CassandraTimelineDao(entityDao, notificationEntityDao, notificationBySenderEntityDao, notificationByRecipientEntityDao, dto2Entity, entity2dto);
     }
 
     @Test

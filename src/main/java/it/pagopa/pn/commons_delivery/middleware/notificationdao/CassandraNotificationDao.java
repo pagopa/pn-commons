@@ -8,9 +8,7 @@ import it.pagopa.pn.commons.abstractions.IdConflictException;
 import it.pagopa.pn.commons.abstractions.KeyValueStore;
 import it.pagopa.pn.commons.abstractions.impl.MiddlewareTypes;
 import it.pagopa.pn.commons_delivery.middleware.NotificationDao;
-import it.pagopa.pn.commons_delivery.model.notification.cassandra.NotificationBySenderEntity;
-import it.pagopa.pn.commons_delivery.model.notification.cassandra.NotificationBySenderEntityId;
-import it.pagopa.pn.commons_delivery.model.notification.cassandra.NotificationEntity;
+import it.pagopa.pn.commons_delivery.model.notification.cassandra.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.cassandra.core.CassandraOperations;
@@ -33,22 +31,28 @@ public class CassandraNotificationDao implements NotificationDao {
     private final CassandraOperations cassandraTemplate;
     private final KeyValueStore<String, NotificationEntity> notificationEntityDao;
     private final KeyValueStore<NotificationBySenderEntityId, NotificationBySenderEntity> notificationBySenderEntityDao;
+    private final KeyValueStore<NotificationByRecipientEntityId, NotificationByRecipientEntity> notificationByRecipientEntityDao;
     private final DtoToEntityNotificationMapper dto2entityMapper;
     private final DtoToBySenderEntityMapper dto2BySenderEntityMapper;
+    private final DtoToByRecipientEntityMapper dto2ByRecipientEntityMapper;
     private final EntityToDtoNotificationMapper entity2dtoMapper;
 
     public CassandraNotificationDao(
             CassandraOperations cassandraTemplate,
             KeyValueStore<String, NotificationEntity> notificationEntityDao,
             KeyValueStore<NotificationBySenderEntityId, NotificationBySenderEntity> notificationBySenderEntityDao,
+            KeyValueStore<NotificationByRecipientEntityId, NotificationByRecipientEntity> notificationByRecipientEntityDao,
             DtoToEntityNotificationMapper dto2entityMapper,
             DtoToBySenderEntityMapper dto2BySenderEntityMapper,
+            DtoToByRecipientEntityMapper dto2ByRecipientEntityMapper,
             EntityToDtoNotificationMapper entity2dtoMapper) {
         this.cassandraTemplate = cassandraTemplate;
         this.notificationEntityDao = notificationEntityDao;
         this.notificationBySenderEntityDao = notificationBySenderEntityDao;
+        this.notificationByRecipientEntityDao = notificationByRecipientEntityDao;
         this.dto2entityMapper = dto2entityMapper;
         this.dto2BySenderEntityMapper = dto2BySenderEntityMapper;
+        this.dto2ByRecipientEntityMapper = dto2ByRecipientEntityMapper;
         this.entity2dtoMapper = entity2dtoMapper;
     }
 
@@ -57,6 +61,9 @@ public class CassandraNotificationDao implements NotificationDao {
         List<NotificationBySenderEntity> bySenderEntity = dto2BySenderEntityMapper.dto2Entity(notification, NotificationStatus.RECEIVED);
         bySenderEntity.forEach(entity ->
                 notificationBySenderEntityDao.put(entity));
+        List<NotificationByRecipientEntity> byRecipientEntity = dto2ByRecipientEntityMapper.dto2Entity(notification, NotificationStatus.RECEIVED);
+        byRecipientEntity.forEach(entity ->
+                notificationByRecipientEntityDao.put(entity));
         NotificationEntity entity = dto2entityMapper.dto2Entity(notification);
         notificationEntityDao.putIfAbsent(entity);
     }
@@ -95,11 +102,38 @@ public class CassandraNotificationDao implements NotificationDao {
 
     }
 
+    @Override
+    public List<NotificationSearchRow> searchReceivedNotification(
+            String recipientId, Instant startDate,
+            Instant endDate, String senderId,
+            NotificationStatus status, String subjectRegExp) {
+
+        Predicate<String> matchSubject = buildRegexpPredicate(subjectRegExp);
+
+        List<NotificationSearchRow> result;
+        if (status != null) {
+            result = executeReceivedNotificationQuery(recipientId, startDate, endDate, senderId, status, subjectRegExp);
+        } else {
+            result = new ArrayList<>();
+            for (NotificationStatus oneStatus : NotificationStatus.values()) {
+                List<NotificationSearchRow> oneStatusResult = executeReceivedNotificationQuery(
+                        recipientId, startDate, endDate, senderId, oneStatus, subjectRegExp);
+                result.addAll(oneStatusResult);
+            }
+        }
+
+        return result.stream()
+                .filter(row -> matchSubject.test(row.getSubject()))
+                .sorted(Comparator.comparing(NotificationSearchRow::getSentAt))
+                .collect(Collectors.toList());
+    }
+
+
     Predicate<String> buildRegexpPredicate(String subjectRegExp) {
         Predicate<String> matchSubject;
         if (subjectRegExp != null) {
             matchSubject = Objects::nonNull;
-            matchSubject = matchSubject.and(Pattern.compile("^"+subjectRegExp+"$").asMatchPredicate());
+            matchSubject = matchSubject.and(Pattern.compile("^" + subjectRegExp + "$").asMatchPredicate());
         } else {
             matchSubject = x -> true;
         }
@@ -137,6 +171,30 @@ public class CassandraNotificationDao implements NotificationDao {
                 )
                 .collect(Collectors.toList());
     }
+    //TODO accorpare metodi cambia solo metodo generazione query
+    private List<NotificationSearchRow> executeReceivedNotificationQuery(
+            String recipientId, Instant startDate,
+            Instant endDate, String senderId,
+            NotificationStatus status, String subjectRegExp) {
+        Query query = generateSearchReceivedNotificationQuery(
+                recipientId, startDate, endDate, senderId, status, subjectRegExp);
+
+        return cassandraTemplate.select(query, NotificationByRecipientEntity.class)
+                .stream().map(entity -> NotificationSearchRow.builder()
+                        .iun(entity.getNotificationByRecipientId().getIun())
+                        .sentAt(entity.getNotificationByRecipientId().getSentat())
+                        .senderId(entity.getNotificationByRecipientId().getSenderId())
+                        .notificationStatus(entity.getNotificationByRecipientId().getNotificationStatus())
+                        .recipientId(entity.getNotificationByRecipientId().getRecipientId())
+                        .paNotificationId(entity.getPaNotificationId())
+                        .subject(entity.getSubject())
+                        .build()
+                )
+                .collect(Collectors.toList());
+
+    }
+
+
 
     private Query generateSearchSentNotificationQuery(
             String senderId, Instant startDate, Instant endDate, String recipientId,
@@ -147,10 +205,26 @@ public class CassandraNotificationDao implements NotificationDao {
                 Criteria.where("notificationBySenderId.senderId").is(senderId),
                 Criteria.where("notificationBySenderId.sentat").gte(startDate),
                 Criteria.where("notificationBySenderId.sentat").lte(endDate)
-        ).queryOptions( QueryOptions.builder()
-                .consistencyLevel( ConsistencyLevel.LOCAL_QUORUM)
+        ).queryOptions(QueryOptions.builder()
+                .consistencyLevel(ConsistencyLevel.LOCAL_QUORUM)
                 .build()
-            );
+        );
+    }
+
+    private Query generateSearchReceivedNotificationQuery(
+            String recipientId, Instant startDate,
+            Instant endDate, String senderId,
+            NotificationStatus status, String subjectRegExp) {
+
+        return Query.query(
+                Criteria.where("notificationByRecipientId.notificationStatus").is(status),
+                Criteria.where("notificationByRecipientId.recipientId").is(recipientId),
+                Criteria.where("notificationByRecipientId.sentat").gte(startDate),
+                Criteria.where("notificationByRecipientId.sentat").lte(endDate)
+        ).queryOptions(QueryOptions.builder()
+                .consistencyLevel(ConsistencyLevel.LOCAL_QUORUM)
+                .build()
+        );
     }
 
 }

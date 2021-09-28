@@ -13,13 +13,18 @@ public interface NotificationDao {
 
     static final String IMPLEMENTATION_TYPE_PROPERTY_NAME = "pn.middleware.impl.delivery-dao";
 
-    void addNotification(Notification notification ) throws IdConflictException;
+    void addNotification(Notification notification) throws IdConflictException;
 
-    Optional<Notification> getNotificationByIun(String iun );
+    Optional<Notification> getNotificationByIun(String iun);
 
     List<NotificationSearchRow> searchSentNotification(
             String senderId, Instant startDate, Instant endDate,
             String recipientId, NotificationStatus status, String subjectRegExp
+    );
+
+    List<NotificationSearchRow> searchReceivedNotification(
+            String recipientId, Instant startDate, Instant endDate,
+            String senderId, NotificationStatus status, String subjectRegExp
     );
 
 }
