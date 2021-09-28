@@ -35,7 +35,7 @@ class StateMap {
                 .withTimelineGoToState(TimelineElementCategory.END_OF_DIGITAL_DELIVERY_WORKFLOW, NotificationStatus.DELIVERED)
                 .withTimelineGoToState(TimelineElementCategory.NOTIFICATION_VIEWED, NotificationStatus.VIEWED)
                 .withTimelineGoToState(TimelineElementCategory.PAYMENT, NotificationStatus.PAID)
-                .remainToStateWithWarning(TimelineElementCategory.NOTIFICATION_PATH_CHOOSE, NotificationStatus.DELIVERING)
+                .withTimelineGoToState(TimelineElementCategory.NOTIFICATION_PATH_CHOOSE, NotificationStatus.DELIVERING)
                 .remainToStateWithWarning(TimelineElementCategory.RECEIVED_ACK, NotificationStatus.DELIVERING)
                 .remainToStateWithWarning(TimelineElementCategory.WAIT_FOR_RECIPIENT_TIMEOUT, NotificationStatus.DELIVERING)
         ;
@@ -86,7 +86,7 @@ class StateMap {
                 .remainToStateWithWarning(TimelineElementCategory.NOTIFICATION_PATH_CHOOSE, NotificationStatus.PAID)
                 .remainToStateWithWarning(TimelineElementCategory.RECEIVED_ACK, NotificationStatus.PAID)
                 .withTimelineGoToState(TimelineElementCategory.WAIT_FOR_RECIPIENT_TIMEOUT, NotificationStatus.PAID)
-        ;
+            ;
 
     }
 
@@ -98,7 +98,7 @@ class StateMap {
 
         final MapValue mapValue = this.mappings.get(key);
         if (mapValue.isWarning()) {
-            log.warn("");
+            log.warn("Illegal input \"" + timelineRowType + "\" in state \"" + fromStatus + "\"");
         }
         return mapValue.getStatus();
     }

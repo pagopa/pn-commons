@@ -14,7 +14,7 @@ import java.util.Map;
 @Table("notifications")
 @Getter
 @Builder
-public class    NotificationEntity {
+public class NotificationEntity {
 
     @PrimaryKey
     private String iun;
