@@ -49,8 +49,7 @@ import java.util.stream.Collectors;
         CassandraNotificationDaoSearchTestIT.TestContext.class,
         CassandraNotificationBySenderEntityDao.class,
         CassandraNotificationByRecipientEntityDao.class,
-        DtoToBySenderEntityMapper.class,
-        DtoToByRecipientEntityMapper.class,
+        DtoToSearchEntityMapper.class,
         DtoToEntityNotificationMapper.class,
         EntityToDtoNotificationMapper.class,
         CassandraAutoConfiguration.class,
@@ -94,7 +93,8 @@ class CassandraNotificationDaoSearchTestIT {
 
         dao.addNotification(n);
 
-        List<NotificationSearchRow> result = dao.searchSentNotification(
+        List<NotificationSearchRow> result = dao.searchNotification(
+                true,
                 senderId,
                 Instant.EPOCH,
                 Instant.EPOCH.plus(1, ChronoUnit.MINUTES),
@@ -103,7 +103,8 @@ class CassandraNotificationDaoSearchTestIT {
                 null
         );
 
-        List<NotificationSearchRow> resultByRecipient = dao.searchReceivedNotification(
+        List<NotificationSearchRow> resultByRecipient = dao.searchNotification(
+                false,
                 recipientId,
                 Instant.EPOCH,
                 Instant.EPOCH.plus(1, ChronoUnit.MINUTES),
@@ -154,7 +155,8 @@ class CassandraNotificationDaoSearchTestIT {
 
         dao.addNotification(n);
 
-        List<NotificationSearchRow> result = dao.searchSentNotification(
+        List<NotificationSearchRow> result = dao.searchNotification(
+                true,
                 senderId,
                 Instant.EPOCH,
                 Instant.EPOCH.plus(1, ChronoUnit.MINUTES),
@@ -163,7 +165,8 @@ class CassandraNotificationDaoSearchTestIT {
                 null
         );
 
-        List<NotificationSearchRow> resultByRecipient = dao.searchReceivedNotification(
+        List<NotificationSearchRow> resultByRecipient = dao.searchNotification(
+                false,
                 recipientId,
                 Instant.EPOCH,
                 Instant.EPOCH.plus(1, ChronoUnit.MINUTES),
@@ -224,7 +227,8 @@ class CassandraNotificationDaoSearchTestIT {
 
         dao.addNotification(n);
 
-        List<NotificationSearchRow> result = dao.searchSentNotification(
+        List<NotificationSearchRow> result = dao.searchNotification(
+                true,
                 senderId,
                 Instant.EPOCH,
                 Instant.EPOCH.plus(1, ChronoUnit.MINUTES),
@@ -278,7 +282,8 @@ class CassandraNotificationDaoSearchTestIT {
 
         dao.addNotification(n);
 
-        List<NotificationSearchRow> result = dao.searchSentNotification(
+        List<NotificationSearchRow> result = dao.searchNotification(
+                true,
                 senderId,
                 Instant.EPOCH,
                 Instant.EPOCH.plus(1, ChronoUnit.MINUTES),
@@ -286,7 +291,6 @@ class CassandraNotificationDaoSearchTestIT {
                 NotificationStatus.RECEIVED,
                 subjectRegExp
         );
-
 
 
         Set<String> senderIds = result.stream()

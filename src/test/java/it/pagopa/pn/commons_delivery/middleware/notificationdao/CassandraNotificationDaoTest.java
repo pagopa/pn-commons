@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
-import java.util.regex.Pattern;
 
 class CassandraNotificationDaoTest extends AbstractNotificationDaoTest {
 
@@ -29,13 +28,11 @@ class CassandraNotificationDaoTest extends AbstractNotificationDaoTest {
         ObjectMapper objMapper = new ObjectMapper();
         DtoToEntityNotificationMapper dto2Entity = new DtoToEntityNotificationMapper(objMapper);
         entity2dto = new EntityToDtoNotificationMapper(objMapper);
-
         KeyValueStore<String, NotificationEntity> entityDao = new EntityDaoMock();
         KeyValueStore<NotificationBySenderEntityId, NotificationBySenderEntity> notificationBySenderEntityDao = Mockito.mock(KeyValueStore.class);
         KeyValueStore<NotificationByRecipientEntityId, NotificationByRecipientEntity> notificationByRecipientEntityDao = Mockito.mock(KeyValueStore.class);
-        DtoToBySenderEntityMapper dto2BySenderEntityMapper = Mockito.mock(DtoToBySenderEntityMapper.class);
-        DtoToByRecipientEntityMapper dto2ByRecipientEntityMapper = Mockito.mock(DtoToByRecipientEntityMapper.class);
-        specificDao = new CassandraNotificationDao(null, entityDao, notificationBySenderEntityDao, notificationByRecipientEntityDao, dto2Entity, dto2BySenderEntityMapper, dto2ByRecipientEntityMapper, entity2dto);
+        DtoToSearchEntityMapper dto2SearchEntityMapper = Mockito.mock(DtoToSearchEntityMapper.class);
+        specificDao = new CassandraNotificationDao(null, entityDao, notificationBySenderEntityDao, notificationByRecipientEntityDao, dto2Entity, dto2SearchEntityMapper, entity2dto);
         dao = specificDao;
     }
 

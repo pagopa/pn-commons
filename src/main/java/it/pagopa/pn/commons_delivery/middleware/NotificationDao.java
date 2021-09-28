@@ -17,14 +17,8 @@ public interface NotificationDao {
 
     Optional<Notification> getNotificationByIun(String iun);
 
-    List<NotificationSearchRow> searchSentNotification(
-            String senderId, Instant startDate, Instant endDate,
+    List<NotificationSearchRow> searchNotification(
+            boolean bySender ,String senderReceiventId, Instant startDate, Instant endDate,
             String recipientId, NotificationStatus status, String subjectRegExp
     );
-
-    List<NotificationSearchRow> searchReceivedNotification(
-            String recipientId, Instant startDate, Instant endDate,
-            String senderId, NotificationStatus status, String subjectRegExp
-    );
-
 }

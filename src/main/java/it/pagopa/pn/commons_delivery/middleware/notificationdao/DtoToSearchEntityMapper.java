@@ -18,15 +18,37 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Component
-public class DtoToByRecipientEntityMapper {
+public class DtoToSearchEntityMapper {
 
     private final ObjectWriter objectWriter;
 
-    public DtoToByRecipientEntityMapper(ObjectMapper objMapper) {
+    public DtoToSearchEntityMapper(ObjectMapper objMapper) {
         this.objectWriter = objMapper.writerFor(NotificationRecipient.class);
     }
 
-    public List<NotificationByRecipientEntity> dto2Entity(Notification dto, NotificationStatus status) {
+    public List<NotificationBySenderEntity> dto2SenderEntity(Notification dto, NotificationStatus status) {
+        NotificationBySenderEntity.NotificationBySenderEntityBuilder builder = NotificationBySenderEntity.builder()
+                .paNotificationId(dto.getPaNotificationId())
+                .recipientsJson(recipientList2json(dto.getRecipients()))
+                .subject(dto.getSubject());
+        NotificationBySenderEntityId.NotificationBySenderEntityIdBuilder builderId = NotificationBySenderEntityId.builder()
+                .senderId(dto.getSender().getPaId())
+                .notificationStatus(status)
+                .iun(dto.getIun())
+                .sentat(dto.getSentAt());
+
+        return dto.getRecipients().stream()
+                .map(recipient ->
+                        builder
+                                .notificationBySenderId(builderId
+                                        .recipientId(recipient.getTaxId())
+                                        .build())
+                                .build())
+                .collect(Collectors.toList());
+
+    }
+
+    public List<NotificationByRecipientEntity> dto2RecipientEntity(Notification dto, NotificationStatus status) {
 
         NotificationByRecipientEntity.NotificationByRecipientEntityBuilder builder = NotificationByRecipientEntity.builder()
                 .paNotificationId(dto.getPaNotificationId())
