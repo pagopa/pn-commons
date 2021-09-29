@@ -38,14 +38,15 @@ public class CassandraTimelineDao implements TimelineDao {
             CassandraNotificationBySenderEntityDao notificationBySenderEntityDao,
             CassandraNotificationByRecipientEntityDao notificationByRecipientEntityDao,
             DtoToEntityTimelineMapper dto2entity,
-            EntityToDtoTimelineMapper entity2dto) {
+            EntityToDtoTimelineMapper entity2dto,
+            StatusUtils statusUtils) {
         this.entityDao = entityDao;
         this.notificationEntityDao = notificationEntityDao;
         this.notificationBySenderEntityDao = notificationBySenderEntityDao;
         this.notificationByRecipientEntityDao = notificationByRecipientEntityDao;
         this.dto2entity = dto2entity;
         this.entity2dto = entity2dto;
-        statusUtils = new StatusUtils();
+        this.statusUtils = statusUtils;
     }
 
     @Override

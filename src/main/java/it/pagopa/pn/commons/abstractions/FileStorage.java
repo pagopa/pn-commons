@@ -6,9 +6,13 @@ import java.util.Map;
 
 public interface FileStorage {
 
+    default String putFileVersion( FileData fileData ) {
+        return this.putFileVersion( fileData.getKey(), fileData.getContent(), fileData.getContentLength(), fileData.getMetadata() );
+    }
+
     String putFileVersion(String key, InputStream body, long contentLength, Map<String, String> metadata);
 
     FileData getFileVersion(String key, String versionId);
 
-    List<FileData> getDocumentsByPrefix(String prefix);
+    List<FileData> getDocumentsListing(String prefix);
 }

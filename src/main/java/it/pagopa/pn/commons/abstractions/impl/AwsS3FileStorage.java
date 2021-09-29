@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -17,16 +18,7 @@ import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.core.waiters.WaiterResponse;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.GetObjectResponse;
-import software.amazon.awssdk.services.s3.model.HeadBucketRequest;
-import software.amazon.awssdk.services.s3.model.HeadBucketResponse;
-import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
-import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.PutObjectResponse;
-import software.amazon.awssdk.services.s3.model.S3Object;
+import software.amazon.awssdk.services.s3.model.*;
 import software.amazon.awssdk.services.s3.waiters.S3Waiter;
 
 @Slf4j
@@ -84,6 +76,7 @@ public class AwsS3FileStorage implements FileStorage {
         GetObjectResponse response = s3Object.response();
 
         return FileData.builder()
+                .key( key )
                 .content( s3Object )
                 .contentLength( response.contentLength() )
                 .metadata ( response.metadata() )
@@ -91,24 +84,31 @@ public class AwsS3FileStorage implements FileStorage {
     }
     
     @Override
-    public List<FileData> getDocumentsByPrefix(String prefix) {
+    public List<FileData> getDocumentsListing(String prefix) {
     	List<FileData> documents = new ArrayList<>();
     	
         ListObjectsV2Response result = s3.listObjectsV2(ListObjectsV2Request.builder()
         													.bucket( getBucketName() )
         													.prefix( prefix )
         													.build());
-        List<S3Object> objects = result.contents();
-        
-        for ( S3Object s3Object : objects ) {
-        	FileData fileData = getFileVersion(s3Object.key(), null);
-        	documents.add( FileData.builder()
-                    		.key( s3Object.key() )
-                    		.metadata ( fileData.getMetadata() )
-                    		.build() );
-        }
-        
-        return documents;
+        return result.contents().stream().map( s3Obj ->
+                FileData.builder()
+                    .key( s3Obj.key() )
+                    .contentLength( s3Obj.size() )
+                    .metadata( this.loadMetadata( s3Obj ) )
+                    .build()
+            ).collect(Collectors.toList());
+
+    }
+
+    private Map<String, String> loadMetadata( S3Object s3Obj ) {
+        HeadObjectRequest headObjectRequest = HeadObjectRequest.builder()
+                .bucket( this.getBucketName() )
+                .key(s3Obj.key() )
+                .build();
+
+        HeadObjectResponse headObjectResponse = s3.headObject(headObjectRequest);
+        return headObjectResponse.metadata();
     }
     
     private void createBucket() {

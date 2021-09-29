@@ -17,6 +17,7 @@ import it.pagopa.pn.commons_delivery.middleware.notificationdao.CassandraNotific
 import it.pagopa.pn.commons_delivery.model.notification.cassandra.NotificationEntity;
 import it.pagopa.pn.commons_delivery.model.notification.cassandra.TimelineElementEntity;
 import it.pagopa.pn.commons_delivery.model.notification.cassandra.TimelineElementEntityId;
+import it.pagopa.pn.commons_delivery.utils.StatusUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,7 +46,7 @@ class CassandraTimelineDaoTest {
         notificationEntityDao = Mockito.mock(CassandraNotificationEntityDao.class);
         notificationBySenderEntityDao = Mockito.mock(CassandraNotificationBySenderEntityDao.class);
         notificationByRecipientEntityDao = Mockito.mock(CassandraNotificationByRecipientEntityDao.class);
-        this.dao = new CassandraTimelineDao(entityDao, notificationEntityDao, notificationBySenderEntityDao, notificationByRecipientEntityDao, dto2Entity, entity2dto);
+        this.dao = new CassandraTimelineDao(entityDao, notificationEntityDao, notificationBySenderEntityDao, notificationByRecipientEntityDao, dto2Entity, entity2dto, new StatusUtils());
     }
 
     @Test
