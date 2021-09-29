@@ -9,6 +9,7 @@ import lombok.Value;
 @Value
 @Builder(toBuilder = true)
 public class FileData {
+	private final String key;
 	private final InputStream content;
 	private final long contentLength;
 	private final Map<String, String> metadata;

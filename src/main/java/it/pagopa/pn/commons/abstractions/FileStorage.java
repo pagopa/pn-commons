@@ -10,5 +10,5 @@ public interface FileStorage {
 
     FileData getFileVersion(String key, String versionId);
 
-    List<String> getDocumentsByPrefix(String prefix);
+    List<FileData> getDocumentsByPrefix(String prefix);
 }

@@ -91,8 +91,8 @@ public class AwsS3FileStorage implements FileStorage {
     }
     
     @Override
-    public List<String> getDocumentsByPrefix(String prefix) {
-    	List<String> documents = new ArrayList<>();
+    public List<FileData> getDocumentsByPrefix(String prefix) {
+    	List<FileData> documents = new ArrayList<>();
     	
         ListObjectsV2Response result = s3.listObjectsV2(ListObjectsV2Request.builder()
         													.bucket( getBucketName() )
@@ -101,7 +101,11 @@ public class AwsS3FileStorage implements FileStorage {
         List<S3Object> objects = result.contents();
         
         for ( S3Object s3Object : objects ) {
-        	documents.add( s3Object.key() );
+        	FileData fileData = getFileVersion(s3Object.key(), null);
+        	documents.add( FileData.builder()
+                    		.key( s3Object.key() )
+                    		.metadata ( fileData.getMetadata() )
+                    		.build() );
         }
         
         return documents;
