@@ -35,9 +35,11 @@ public class NotificationEntity {
 
     private Map<String,String> recipientsJson;
 
-    // - Next two properties keep track of sha256 and versionId of the documents.
+    // - Next three properties keep track of s3 keys, sha256 and versionId of the documents.
     // We do not use only one list with a structured type because AWS keyspace lacks support
     // for cassandra User Defined Type
+
+    private List<String> documentsKeys;
 
     private List<String> documentsDigestsSha256;
 
@@ -47,13 +49,19 @@ public class NotificationEntity {
 
     private NotificationPaymentInfoFeePolicies notificationFeePolicy;
 
+    private String f24FlatRateKey;
+
     private String f24FlatRateDigestSha256;
 
     private String f24FlatRateVersionId;
 
+    private String f24DigitalKey;
+
     private String f24DigitalDigestSha256;
 
     private String f24DigitalVersionId;
+
+    private String f24AnalogKey;
 
     private String f24AnalogDigestSha256;
 

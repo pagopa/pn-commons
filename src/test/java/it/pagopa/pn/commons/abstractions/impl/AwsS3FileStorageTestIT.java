@@ -26,8 +26,13 @@ public class AwsS3FileStorageTestIT {
     void loadDownloadAndCompare() throws IOException {
         InputStream inputStream = getInputStream();
 
-        String versionId = fileStore.putFileVersion(TEST_KEY, inputStream, 517514l,
-                Collections.singletonMap("content-type", "image/jpeg"));
+        String versionId = fileStore.putFileVersion(
+                TEST_KEY,
+                inputStream,
+                517514l,
+                "image/jpeg",
+                Collections.emptyMap()
+            );
 
         FileData download = fileStore.getFileVersion( TEST_KEY, versionId );
 

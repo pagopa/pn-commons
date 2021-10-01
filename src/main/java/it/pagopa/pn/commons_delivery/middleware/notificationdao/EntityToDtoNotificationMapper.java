@@ -64,11 +64,11 @@ public class EntityToDtoNotificationMapper {
                 .notificationFeePolicy( entity.getNotificationFeePolicy() )
                 ;
 
-        NotificationAttachment f24Digital = buildF24Attachment(
+        NotificationAttachment f24Digital = buildAttachment( entity.getF24DigitalKey(),
                              entity.getF24DigitalVersionId(), entity.getF24DigitalDigestSha256() );
-        NotificationAttachment f24Analog = buildF24Attachment(
+        NotificationAttachment f24Analog = buildAttachment( entity.getF24AnalogKey(),
                              entity.getF24AnalogVersionId(), entity.getF24AnalogDigestSha256() );
-        NotificationAttachment f24FlatRate = buildF24Attachment(
+        NotificationAttachment f24FlatRate = buildAttachment( entity.getF24FlatRateKey(),
                            entity.getF24FlatRateVersionId(), entity.getF24FlatRateDigestSha256() );
 
         boolean anyF24moduleNotNull = Stream.of( f24Analog, f24Digital, f24FlatRate )
@@ -86,14 +86,18 @@ public class EntityToDtoNotificationMapper {
         return builder.build();
     }
 
-    private NotificationAttachment buildF24Attachment( String version, String sha256 ) {
+    private NotificationAttachment buildAttachment(String key, String version, String sha256 ) {
         NotificationAttachment result;
-        if ( StringUtils.isAllBlank( version, sha256 ) ) {
+        if ( StringUtils.isAllBlank( key, version, sha256 ) ) {
             result = null;
         }
-        else if ( version != null && StringUtils.isNotBlank( sha256 ) ) {
+        else if ( version != null && StringUtils.isNotBlank( sha256 ) && StringUtils.isNotBlank( key ) ) {
             result = NotificationAttachment.builder()
-                    .savedVersionId( version )
+                    .ref( NotificationAttachment.Ref.builder()
+                            .key( key )
+                            .versionToken( version )
+                            .build()
+                    )
                     .digests( NotificationAttachment.Digests.builder()
                             .sha256( sha256 )
                             .build()
@@ -101,30 +105,32 @@ public class EntityToDtoNotificationMapper {
                     .build();
         }
         else {
-            throw new PnInternalException( "Error version (" + version + ") and sha256 (" + sha256 + ") are both required or both blank" );
+            throw new PnInternalException( "Error key (" + key + ") version (" + version + ") and sha256 (" + sha256 + ") are both required or both blank" );
         }
         return result;
     }
 
     private List<NotificationAttachment> buildDocumentsList( NotificationEntity entity ) {
         List<String> documentsDigestsSha256 = entity.getDocumentsDigestsSha256();
+        List<String> documentsKeys = entity.getDocumentsKeys();
         List<String> documentsVersionIds = entity.getDocumentsVersionIds();
 
-        int length = documentsDigestsSha256.size();
-        if ( length != documentsVersionIds.size() ) {
-            throw new PnInternalException(" Notification entity with iun " + entity.getIun() + " hash different quantity of document versions and sha");
+        int lengthShas = documentsDigestsSha256 == null ? 0 : documentsDigestsSha256.size();
+        int lengthKeys = documentsKeys == null ? 0 : documentsKeys.size();
+        int lengthVersionIds = documentsVersionIds == null ? 0 : documentsVersionIds.size();
+        if ( lengthShas != lengthKeys || lengthKeys != lengthVersionIds ) {
+            throw new PnInternalException(" Notification entity with iun " + entity.getIun() + " hash different quantity of document versions, sha256s and keys");
         }
 
-        // - Two different list with one information each instead of a list of object:
+        // - Three different list with one information each instead of a list of object:
         //   AWS keyspace do not support UDT
         List<NotificationAttachment> result = new ArrayList<>();
-        for( int d = 0; d < length; d += 1 ) {
-            NotificationAttachment notificationAttachment = NotificationAttachment.builder()
-                    .savedVersionId( documentsVersionIds.get( d ) )
-                    .digests( NotificationAttachment.Digests.builder()
-                            .sha256( documentsDigestsSha256.get( d ) )
-                            .build())
-                    .build();
+        for( int d = 0; d < lengthShas; d += 1 ) {
+            NotificationAttachment notificationAttachment = buildAttachment(
+                    documentsKeys.get( d ),
+                    documentsVersionIds.get( d ),
+                    documentsDigestsSha256.get( d )
+                );
             result.add( notificationAttachment );
         }
 
