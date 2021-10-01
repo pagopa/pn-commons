@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import it.pagopa.pn.api.dto.events.GenericEvent;
 import it.pagopa.pn.commons.abstractions.MomProducer;
+import it.pagopa.pn.commons.exceptions.PnInternalException;
+import org.jetbrains.annotations.NotNull;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.GetQueueUrlRequest;
 import software.amazon.awssdk.services.sqs.model.SendMessageBatchRequest;
@@ -27,9 +29,19 @@ public abstract class AbstractSqsMomProducer<T extends GenericEvent> implements 
 
     protected AbstractSqsMomProducer(SqsClient sqsClient, String topic, ObjectMapper objectMapper, Class<T> msgClass) {
         this.sqsClient = sqsClient;
-        this.objectWriter = objectMapper.writerFor(msgClass);
+        Class<?> payloadClass = getPayloadClass(msgClass);
+        this.objectWriter = objectMapper.writerFor(payloadClass);
 
         this.queueUrl = getQueueUrl(sqsClient, topic);
+    }
+
+    @NotNull
+    private Class<?> getPayloadClass(Class<T> msgClass) {
+        try {
+            return msgClass.getDeclaredField("payload").getType();
+        } catch (NoSuchFieldException exc) {
+            throw new PnInternalException( "Preparing sqs producer " + this.getClass(), exc );
+        }
     }
 
     private String getQueueUrl(SqsClient sqsClient, String topic) {
@@ -43,7 +55,7 @@ public abstract class AbstractSqsMomProducer<T extends GenericEvent> implements 
                 .queueUrl(this.queueUrl)
                 .entries(msges.stream()
                         .map(msg -> SendMessageBatchRequestEntry.builder()
-                            .messageBody(toJson(msg))
+                            .messageBody(toJson(msg.getPayload()))
                             .id(msg.getHeader().getEventId())
                             .messageAttributes(getSqSHeader(msg.getHeader()))
                             .build()
@@ -53,9 +65,9 @@ public abstract class AbstractSqsMomProducer<T extends GenericEvent> implements 
 
     }
 
-    private String toJson(T msg) {
+    private String toJson(Object obj) {
         try {
-            return objectWriter.writeValueAsString(msg);
+            return objectWriter.writeValueAsString(obj);
         } catch (JsonProcessingException exc) {
             throw new IllegalStateException(exc);
         }
