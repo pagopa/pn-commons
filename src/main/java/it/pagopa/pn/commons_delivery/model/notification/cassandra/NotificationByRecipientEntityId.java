@@ -23,7 +23,7 @@ public class NotificationByRecipientEntityId implements Serializable {
     @PrimaryKeyColumn(name = "recipientid", ordinal = 1, type = PrimaryKeyType.PARTITIONED)
     private String recipientId;
 
-    @PrimaryKeyColumn(name = "sentat", ordinal = 2, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.ASCENDING)
+    @PrimaryKeyColumn(name = "sentat", ordinal = 2, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
     private Instant sentat;
 
     @PrimaryKeyColumn(name = "senderid", ordinal = 3, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.ASCENDING)
