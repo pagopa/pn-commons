@@ -7,10 +7,16 @@ import java.util.Map;
 public interface FileStorage {
 
     default String putFileVersion( FileData fileData ) {
-        return this.putFileVersion( fileData.getKey(), fileData.getContent(), fileData.getContentLength(), fileData.getMetadata() );
+        return this.putFileVersion(
+                fileData.getKey(),
+                fileData.getContent(),
+                fileData.getContentLength(),
+                fileData.getContentType(),
+                fileData.getMetadata()
+            );
     }
 
-    String putFileVersion(String key, InputStream body, long contentLength, Map<String, String> metadata);
+    String putFileVersion(String key, InputStream body, long contentLength, String contentType, Map<String, String> metadata);
 
     FileData getFileVersion(String key, String versionId);
 

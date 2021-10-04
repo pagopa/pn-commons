@@ -19,7 +19,6 @@ import org.springframework.boot.autoconfigure.data.cassandra.CassandraDataAutoCo
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.cassandra.core.CassandraOperations;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -61,9 +60,6 @@ class CassandraNotificationDaoSearchTestIT {
     @Autowired
     private CassandraNotificationDao dao;
 
-    @Autowired
-    private CassandraOperations cassandra;
-
     @Test
     void testSimple() throws IdConflictException {
         String senderId = "pa1";
@@ -86,7 +82,11 @@ class CassandraNotificationDaoSearchTestIT {
                                         .sha256("aaaa")
                                         .build())
                                 .contentType("content/type")
-                                .savedVersionId("v1")
+                                .ref( NotificationAttachment.Ref.builder()
+                                        .key("key")
+                                        .versionToken("v1")
+                                        .build()
+                                )
                                 .build()
                 ))
                 .build();
@@ -148,7 +148,11 @@ class CassandraNotificationDaoSearchTestIT {
                                         .sha256("aaaa")
                                         .build())
                                 .contentType("content/type")
-                                .savedVersionId("v1")
+                                .ref( NotificationAttachment.Ref.builder()
+                                        .key("key")
+                                        .versionToken("v1")
+                                        .build()
+                                )
                                 .build()
                 ))
                 .build();
@@ -220,7 +224,11 @@ class CassandraNotificationDaoSearchTestIT {
                                         .sha256("aaaa")
                                         .build())
                                 .contentType("content/type")
-                                .savedVersionId("v1")
+                                .ref( NotificationAttachment.Ref.builder()
+                                        .key("key")
+                                        .versionToken("v1")
+                                        .build()
+                                )
                                 .build()
                 ))
                 .build();
@@ -275,7 +283,11 @@ class CassandraNotificationDaoSearchTestIT {
                                         .sha256("aaaa")
                                         .build())
                                 .contentType("content/type")
-                                .savedVersionId("v1")
+                                .ref( NotificationAttachment.Ref.builder()
+                                        .key("key")
+                                        .versionToken("v1")
+                                        .build()
+                                )
                                 .build()
                 ))
                 .build();

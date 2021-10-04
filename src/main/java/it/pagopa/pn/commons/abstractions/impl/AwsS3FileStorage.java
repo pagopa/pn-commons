@@ -1,10 +1,7 @@
 package it.pagopa.pn.commons.abstractions.impl;
 
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -42,12 +39,13 @@ public class AwsS3FileStorage implements FileStorage {
     }
 
     @Override
-    public String putFileVersion(String key, InputStream body, long contentLength, Map<String, String> metadata) {
+    public String putFileVersion(String key, InputStream body, long contentLength, String contentType, Map<String, String> metadata) {
         String bucketName = getBucketName();
 
         PutObjectRequest putObjRequest = PutObjectRequest.builder()
                 .bucket( bucketName )
                 .key( key )
+                .contentType( contentType )
                 .metadata( metadata )
                 .build();
 
@@ -77,38 +75,40 @@ public class AwsS3FileStorage implements FileStorage {
 
         return FileData.builder()
                 .key( key )
+                .versionId(response.versionId() )
                 .content( s3Object )
                 .contentLength( response.contentLength() )
+                .contentType( response.contentType() )
                 .metadata ( response.metadata() )
                 .build();
     }
     
     @Override
     public List<FileData> getDocumentsListing(String prefix) {
-    	List<FileData> documents = new ArrayList<>();
-    	
-        ListObjectsV2Response result = s3.listObjectsV2(ListObjectsV2Request.builder()
+    	ListObjectsV2Response result = s3.listObjectsV2(ListObjectsV2Request.builder()
         													.bucket( getBucketName() )
         													.prefix( prefix )
         													.build());
-        return result.contents().stream().map( s3Obj ->
-                FileData.builder()
+        return result.contents().stream().map( s3Obj -> {
+                HeadObjectResponse head = loadMetadata( s3Obj );
+                return FileData.builder()
                     .key( s3Obj.key() )
-                    .contentLength( s3Obj.size() )
-                    .metadata( this.loadMetadata( s3Obj ) )
-                    .build()
-            ).collect(Collectors.toList());
+                    .versionId( head.versionId() )
+                    .contentLength(head.contentLength() )
+                    .contentType(head.contentType() )
+                    .metadata( head.metadata() )
+                    .build();
+            }).collect(Collectors.toList());
 
     }
 
-    private Map<String, String> loadMetadata( S3Object s3Obj ) {
+    private HeadObjectResponse loadMetadata( S3Object s3Obj ) {
         HeadObjectRequest headObjectRequest = HeadObjectRequest.builder()
                 .bucket( this.getBucketName() )
                 .key(s3Obj.key() )
                 .build();
 
-        HeadObjectResponse headObjectResponse = s3.headObject(headObjectRequest);
-        return headObjectResponse.metadata();
+        return s3.headObject(headObjectRequest);
     }
     
     private void createBucket() {

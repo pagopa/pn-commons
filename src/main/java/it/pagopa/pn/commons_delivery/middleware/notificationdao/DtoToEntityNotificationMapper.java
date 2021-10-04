@@ -47,6 +47,7 @@ public class DtoToEntityNotificationMapper {
                         .map( NotificationRecipient::getTaxId )
                         .collect(Collectors.toList())
                     )
+                .documentsKeys( listDocumentsKeys( dto.getDocuments() ))
                 .documentsDigestsSha256( listDocumentsSha256( dto.getDocuments() ))
                 .documentsVersionIds( listDocumentsVersionIds( dto.getDocuments() ))
             ;
@@ -57,6 +58,12 @@ public class DtoToEntityNotificationMapper {
         return builder.build();
     }
 
+    private List<String> listDocumentsKeys(List<NotificationAttachment> documents) {
+        return documents.stream()
+                .map( doc -> doc.getRef().getKey() )
+                .collect(Collectors.toList());
+    }
+
     private List<String> listDocumentsSha256(List<NotificationAttachment> documents) {
         return documents.stream()
                 .map( doc -> doc.getDigests().getSha256() )
@@ -65,7 +72,7 @@ public class DtoToEntityNotificationMapper {
 
     private List<String> listDocumentsVersionIds(List<NotificationAttachment> documents) {
         return documents.stream()
-                .map( NotificationAttachment::getSavedVersionId )
+                .map( attachment -> attachment.getRef().getVersionToken() )
                 .collect(Collectors.toList());
     }
 
@@ -81,21 +88,24 @@ public class DtoToEntityNotificationMapper {
                 if( flatRateF24 != null ) {
                     builder
                             .f24FlatRateDigestSha256( flatRateF24.getDigests().getSha256() )
-                            .f24FlatRateVersionId( flatRateF24.getSavedVersionId() );
+                            .f24FlatRateKey( flatRateF24.getRef().getKey() )
+                            .f24FlatRateVersionId( flatRateF24.getRef().getVersionToken() );
                 }
 
                 NotificationAttachment digitalF24 = paymentInfo.getF24().getDigital();
                 if( digitalF24 != null ) {
                     builder
                             .f24DigitalDigestSha256( digitalF24.getDigests().getSha256() )
-                            .f24DigitalVersionId( digitalF24.getSavedVersionId() );
+                            .f24DigitalKey( digitalF24.getRef().getKey() )
+                            .f24DigitalVersionId( digitalF24.getRef().getVersionToken() );
                 }
 
                 NotificationAttachment analogF24 = paymentInfo.getF24().getAnalog();
                 if( analogF24 != null ) {
                     builder
                             .f24AnalogDigestSha256( analogF24.getDigests().getSha256() )
-                            .f24AnalogVersionId( analogF24.getSavedVersionId() );
+                            .f24AnalogKey( analogF24.getRef().getKey() )
+                            .f24AnalogVersionId( analogF24.getRef().getVersionToken() );
                 }
             }
         }

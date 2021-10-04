@@ -11,7 +11,8 @@ import lombok.Value;
 public class FileData {
 	private final String key;
 	private final InputStream content;
+	private final String contentType;
 	private final long contentLength;
+	private final String versionId;
 	private final Map<String, String> metadata;
-	
 }
