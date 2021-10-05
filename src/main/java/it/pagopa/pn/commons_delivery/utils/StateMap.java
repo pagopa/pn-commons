@@ -26,10 +26,14 @@ class StateMap {
                 .remainToStateWithWarning(TimelineElementCategory.NOTIFICATION_VIEWED, NotificationStatus.RECEIVED)
                 .remainToStateWithWarning(TimelineElementCategory.PAYMENT, NotificationStatus.RECEIVED)
                 .remainToStateWithWarning(TimelineElementCategory.WAIT_FOR_RECIPIENT_TIMEOUT, NotificationStatus.RECEIVED)
+                .remainToStateWithWarning(TimelineElementCategory.SEND_DIGITAL_DOMICILE_FAILURE, NotificationStatus.RECEIVED)
+                .remainToStateWithWarning(TimelineElementCategory.SEND_PAPER_FEEDBACK, NotificationStatus.RECEIVED)
         ;
 
         // Delivering state
         this.fromState(NotificationStatus.DELIVERING)
+                .withTimelineGoToState(TimelineElementCategory.SEND_DIGITAL_DOMICILE_FAILURE, NotificationStatus.DELIVERING)
+                .withTimelineGoToState(TimelineElementCategory.SEND_PAPER_FEEDBACK, NotificationStatus.DELIVERING)
                 .withTimelineGoToState(TimelineElementCategory.SEND_DIGITAL_DOMICILE, NotificationStatus.DELIVERING)
                 .withTimelineGoToState(TimelineElementCategory.SEND_DIGITAL_DOMICILE_FEEDBACK, NotificationStatus.DELIVERING)
                 .withTimelineGoToState(TimelineElementCategory.END_OF_DIGITAL_DELIVERY_WORKFLOW, NotificationStatus.DELIVERED)
@@ -50,6 +54,8 @@ class StateMap {
                 .remainToStateWithWarning(TimelineElementCategory.NOTIFICATION_PATH_CHOOSE, NotificationStatus.DELIVERED)
                 .remainToStateWithWarning(TimelineElementCategory.RECEIVED_ACK, NotificationStatus.DELIVERED)
                 .withTimelineGoToState(TimelineElementCategory.WAIT_FOR_RECIPIENT_TIMEOUT, NotificationStatus.EFFECTIVE_DATE)
+                .remainToStateWithWarning(TimelineElementCategory.SEND_DIGITAL_DOMICILE_FAILURE, NotificationStatus.DELIVERED)
+                .remainToStateWithWarning(TimelineElementCategory.SEND_PAPER_FEEDBACK, NotificationStatus.DELIVERED)
         ;
 
         // Effective date state
@@ -62,6 +68,8 @@ class StateMap {
                 .remainToStateWithWarning(TimelineElementCategory.NOTIFICATION_PATH_CHOOSE, NotificationStatus.EFFECTIVE_DATE)
                 .remainToStateWithWarning(TimelineElementCategory.RECEIVED_ACK, NotificationStatus.EFFECTIVE_DATE)
                 .remainToStateWithWarning(TimelineElementCategory.WAIT_FOR_RECIPIENT_TIMEOUT, NotificationStatus.EFFECTIVE_DATE)
+                .remainToStateWithWarning(TimelineElementCategory.SEND_DIGITAL_DOMICILE_FAILURE, NotificationStatus.EFFECTIVE_DATE)
+                .remainToStateWithWarning(TimelineElementCategory.SEND_PAPER_FEEDBACK, NotificationStatus.EFFECTIVE_DATE)
         ;
 
         // Viewed state
@@ -74,6 +82,8 @@ class StateMap {
                 .remainToStateWithWarning(TimelineElementCategory.NOTIFICATION_PATH_CHOOSE, NotificationStatus.VIEWED)
                 .remainToStateWithWarning(TimelineElementCategory.RECEIVED_ACK, NotificationStatus.VIEWED)
                 .withTimelineGoToState(TimelineElementCategory.WAIT_FOR_RECIPIENT_TIMEOUT, NotificationStatus.VIEWED)
+                .remainToStateWithWarning(TimelineElementCategory.SEND_DIGITAL_DOMICILE_FAILURE, NotificationStatus.VIEWED)
+                .remainToStateWithWarning(TimelineElementCategory.SEND_PAPER_FEEDBACK, NotificationStatus.VIEWED)
         ;
 
         // Paid state
@@ -86,6 +96,8 @@ class StateMap {
                 .remainToStateWithWarning(TimelineElementCategory.NOTIFICATION_PATH_CHOOSE, NotificationStatus.PAID)
                 .remainToStateWithWarning(TimelineElementCategory.RECEIVED_ACK, NotificationStatus.PAID)
                 .withTimelineGoToState(TimelineElementCategory.WAIT_FOR_RECIPIENT_TIMEOUT, NotificationStatus.PAID)
+                .remainToStateWithWarning(TimelineElementCategory.SEND_DIGITAL_DOMICILE_FAILURE, NotificationStatus.PAID)
+                .remainToStateWithWarning(TimelineElementCategory.SEND_PAPER_FEEDBACK, NotificationStatus.PAID)
             ;
 
     }
