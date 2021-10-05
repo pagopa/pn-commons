@@ -67,7 +67,7 @@ class StateMap {
                 .withTimelineGoToState(TimelineElementCategory.PAYMENT, NotificationStatus.PAID)
                 .remainToStateWithWarning(TimelineElementCategory.NOTIFICATION_PATH_CHOOSE, NotificationStatus.EFFECTIVE_DATE)
                 .remainToStateWithWarning(TimelineElementCategory.RECEIVED_ACK, NotificationStatus.EFFECTIVE_DATE)
-                .remainToStateWithWarning(TimelineElementCategory.WAIT_FOR_RECIPIENT_TIMEOUT, NotificationStatus.EFFECTIVE_DATE)
+                .withTimelineGoToState(TimelineElementCategory.WAIT_FOR_RECIPIENT_TIMEOUT, NotificationStatus.EFFECTIVE_DATE)
                 .remainToStateWithWarning(TimelineElementCategory.SEND_DIGITAL_DOMICILE_FAILURE, NotificationStatus.EFFECTIVE_DATE)
                 .remainToStateWithWarning(TimelineElementCategory.SEND_PAPER_FEEDBACK, NotificationStatus.EFFECTIVE_DATE)
         ;
