@@ -50,6 +50,7 @@ public class DtoToEntityNotificationMapper {
                 .documentsKeys( listDocumentsKeys( dto.getDocuments() ))
                 .documentsDigestsSha256( listDocumentsSha256( dto.getDocuments() ))
                 .documentsVersionIds( listDocumentsVersionIds( dto.getDocuments() ))
+                .physicalCommunicationType (dto.getPhysicalCommunicationType().name() )
             ;
 
         NotificationPaymentInfo paymentInfo = dto.getPayment();

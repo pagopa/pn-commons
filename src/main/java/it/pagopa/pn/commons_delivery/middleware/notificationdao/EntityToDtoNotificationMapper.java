@@ -3,6 +3,8 @@ package it.pagopa.pn.commons_delivery.middleware.notificationdao;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
+
+import it.pagopa.pn.api.dto.events.ServiceLevelType;
 import it.pagopa.pn.api.dto.notification.*;
 import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.commons_delivery.model.notification.cassandra.NotificationEntity;
@@ -34,7 +36,8 @@ public class EntityToDtoNotificationMapper {
                 .paNotificationId( entity.getPaNotificationId() )
                 .cancelledByIun( entity.getCancelledByIun() )
                 .cancelledIun( entity.getCancelledIun() )
-
+                .physicalCommunicationType( ServiceLevelType.valueOf( entity.getPhysicalCommunicationType() ) )
+                
                 .sender( NotificationSender.builder()
                         .paId( entity.getSenderPaId() )
                         .build()

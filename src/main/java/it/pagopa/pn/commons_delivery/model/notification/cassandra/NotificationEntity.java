@@ -67,4 +67,5 @@ public class NotificationEntity {
 
     private String f24AnalogVersionId;
 
+    private String physicalCommunicationType;
 }
