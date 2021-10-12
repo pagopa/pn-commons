@@ -29,6 +29,13 @@ public class EntityToDtoNotificationMapper {
     }
 
     public Notification entity2Dto(NotificationEntity entity) {
+    	String physicalCommunicationType = null;
+    	if ( StringUtils.isNotBlank( entity.getPhysicalCommunicationType() )) { 
+    		physicalCommunicationType = entity.getPhysicalCommunicationType();
+    	} else {
+            throw new PnInternalException(" Notification entity with iun " + entity.getIun() + " hash invalid physicalCommunicationType value");
+        }
+    	
         Notification.NotificationBuilder builder = Notification.builder()
                 .iun( entity.getIun() )
                 .subject( entity.getSubject() )
@@ -36,7 +43,7 @@ public class EntityToDtoNotificationMapper {
                 .paNotificationId( entity.getPaNotificationId() )
                 .cancelledByIun( entity.getCancelledByIun() )
                 .cancelledIun( entity.getCancelledIun() )
-                .physicalCommunicationType( ServiceLevelType.valueOf( entity.getPhysicalCommunicationType() ) )
+                .physicalCommunicationType( ServiceLevelType.valueOf( physicalCommunicationType ) )
                 
                 .sender( NotificationSender.builder()
                         .paId( entity.getSenderPaId() )

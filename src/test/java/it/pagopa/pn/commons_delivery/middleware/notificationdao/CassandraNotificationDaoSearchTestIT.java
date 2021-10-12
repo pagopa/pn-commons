@@ -2,6 +2,7 @@ package it.pagopa.pn.commons_delivery.middleware.notificationdao;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.api.dto.NotificationSearchRow;
+import it.pagopa.pn.api.dto.events.ServiceLevelType;
 import it.pagopa.pn.api.dto.notification.Notification;
 import it.pagopa.pn.api.dto.notification.NotificationAttachment;
 import it.pagopa.pn.api.dto.notification.NotificationRecipient;
@@ -68,6 +69,7 @@ class CassandraNotificationDaoSearchTestIT {
         Notification n = Notification.builder()
                 .iun(UUID.randomUUID().toString())
                 .sentAt(Instant.EPOCH.plus(1, ChronoUnit.MINUTES))
+                .physicalCommunicationType( ServiceLevelType.SIMPLE_REGISTERED_LETTER )
                 .sender(NotificationSender.builder().paId(senderId).build())
                 .recipients(Collections.singletonList(
                                 NotificationRecipient.builder()
@@ -133,6 +135,7 @@ class CassandraNotificationDaoSearchTestIT {
 
         Notification n = Notification.builder()
                 .iun(UUID.randomUUID().toString())
+                .physicalCommunicationType( ServiceLevelType.SIMPLE_REGISTERED_LETTER )
                 .sentAt(Instant.EPOCH.plus(1, ChronoUnit.MINUTES))
                 .sender(NotificationSender.builder().paId(senderId).build())
                 .recipients(Collections.singletonList(
@@ -210,6 +213,7 @@ class CassandraNotificationDaoSearchTestIT {
         Notification n = Notification.builder()
                 .iun(UUID.randomUUID().toString())
                 .sentAt(Instant.EPOCH.plus(1, ChronoUnit.MINUTES))
+                .physicalCommunicationType( ServiceLevelType.SIMPLE_REGISTERED_LETTER )
                 .sender(NotificationSender.builder().paId(senderId).build())
                 .recipients(Collections.singletonList(
                                 NotificationRecipient.builder()
@@ -276,6 +280,7 @@ class CassandraNotificationDaoSearchTestIT {
                         )
                 )
                 .subject("Subject Test")
+                .physicalCommunicationType( ServiceLevelType.SIMPLE_REGISTERED_LETTER )
                 .documents(Collections.singletonList(
                         NotificationAttachment.builder()
                                 .body("body")

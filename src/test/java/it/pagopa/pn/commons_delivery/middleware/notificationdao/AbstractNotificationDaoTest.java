@@ -1,5 +1,6 @@
 package it.pagopa.pn.commons_delivery.middleware.notificationdao;
 
+import it.pagopa.pn.api.dto.events.ServiceLevelType;
 import it.pagopa.pn.api.dto.notification.*;
 import it.pagopa.pn.api.dto.notification.address.DigitalAddress;
 import it.pagopa.pn.api.dto.notification.address.DigitalAddressType;
@@ -110,6 +111,7 @@ abstract class AbstractNotificationDaoTest {
                 .iun("IUN_01")
                 .paNotificationId("protocol_01")
                 .subject("Subject 01")
+                .physicalCommunicationType( ServiceLevelType.SIMPLE_REGISTERED_LETTER )
                 .cancelledByIun("IUN_05")
                 .cancelledIun("IUN_00")
                 .sender(NotificationSender.builder()
