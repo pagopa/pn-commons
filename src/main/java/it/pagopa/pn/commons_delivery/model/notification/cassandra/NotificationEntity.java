@@ -1,15 +1,17 @@
 package it.pagopa.pn.commons_delivery.model.notification.cassandra;
 
 
-import it.pagopa.pn.api.dto.notification.NotificationPaymentInfoFeePolicies;
-import lombok.Builder;
-import lombok.Getter;
-import org.springframework.data.cassandra.core.mapping.PrimaryKey;
-import org.springframework.data.cassandra.core.mapping.Table;
-
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+
+import org.springframework.data.cassandra.core.mapping.PrimaryKey;
+import org.springframework.data.cassandra.core.mapping.Table;
+
+import it.pagopa.pn.api.dto.events.ServiceLevelType;
+import it.pagopa.pn.api.dto.notification.NotificationPaymentInfoFeePolicies;
+import lombok.Builder;
+import lombok.Getter;
 
 @Table("notifications")
 @Getter
@@ -67,5 +69,5 @@ public class NotificationEntity {
 
     private String f24AnalogVersionId;
 
-    private String physicalCommunicationType;
+    private ServiceLevelType physicalCommunicationType;
 }
