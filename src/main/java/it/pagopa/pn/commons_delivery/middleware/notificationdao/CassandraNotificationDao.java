@@ -55,11 +55,13 @@ public class CassandraNotificationDao implements NotificationDao {
 
     @Override
     public void addNotification(Notification notification) throws IdConflictException {
-        List<NotificationBySenderEntity> bySenderEntity = dto2SearchEntityMapper.dto2SenderEntity(notification, NotificationStatus.RECEIVED);
-        bySenderEntity.stream().forEach( notificationBySenderEntityDao::put ); 
+        dto2SearchEntityMapper
+                .dto2SenderEntity(notification, NotificationStatus.RECEIVED)
+                .forEach( notificationBySenderEntityDao::put );
         
-        List<NotificationByRecipientEntity> byRecipientEntity = dto2SearchEntityMapper.dto2RecipientEntity(notification, NotificationStatus.RECEIVED);
-        byRecipientEntity.stream().forEach( notificationByRecipientEntityDao::put );
+        dto2SearchEntityMapper
+                .dto2RecipientEntity(notification, NotificationStatus.RECEIVED)
+                .forEach( notificationByRecipientEntityDao::put );
         
         NotificationEntity entity = dto2entityMapper.dto2Entity(notification);
         notificationEntityDao.putIfAbsent(entity);
@@ -114,7 +116,7 @@ public class CassandraNotificationDao implements NotificationDao {
     private Predicate<String> buildFilterIdPredicate(String filterId) {
         Predicate<String> matchSubject;
         if (filterId != null) {
-            matchSubject = s -> s.equals( filterId );
+            matchSubject = filterId::equals;
         } else {
             matchSubject = x -> true;
         }

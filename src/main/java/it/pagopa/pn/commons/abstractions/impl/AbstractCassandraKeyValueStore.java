@@ -54,8 +54,8 @@ public abstract class AbstractCassandraKeyValueStore<K, V> implements KeyValueSt
 
     @Override
     public void delete(K key) {
-        this.get( key ).ifPresent( entity -> {
-            cassandraTemplate.delete( entity, DELETE_OPTIONS );
-        });
+        this.get( key ).ifPresent( entity ->
+            cassandraTemplate.delete( entity, DELETE_OPTIONS )
+        );
     }
 }
