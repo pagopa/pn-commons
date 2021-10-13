@@ -15,7 +15,7 @@ import java.util.Collections;
 
 @SpringBootTest()
 @ActiveProfiles("test")
-public class AwsS3FileStorageTestIT {
+class AwsS3FileStorageTestIT {
 
     private final static String TEST_KEY = "testKey";
 

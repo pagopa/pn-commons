@@ -6,14 +6,14 @@ import java.util.Set;
 
 public class PnValidationException extends IllegalArgumentException {
 
-    private final transient Set<ConstraintViolation<?>> validationErrors;
+    private final transient Set<ConstraintViolation> validationErrors;
 
     public <T> PnValidationException( Set<ConstraintViolation<T>> validationErrors ) {
         super( validationErrors.toString() );
         this.validationErrors = Collections.unmodifiableSet( validationErrors );
     }
 
-    public Set<ConstraintViolation<?>> getValidationErrors() {
+    public Set<ConstraintViolation> getValidationErrors() {
         return validationErrors;
     }
 }
