@@ -37,9 +37,11 @@ class StateMap {
                 .withTimelineGoToState(TimelineElementCategory.SEND_DIGITAL_DOMICILE, NotificationStatus.DELIVERING)
                 .withTimelineGoToState(TimelineElementCategory.SEND_DIGITAL_DOMICILE_FEEDBACK, NotificationStatus.DELIVERING)
                 .withTimelineGoToState(TimelineElementCategory.END_OF_DIGITAL_DELIVERY_WORKFLOW, NotificationStatus.DELIVERED)
+                .withTimelineGoToState(TimelineElementCategory.END_OF_ANALOG_DELIVERY_WORKFLOW, NotificationStatus.DELIVERED)
                 .withTimelineGoToState(TimelineElementCategory.NOTIFICATION_VIEWED, NotificationStatus.VIEWED)
                 .withTimelineGoToState(TimelineElementCategory.PAYMENT, NotificationStatus.PAID)
                 .withTimelineGoToState(TimelineElementCategory.NOTIFICATION_PATH_CHOOSE, NotificationStatus.DELIVERING)
+                .withTimelineGoToState(TimelineElementCategory.SEND_PAPER, NotificationStatus.DELIVERING)
                 .remainToStateWithWarning(TimelineElementCategory.RECEIVED_ACK, NotificationStatus.DELIVERING)
                 .remainToStateWithWarning(TimelineElementCategory.WAIT_FOR_RECIPIENT_TIMEOUT, NotificationStatus.DELIVERING)
         ;

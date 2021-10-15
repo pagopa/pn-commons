@@ -14,8 +14,12 @@ import java.util.stream.Collectors;
 public class StatusUtils {
 
     private static final NotificationStatus INITIAL_STATUS = NotificationStatus.RECEIVED;
-
+    private static final Set<TimelineElementCategory> END_OF_DELIVERY_WORKFLOW = new HashSet<>(Arrays.asList(
+      TimelineElementCategory.END_OF_DIGITAL_DELIVERY_WORKFLOW,
+      TimelineElementCategory.END_OF_ANALOG_DELIVERY_WORKFLOW
+    ));
     private final StateMap stateMap = new StateMap();
+
 
     public NotificationStatus getCurrentStatus(List<NotificationStatusHistoryElement> statusHistory) {
         if (!statusHistory.isEmpty()) {
@@ -38,7 +42,7 @@ public class StatusUtils {
             );
 
         NotificationStatus currentState = INITIAL_STATUS;
-        int numberOfEndedDigitalWorkflows = 0;
+        int numberOfEndedDeliveryWorkflows = 0;
 
 
         List<TimelineElement> timelineByTimestampSorted = timelineElementList.stream()
@@ -48,12 +52,12 @@ public class StatusUtils {
         for (TimelineElement timelineElement : timelineByTimestampSorted) {
             TimelineElementCategory category = timelineElement.getCategory();
 
-            if( TimelineElementCategory.END_OF_DIGITAL_DELIVERY_WORKFLOW.equals( category ) ) {
-                numberOfEndedDigitalWorkflows += 1;
+            if( END_OF_DELIVERY_WORKFLOW.contains( category ) ) {
+                numberOfEndedDeliveryWorkflows += 1;
             }
 
             NotificationStatus nextState = computeStateAfterEvent(
-                        currentState, category, numberOfEndedDigitalWorkflows, numberOfRecipients);
+                        currentState, category, numberOfEndedDeliveryWorkflows, numberOfRecipients);
 
             if (!Objects.equals(currentState, nextState)) {
                 NotificationStatusHistoryElement statusHistoryElement = NotificationStatusHistoryElement.builder()
