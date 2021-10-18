@@ -15,7 +15,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.time.Duration;
 import java.util.List;
 
-@SpringBootTest
+//@SpringBootTest
 @ActiveProfiles("test")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class KafkaProducerConsumerTestIT {
@@ -40,7 +40,7 @@ class KafkaProducerConsumerTestIT {
 		consumer.poll( Duration.ofSeconds(1) );
 	}
 
-	@Test
+	//@Test
 	void successPushAndPullToKafka() {
 
 		// - Given
