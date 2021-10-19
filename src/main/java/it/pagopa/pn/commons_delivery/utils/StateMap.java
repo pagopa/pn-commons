@@ -107,7 +107,9 @@ class StateMap {
     NotificationStatus getStateTransition(NotificationStatus fromStatus, TimelineElementCategory timelineRowType) throws PnInternalException {
         MapKey key = new MapKey(fromStatus, timelineRowType);
         if (!this.mappings.containsKey(key)) {
-            throw new PnInternalException("Unsupported state transition from state " + fromStatus + " with timeline element type " + timelineRowType);
+            log.warn("Illegal input \"" + timelineRowType + "\" in state \"" + fromStatus + "\"");
+            return fromStatus;
+            //throw new PnInternalException("Unsupported state transition from state " + fromStatus + " with timeline element type " + timelineRowType);
         }
 
         final MapValue mapValue = this.mappings.get(key);
