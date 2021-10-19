@@ -55,6 +55,64 @@ class AddressBookTestIT {
     }
 
     @Test
+    void successWithPhysicalAddress() {
+        // GIVEN
+        String taxId = "CGNNMO80A01H501M";
+
+        // WHEN
+        Optional<AddressBookEntry> response = client.getAddresses( taxId );
+
+        // THEN
+        Assertions.assertTrue( response.isPresent() );
+        AddressBookEntry ab = response.get();
+
+        Assertions.assertEquals( taxId, ab.getTaxId() );
+        Assertions.assertNotNull( ab.getResidentialAddress() );
+        Assertions.assertNotNull( ab.getDigitalAddresses() );
+        Assertions.assertNotNull( ab.getDigitalAddresses().getPlatform() );
+        Assertions.assertNotNull( ab.getDigitalAddresses().getGeneral() );
+        Assertions.assertNotNull( ab.getCourtesyAddresses() );
+        Assertions.assertNotNull( ab.getCourtesyAddresses().get(0) );
+        Assertions.assertNotNull( ab.getCourtesyAddresses().get(1) );
+
+        Assertions.assertTrue( StringUtils.isNotBlank( ab.getResidentialAddress().getAt() ));
+        Assertions.assertTrue( StringUtils.isNotBlank( ab.getResidentialAddress().getAddress() ));
+        Assertions.assertTrue( StringUtils.isNotBlank( ab.getResidentialAddress().getAddressDetails() ));
+        Assertions.assertTrue( StringUtils.isNotBlank( ab.getResidentialAddress().getZip() ));
+        Assertions.assertTrue( StringUtils.isNotBlank( ab.getResidentialAddress().getMunicipality() ));
+        Assertions.assertTrue( StringUtils.isNotBlank( ab.getResidentialAddress().getProvince() ));
+        Assertions.assertTrue( StringUtils.isNotBlank( ab.getResidentialAddress().getForeignState() ));
+        Assertions.assertTrue( StringUtils.isNotBlank( ab.getDigitalAddresses().getPlatform().getAddress() ));
+        Assertions.assertTrue( StringUtils.isNotBlank( ab.getDigitalAddresses().getGeneral().getAddress() ));
+        Assertions.assertTrue( StringUtils.isNotBlank( ab.getCourtesyAddresses().get(0).getAddress() ));
+        Assertions.assertTrue( StringUtils.isNotBlank( ab.getCourtesyAddresses().get(1).getAddress() ));
+    }
+
+    @Test
+    void successOnlyWithPhysicalAddress() {
+        // GIVEN
+        String taxId = "CGNNMO80A03H501U";
+
+        // WHEN
+        Optional<AddressBookEntry> response = client.getAddresses( taxId );
+
+        // THEN
+        Assertions.assertTrue( response.isPresent() );
+        AddressBookEntry ab = response.get();
+
+        Assertions.assertEquals( taxId, ab.getTaxId() );
+        Assertions.assertNotNull( ab.getResidentialAddress() );
+
+        Assertions.assertTrue( StringUtils.isNotBlank( ab.getResidentialAddress().getAt() ));
+        Assertions.assertTrue( StringUtils.isNotBlank( ab.getResidentialAddress().getAddress() ));
+        Assertions.assertTrue( StringUtils.isNotBlank( ab.getResidentialAddress().getAddressDetails() ));
+        Assertions.assertTrue( StringUtils.isNotBlank( ab.getResidentialAddress().getZip() ));
+        Assertions.assertTrue( StringUtils.isNotBlank( ab.getResidentialAddress().getMunicipality() ));
+        Assertions.assertTrue( StringUtils.isNotBlank( ab.getResidentialAddress().getProvince() ));
+        Assertions.assertTrue( StringUtils.isNotBlank( ab.getResidentialAddress().getForeignState() ));
+    }
+
+    @Test
     void entryWithoutAddresses() {
         // GIVEN
         String taxId = "IsNotATaxId";

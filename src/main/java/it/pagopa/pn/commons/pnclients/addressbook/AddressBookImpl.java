@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import java.lang.reflect.Field;
 import java.util.Optional;
 
 @Component
@@ -32,8 +33,12 @@ public class AddressBookImpl implements AddressBook {
         AddressBookEntry responseBody = response.getBody();
 
         // - Less null checking for callers
-        if( responseBody != null && responseBody.getDigitalAddresses() == null ) {
-            responseBody = null;
+        try {
+            if( responseBody != null && responseBody.checkAllNull() ) {
+                responseBody = null;
+            }
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
         }
 
         return Optional.ofNullable( responseBody );
