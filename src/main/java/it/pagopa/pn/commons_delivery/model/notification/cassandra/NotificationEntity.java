@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.data.cassandra.core.mapping.Column;
 import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.Table;
 
@@ -68,6 +69,6 @@ public class NotificationEntity {
     private String f24AnalogDigestSha256;
 
     private String f24AnalogVersionId;
-
+    @Column("physicalCommunicationType")
     private ServiceLevelType physicalCommunicationType;
 }
