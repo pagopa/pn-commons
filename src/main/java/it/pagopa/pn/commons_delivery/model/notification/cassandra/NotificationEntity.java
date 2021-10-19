@@ -69,6 +69,7 @@ public class NotificationEntity {
     private String f24AnalogDigestSha256;
 
     private String f24AnalogVersionId;
-    @Column("\"physicalCommunicationType\"")
+
+    @Column("physical_communication_type")
     private ServiceLevelType physicalCommunicationType;
 }
