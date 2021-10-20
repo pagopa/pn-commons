@@ -32,7 +32,8 @@ public class AddressBookImpl implements AddressBook {
         AddressBookEntry responseBody = response.getBody();
 
         // - Less null checking for callers
-        if( responseBody != null && responseBody.getDigitalAddresses() == null ) {
+
+        if( responseBody != null && responseBody.checkAllNull() ) {
             responseBody = null;
         }
 
