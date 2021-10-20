@@ -130,18 +130,4 @@ class AddressBookTestIT {
         Assertions.assertTrue( response.isEmpty() );
     }
 
-    @Test
-    void checkNullCompare() throws IllegalAccessException {
-
-        AddressBookEntry addressBookEntry = AddressBookEntry.builder().build();
-
-        long startTime = System.currentTimeMillis();
-        for (int i = 0; i<1000000; i++) {
-            addressBookEntry.checkAllNull();
-        }
-        long stopTime = System.currentTimeMillis();
-        log.info("++++++ Execution time: " + (stopTime - startTime) + " ms");
-
-    }
-
 }
