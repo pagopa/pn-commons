@@ -1,21 +1,29 @@
 package it.pagopa.pn.commons.pnclients.addressbook;
 
 import it.pagopa.pn.api.dto.addressbook.AddressBookEntry;
+import it.pagopa.pn.api.dto.addressbook.DigitalAddresses;
+import it.pagopa.pn.api.dto.notification.address.PhysicalAddress;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.platform.commons.util.StringUtils;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.List;
 import java.util.Optional;
 
 @ExtendWith(SpringExtension.class)
 @TestPropertySource("classpath:/application-test.properties")
 @EnableConfigurationProperties(value = MicroserviceClientsConfigs.class)
+@Slf4j
 class AddressBookTestIT {
 
     private AddressBook client;
@@ -24,9 +32,7 @@ class AddressBookTestIT {
     private MicroserviceClientsConfigs cfg;
 
     @BeforeEach
-    void prepareClient() {
-        client = new AddressBookImpl( cfg );
-    }
+    void prepareClient() { client = new AddressBookImpl( cfg ); }
     
     @Test
     void successWithPlatformAndGeneralDigitalAddresses() {
@@ -122,6 +128,20 @@ class AddressBookTestIT {
 
         // THEN
         Assertions.assertTrue( response.isEmpty() );
+    }
+
+    @Test
+    void checkNullCompare() throws IllegalAccessException {
+
+        AddressBookEntry addressBookEntry = AddressBookEntry.builder().build();
+
+        long startTime = System.currentTimeMillis();
+        for (int i = 0; i<1000000; i++) {
+            addressBookEntry.checkAllNull();
+        }
+        long stopTime = System.currentTimeMillis();
+        log.info("++++++ Execution time: " + (stopTime - startTime) + " ms");
+
     }
 
 }

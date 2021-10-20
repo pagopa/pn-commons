@@ -33,12 +33,9 @@ public class AddressBookImpl implements AddressBook {
         AddressBookEntry responseBody = response.getBody();
 
         // - Less null checking for callers
-        try {
-            if( responseBody != null && responseBody.checkAllNull() ) {
-                responseBody = null;
-            }
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+
+        if( responseBody != null && responseBody.checkAllNull() ) {
+            responseBody = null;
         }
 
         return Optional.ofNullable( responseBody );
