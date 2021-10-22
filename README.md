@@ -1,1 +1,4 @@
-# pn-commons
+##Istruzioni per la compilazione
+```
+    ./mvnw clean install
+```
