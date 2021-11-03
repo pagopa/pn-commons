@@ -1,7 +1,6 @@
 package it.pagopa.pn.commons_delivery.middleware.failednotification;
 
 import it.pagopa.pn.api.dto.notification.failednotification.PaperNotificationFailed;
-import it.pagopa.pn.commons.abstractions.IdConflictException;
 import it.pagopa.pn.commons.abstractions.impl.MiddlewareTypes;
 import it.pagopa.pn.commons_delivery.model.notification.cassandra.PaperNotificationFailedEntity;
 import it.pagopa.pn.commons_delivery.model.notification.cassandra.PaperNotificationFailedEntityId;
@@ -28,7 +27,7 @@ public class CassandraPaperNotificationFailedDao implements PaperNotificationFai
     }
 
     @Override
-    public void addPaperNotificationFailed(PaperNotificationFailed paperNotificationFailed) throws IdConflictException {
+    public void addPaperNotificationFailed(PaperNotificationFailed paperNotificationFailed) {
         PaperNotificationFailedEntity entity = dtoToEntity.dto2Entity(paperNotificationFailed);
         dao.put(entity);
     }

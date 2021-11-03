@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 @Slf4j
 class StateMap {
 
@@ -42,6 +41,7 @@ class StateMap {
                 .withTimelineGoToState(TimelineElementCategory.PAYMENT, NotificationStatus.PAID)
                 .withTimelineGoToState(TimelineElementCategory.NOTIFICATION_PATH_CHOOSE, NotificationStatus.DELIVERING)
                 .withTimelineGoToState(TimelineElementCategory.SEND_PAPER, NotificationStatus.DELIVERING)
+                .withTimelineGoToState(TimelineElementCategory.COMPLETELY_UNREACHABLE, NotificationStatus.UNREACHABLE)
                 .remainToStateWithWarning(TimelineElementCategory.RECEIVED_ACK, NotificationStatus.DELIVERING)
                 .remainToStateWithWarning(TimelineElementCategory.WAIT_FOR_RECIPIENT_TIMEOUT, NotificationStatus.DELIVERING)
         ;
@@ -100,8 +100,10 @@ class StateMap {
                 .withTimelineGoToState(TimelineElementCategory.WAIT_FOR_RECIPIENT_TIMEOUT, NotificationStatus.PAID)
                 .remainToStateWithWarning(TimelineElementCategory.SEND_DIGITAL_DOMICILE_FAILURE, NotificationStatus.PAID)
                 .remainToStateWithWarning(TimelineElementCategory.SEND_PAPER_FEEDBACK, NotificationStatus.PAID)
-            ;
-
+        ;
+        this.fromState(NotificationStatus.UNREACHABLE)
+                .withTimelineGoToState(TimelineElementCategory.NOTIFICATION_VIEWED, NotificationStatus.VIEWED)
+        ;
     }
 
     NotificationStatus getStateTransition(NotificationStatus fromStatus, TimelineElementCategory timelineRowType) throws PnInternalException {
