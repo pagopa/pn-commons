@@ -103,6 +103,7 @@ class StateMap {
         ;
         this.fromState(NotificationStatus.UNREACHABLE)
                 .withTimelineGoToState(TimelineElementCategory.NOTIFICATION_VIEWED, NotificationStatus.VIEWED)
+                .withTimelineGoToState(TimelineElementCategory.WAIT_FOR_RECIPIENT_TIMEOUT, NotificationStatus.EFFECTIVE_DATE)
         ;
     }
 
