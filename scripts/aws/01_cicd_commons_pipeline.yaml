@@ -176,6 +176,13 @@ Resources:
                   - - !Sub "arn:aws:codeartifact:${AWS::Region}:${AWS::AccountId}:repository"
                     - Fn::ImportValue: !Sub "${CodeArtifactDeploymentStackName}-CodeArtifactDomainName"
                     - Fn::ImportValue: !Sub "${CodeArtifactDeploymentStackName}-CodeArtifactRepositoryName"
+          - Sid: SonarSecretManager
+            Effect: Allow
+            Action:
+              - secretsmanager:GetSecretValue
+            Resource:
+              - "arn:aws:secretsmanager:eu-central-1:911845998067:secret:SonarCloud-7370vM"
+
       Roles:
         - !Ref CodeBuildRole
   
@@ -188,6 +195,9 @@ Resources:
         Type: CODEPIPELINE
         BuildSpec: |
           version: 0.2
+          env:
+            secrets-manager:
+              SONAR_TOKEN: arn:aws:secretsmanager:eu-central-1:911845998067:secret:SonarCloud-7370vM:token
           phases:
             pre_build:
               commands:
@@ -201,6 +211,10 @@ Resources:
                 - ls target
                 - echo "Deploy"
                 - ./mvnw --settings maven-deploy-settings.xml -DskipITs -DaltDeploymentRepository=pn-codeartifact::default::https://${CODEARTIFACT_DOMAIN_FULL}/maven/${CODEARTIFACT_REPO}/ deploy
+            post_build:
+              commands:
+                - echo "Sonar"
+                - ./mvnw verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -DskipITs -Dsonar.organization=pagopa -Dsonar.host.url=https://sonarcloud.io -Dsonar.projectKey=pagopa_pn-commons
           artifacts:
             files:
               - 'target/**'
