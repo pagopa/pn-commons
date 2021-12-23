@@ -48,6 +48,8 @@ public class NotificationEntity {
 
     private List<String> documentsVersionIds;
 
+    private List<String> documentsContentTypes;
+
     private String iuv;
 
     private NotificationPaymentInfoFeePolicies notificationFeePolicy;
