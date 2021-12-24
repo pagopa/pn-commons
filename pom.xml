@@ -290,5 +290,18 @@
 			</plugin>
 		</plugins>
 	</build>
-
+	<profiles>
+		<profile>
+			<id>skip IT tests</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+				<property>
+					<name>CI_PROFILE</name>
+				</property>
+			</activation>
+			<properties>
+				<skipITs>true</skipITs>
+			</properties>
+		</profile>
+	</profiles>
 </project>
