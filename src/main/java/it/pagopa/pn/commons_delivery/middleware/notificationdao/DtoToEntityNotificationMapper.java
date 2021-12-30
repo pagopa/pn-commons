@@ -50,6 +50,7 @@ public class DtoToEntityNotificationMapper {
                 .documentsKeys( listDocumentsKeys( dto.getDocuments() ))
                 .documentsDigestsSha256( listDocumentsSha256( dto.getDocuments() ))
                 .documentsVersionIds( listDocumentsVersionIds( dto.getDocuments() ))
+                .documentsContentTypes( listDocumentsContentTypes( dto.getDocuments() ) )
                 .physicalCommunicationType (dto.getPhysicalCommunicationType() )
             ;
 
@@ -57,6 +58,12 @@ public class DtoToEntityNotificationMapper {
         fillBuilderWithPaymentInfo(builder, paymentInfo);
 
         return builder.build();
+    }
+
+    private List<String> listDocumentsContentTypes(List<NotificationAttachment> documents) {
+        return documents.stream()
+                .map(NotificationAttachment::getContentType)
+                .collect( Collectors.toList() );
     }
 
     private List<String> listDocumentsKeys(List<NotificationAttachment> documents) {
