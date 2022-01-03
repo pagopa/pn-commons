@@ -9,7 +9,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 class StatusUtilsTest {
     private StatusUtils statusUtils;
@@ -25,7 +28,7 @@ class StatusUtilsTest {
         // creare TimelineElement
         TimelineElement timelineElement1 = TimelineElement.builder()
                 .timestamp(Instant.parse("2021-09-16T15:24:00.00Z"))
-                .category(TimelineElementCategory.RECEIVED_ACK)
+                .category(TimelineElementCategory.REQUEST_ACCEPTED)
                 .build();
         TimelineElement timelineElement2 = TimelineElement.builder()
                 .timestamp(Instant.parse("2021-09-16T15:25:00.00Z"))
@@ -95,7 +98,7 @@ class StatusUtilsTest {
         // creare TimelineElement
         TimelineElement timelineElement1 = TimelineElement.builder()
                 .timestamp(Instant.parse("2021-09-16T15:24:00.00Z"))
-                .category(TimelineElementCategory.RECEIVED_ACK)
+                .category(TimelineElementCategory.REQUEST_ACCEPTED)
                 .build();
         TimelineElement timelineElement2 = TimelineElement.builder()
                 .timestamp(Instant.parse("2021-09-16T15:25:00.00Z"))
@@ -177,7 +180,7 @@ class StatusUtilsTest {
         // creare TimelineElement
         TimelineElement timelineElement1 = TimelineElement.builder()
                 .timestamp(Instant.parse("2021-09-16T15:24:00.00Z"))
-                .category(TimelineElementCategory.RECEIVED_ACK)
+                .category(TimelineElementCategory.REQUEST_ACCEPTED)
                 .build();
         TimelineElement timelineElement2 = TimelineElement.builder()
                 .timestamp(Instant.parse("2021-09-16T15:25:00.00Z"))
@@ -218,7 +221,7 @@ class StatusUtilsTest {
     void getCurrentStatusTest() {
         TimelineElement timelineElement1 = TimelineElement.builder()
                 .timestamp(Instant.parse("2021-09-16T15:24:00.00Z"))
-                .category(TimelineElementCategory.RECEIVED_ACK)
+                .category(TimelineElementCategory.REQUEST_ACCEPTED)
                 .build();
         TimelineElement timelineElement2 = TimelineElement.builder()
                 .timestamp(Instant.parse("2021-09-16T15:25:00.00Z"))

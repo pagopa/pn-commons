@@ -1,15 +1,11 @@
 package it.pagopa.pn.commons_delivery.middleware.timelinedao;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.pagopa.pn.api.dto.NotificationSearchRow;
-import it.pagopa.pn.api.dto.notification.Notification;
-import it.pagopa.pn.api.dto.notification.status.NotificationStatus;
 import it.pagopa.pn.api.dto.notification.timeline.NotificationPathChooseDetails;
 import it.pagopa.pn.api.dto.notification.timeline.ReceivedDetails;
 import it.pagopa.pn.api.dto.notification.timeline.TimelineElement;
 import it.pagopa.pn.api.dto.notification.timeline.TimelineElementCategory;
 import it.pagopa.pn.commons.abstractions.IdConflictException;
-import it.pagopa.pn.commons_delivery.middleware.NotificationDao;
 import it.pagopa.pn.commons_delivery.middleware.TimelineDao;
 import it.pagopa.pn.commons_delivery.middleware.notificationdao.CassandraNotificationByRecipientEntityDao;
 import it.pagopa.pn.commons_delivery.middleware.notificationdao.CassandraNotificationBySenderEntityDao;
@@ -22,10 +18,12 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.springframework.data.cassandra.core.CassandraOperations;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -59,7 +57,7 @@ class CassandraTimelineDaoTest {
         TimelineElement row1 = TimelineElement.builder()
                 .iun(iun)
                 .elementId(id1)
-                .category(TimelineElementCategory.RECEIVED_ACK)
+                .category(TimelineElementCategory.REQUEST_ACCEPTED)
                 .details(new ReceivedDetails())
                 .timestamp(Instant.ofEpochMilli(System.currentTimeMillis()))
                 .build();
@@ -107,7 +105,7 @@ class CassandraTimelineDaoTest {
         TimelineElement row1 = TimelineElement.builder()
                 .iun(iun)
                 .elementId(id1)
-                .category(TimelineElementCategory.RECEIVED_ACK)
+                .category(TimelineElementCategory.REQUEST_ACCEPTED)
                 .details(new ReceivedDetails())
                 .timestamp(Instant.ofEpochMilli(System.currentTimeMillis()))
                 .build();
