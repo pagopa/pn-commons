@@ -269,6 +269,7 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.22.2</version>
 				<configuration>
+					<!--suppress UnresolvedMavenProperty -->
 					<argLine>${surefire.jacoco.args}</argLine>
 				</configuration>
 			</plugin>
@@ -277,6 +278,7 @@
 				<artifactId>maven-failsafe-plugin</artifactId>
 				<version>2.22.2</version>
 				<configuration>
+					<!--suppress UnresolvedMavenProperty -->
 					<argLine>${failsafe.jacoco.args}</argLine>
 				</configuration>
 				<executions>
