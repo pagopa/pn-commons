@@ -11,11 +11,11 @@ import java.util.Map;
 
 @Slf4j
 class StateMap {
-
+    //TODO Da cambiare i possibili stati della timeline
+    
     private final Map<MapKey, MapValue> mappings = new HashMap<>();
 
     public StateMap() {
-
         // Received state
         this.fromState(NotificationStatus.RECEIVED)
                 .withTimelineGoToState(TimelineElementCategory.NOTIFICATION_PATH_CHOOSE, NotificationStatus.DELIVERING)
