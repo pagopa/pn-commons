@@ -139,6 +139,7 @@ abstract class AbstractNotificationDaoTest {
                                         .sha256("sha256_doc00")
                                         .build()
                                 )
+                                .contentType( "application/pdf" )
                                 .build(),
                         NotificationAttachment.builder()
                                 .ref( NotificationAttachment.Ref.builder()
@@ -150,6 +151,7 @@ abstract class AbstractNotificationDaoTest {
                                         .sha256("sha256_doc01")
                                         .build()
                                 )
+                                .contentType( "application/pdf" )
                                 .build()
                 ))
                 .build();

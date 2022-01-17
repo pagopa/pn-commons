@@ -115,16 +115,29 @@ public class EntityToDtoNotificationMapper {
         return result;
     }
 
+    private NotificationAttachment buildAttachment(String key, String version, String sha256, String contentType ) {
+         NotificationAttachment notificationAttachment = buildAttachment(key, version, sha256);
+         if ( notificationAttachment != null ){
+             notificationAttachment = notificationAttachment.toBuilder()
+                     .contentType(contentType)
+                     .build();
+         }
+        return notificationAttachment;
+    }
+
     private List<NotificationAttachment> buildDocumentsList( NotificationEntity entity ) {
         List<String> documentsDigestsSha256 = entity.getDocumentsDigestsSha256();
         List<String> documentsKeys = entity.getDocumentsKeys();
         List<String> documentsVersionIds = entity.getDocumentsVersionIds();
+        List<String> documentsContentTypes = entity.getDocumentsContentTypes();
 
         int lengthShas = documentsDigestsSha256 == null ? 0 : documentsDigestsSha256.size();
         int lengthKeys = documentsKeys == null ? 0 : documentsKeys.size();
         int lengthVersionIds = documentsVersionIds == null ? 0 : documentsVersionIds.size();
-        if ( lengthShas != lengthKeys || lengthKeys != lengthVersionIds ) {
-            throw new PnInternalException(" Notification entity with iun " + entity.getIun() + " hash different quantity of document versions, sha256s and keys");
+        int lengthContentTypes = documentsContentTypes == null ? 0 : documentsContentTypes.size();
+        if ( lengthShas != lengthKeys || lengthKeys != lengthVersionIds || lengthVersionIds != lengthContentTypes  ) {
+            throw new PnInternalException(" Notification entity with iun " + entity.getIun() +
+                    " hash different quantity of document versions, sha256s, keys and content types");
         }
 
         // - Three different list with one information each instead of a list of object:
@@ -134,7 +147,8 @@ public class EntityToDtoNotificationMapper {
             NotificationAttachment notificationAttachment = buildAttachment(
                     documentsKeys.get( d ),
                     documentsVersionIds.get( d ),
-                    documentsDigestsSha256.get( d )
+                    documentsDigestsSha256.get( d ),
+                    documentsContentTypes.get( d )
                 );
             result.add( notificationAttachment );
         }
