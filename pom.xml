@@ -11,7 +11,7 @@
 	<artifactId>pn-commons</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>pn-commons</name>
-	<description>Common Utilities</description>
+	<description>Pn Common Utilities</description>
 
 	<dependencies>
 		<dependency>
