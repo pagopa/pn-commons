@@ -11,7 +11,7 @@
 	<artifactId>pn-commons</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>pn-commons</name>
-	<description>Common Utilities</description>
+	<description>Pn Common Utilities</description>
 
 	<dependencies>
 		<dependency>
@@ -19,7 +19,6 @@
 			<artifactId>pn-model</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webflux</artifactId>
@@ -41,17 +40,6 @@
 			<artifactId>springdoc-openapi-webflux-ui</artifactId>
 			<version>1.5.8</version>
 		</dependency>
-
-		
-		<!-- https://mvnrepository.com/artifact/net.logstash.logback/logstash-logback-encoder -->
-		<!--
-		<dependency>
-			<groupId>net.logstash.logback</groupId>
-			<artifactId>logstash-logback-encoder</artifactId>
-			<version>6.6</version>
-		</dependency>
-	-->
-
 		<dependency>
 			<groupId>software.amazon.awssdk</groupId>
 			<artifactId>dynamodb</artifactId>
@@ -91,7 +79,6 @@
 			<artifactId>spring-kafka-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-configuration-processor</artifactId>
@@ -108,5 +95,4 @@
 			<version>4.5.13</version>
 		</dependency>
 	</dependencies>
-
 </project>
