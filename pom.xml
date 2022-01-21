@@ -41,17 +41,6 @@
 			<artifactId>springdoc-openapi-webflux-ui</artifactId>
 			<version>1.5.8</version>
 		</dependency>
-
-		
-		<!-- https://mvnrepository.com/artifact/net.logstash.logback/logstash-logback-encoder -->
-		<!--
-		<dependency>
-			<groupId>net.logstash.logback</groupId>
-			<artifactId>logstash-logback-encoder</artifactId>
-			<version>6.6</version>
-		</dependency>
-	-->
-
 		<dependency>
 			<groupId>software.amazon.awssdk</groupId>
 			<artifactId>dynamodb</artifactId>
@@ -108,5 +97,4 @@
 			<version>4.5.13</version>
 		</dependency>
 	</dependencies>
-
 </project>
