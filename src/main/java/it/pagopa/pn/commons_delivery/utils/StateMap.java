@@ -11,6 +11,7 @@ import java.util.Map;
 
 @Slf4j
 class StateMap {
+    //TODO Da rivedere meglio gli stati
 
     private final Map<MapKey, MapValue> mappings = new HashMap<>();
 
@@ -32,6 +33,7 @@ class StateMap {
                 .withTimelineGoToState(TimelineElementCategory.GET_ADDRESS, NotificationStatus.RECEIVED)
                 .withTimelineGoToState(TimelineElementCategory.PUBLIC_REGISTRY_CALL, NotificationStatus.RECEIVED)
                 .withTimelineGoToState(TimelineElementCategory.PUBLIC_REGISTRY_RESPONSE, NotificationStatus.RECEIVED)
+                .withTimelineGoToState(TimelineElementCategory.SCHEDULE_ANALOG_WORKFLOW, NotificationStatus.DELIVERING)
 
                 .remainToStateWithWarning(TimelineElementCategory.SEND_DIGITAL_FEEDBACK, NotificationStatus.RECEIVED)
                 .remainToStateWithWarning(TimelineElementCategory.SCHEDULE_REFINEMENT, NotificationStatus.RECEIVED)
@@ -41,8 +43,8 @@ class StateMap {
                 .remainToStateWithWarning(TimelineElementCategory.ANALOG_FAILURE_WORKFLOW, NotificationStatus.RECEIVED)
                 .remainToStateWithWarning(TimelineElementCategory.SEND_SIMPLE_REGISTERED_LETTER, NotificationStatus.RECEIVED)
 
-                .withTimelineGoToState(TimelineElementCategory.SCHEDULE_DIGITAL_WORKFLOW, NotificationStatus.DELIVERING)
-                .withTimelineGoToState(TimelineElementCategory.SCHEDULE_ANALOG_WORKFLOW, NotificationStatus.DELIVERING)
+                .withTimelineGoToState(TimelineElementCategory.SEND_DIGITAL_DOMICILE, NotificationStatus.DELIVERING)
+                .withTimelineGoToState(TimelineElementCategory.SEND_ANALOG_DOMICILE, NotificationStatus.DELIVERING)
         ;
 
         // Delivering state
@@ -67,15 +69,16 @@ class StateMap {
                 .withTimelineGoToState(TimelineElementCategory.PUBLIC_REGISTRY_RESPONSE, NotificationStatus.DELIVERING)
                 .withTimelineGoToState(TimelineElementCategory.SEND_DIGITAL_FEEDBACK, NotificationStatus.DELIVERING)
                 .withTimelineGoToState(TimelineElementCategory.SEND_SIMPLE_REGISTERED_LETTER, NotificationStatus.DELIVERING)
-                .withTimelineGoToState(TimelineElementCategory.DIGITAL_SUCCESS_WORKFLOW, NotificationStatus.DELIVERED)
-                .withTimelineGoToState(TimelineElementCategory.DIGITAL_FAILURE_WORKFLOW, NotificationStatus.DELIVERED)
-                .withTimelineGoToState(TimelineElementCategory.ANALOG_SUCCESS_WORKFLOW, NotificationStatus.DELIVERED)
-                .withTimelineGoToState(TimelineElementCategory.ANALOG_FAILURE_WORKFLOW, NotificationStatus.DELIVERED)
+                .withTimelineGoToState(TimelineElementCategory.ANALOG_FAILURE_WORKFLOW, NotificationStatus.DELIVERING)
+                .withTimelineGoToState(TimelineElementCategory.SCHEDULE_DIGITAL_WORKFLOW, NotificationStatus.DELIVERING)
 
                 .remainToStateWithWarning(TimelineElementCategory.SEND_COURTESY_MESSAGE, NotificationStatus.DELIVERING)
                 .remainToStateWithWarning(TimelineElementCategory.SCHEDULE_REFINEMENT, NotificationStatus.DELIVERING)
-                .remainToStateWithWarning(TimelineElementCategory.SCHEDULE_DIGITAL_WORKFLOW, NotificationStatus.DELIVERING)
                 .remainToStateWithWarning(TimelineElementCategory.SCHEDULE_ANALOG_WORKFLOW, NotificationStatus.DELIVERING)
+
+                .withTimelineGoToState(TimelineElementCategory.DIGITAL_SUCCESS_WORKFLOW, NotificationStatus.DELIVERED)
+                .withTimelineGoToState(TimelineElementCategory.DIGITAL_FAILURE_WORKFLOW, NotificationStatus.DELIVERED)
+                .withTimelineGoToState(TimelineElementCategory.ANALOG_SUCCESS_WORKFLOW, NotificationStatus.DELIVERED)
         ;
 
         // Delivered state
@@ -101,9 +104,10 @@ class StateMap {
                 .remainToStateWithWarning(TimelineElementCategory.ANALOG_SUCCESS_WORKFLOW, NotificationStatus.DELIVERED)
                 .remainToStateWithWarning(TimelineElementCategory.ANALOG_FAILURE_WORKFLOW, NotificationStatus.DELIVERED)
                 .remainToStateWithWarning(TimelineElementCategory.SEND_COURTESY_MESSAGE, NotificationStatus.DELIVERED)
-                .remainToStateWithWarning(TimelineElementCategory.SCHEDULE_REFINEMENT, NotificationStatus.DELIVERED)
                 .remainToStateWithWarning(TimelineElementCategory.SCHEDULE_DIGITAL_WORKFLOW, NotificationStatus.DELIVERED)
                 .remainToStateWithWarning(TimelineElementCategory.SCHEDULE_ANALOG_WORKFLOW, NotificationStatus.DELIVERED)
+                .withTimelineGoToState(TimelineElementCategory.SCHEDULE_REFINEMENT, NotificationStatus.DELIVERED)
+
         ;
 
         // Effective date state
@@ -119,20 +123,18 @@ class StateMap {
                 .remainToStateWithWarning(TimelineElementCategory.SEND_DIGITAL_DOMICILE_FAILURE, NotificationStatus.EFFECTIVE_DATE)
                 .remainToStateWithWarning(TimelineElementCategory.SEND_PAPER_FEEDBACK, NotificationStatus.EFFECTIVE_DATE)
 
-
-                .remainToStateWithWarning(TimelineElementCategory.GET_ADDRESS, NotificationStatus.DELIVERED)
-                .remainToStateWithWarning(TimelineElementCategory.PUBLIC_REGISTRY_CALL, NotificationStatus.DELIVERED)
-                .remainToStateWithWarning(TimelineElementCategory.PUBLIC_REGISTRY_RESPONSE, NotificationStatus.DELIVERED)
-                .remainToStateWithWarning(TimelineElementCategory.SEND_DIGITAL_FEEDBACK, NotificationStatus.DELIVERED)
-                .remainToStateWithWarning(TimelineElementCategory.SEND_SIMPLE_REGISTERED_LETTER, NotificationStatus.DELIVERED)
-                .remainToStateWithWarning(TimelineElementCategory.DIGITAL_SUCCESS_WORKFLOW, NotificationStatus.DELIVERED)
-                .remainToStateWithWarning(TimelineElementCategory.DIGITAL_FAILURE_WORKFLOW, NotificationStatus.DELIVERED)
-                .remainToStateWithWarning(TimelineElementCategory.ANALOG_SUCCESS_WORKFLOW, NotificationStatus.DELIVERED)
-                .remainToStateWithWarning(TimelineElementCategory.ANALOG_FAILURE_WORKFLOW, NotificationStatus.DELIVERED)
-                .remainToStateWithWarning(TimelineElementCategory.SEND_COURTESY_MESSAGE, NotificationStatus.DELIVERED)
-                .remainToStateWithWarning(TimelineElementCategory.SCHEDULE_REFINEMENT, NotificationStatus.DELIVERED)
-                .remainToStateWithWarning(TimelineElementCategory.SCHEDULE_DIGITAL_WORKFLOW, NotificationStatus.DELIVERED)
-                .remainToStateWithWarning(TimelineElementCategory.SCHEDULE_ANALOG_WORKFLOW, NotificationStatus.DELIVERED)
+                .remainToStateWithWarning(TimelineElementCategory.GET_ADDRESS, NotificationStatus.EFFECTIVE_DATE)
+                .remainToStateWithWarning(TimelineElementCategory.PUBLIC_REGISTRY_CALL, NotificationStatus.EFFECTIVE_DATE)
+                .remainToStateWithWarning(TimelineElementCategory.PUBLIC_REGISTRY_RESPONSE, NotificationStatus.EFFECTIVE_DATE)
+                .remainToStateWithWarning(TimelineElementCategory.SEND_DIGITAL_FEEDBACK, NotificationStatus.EFFECTIVE_DATE)
+                .remainToStateWithWarning(TimelineElementCategory.SEND_SIMPLE_REGISTERED_LETTER, NotificationStatus.EFFECTIVE_DATE)
+                .remainToStateWithWarning(TimelineElementCategory.DIGITAL_SUCCESS_WORKFLOW, NotificationStatus.EFFECTIVE_DATE)
+                .remainToStateWithWarning(TimelineElementCategory.DIGITAL_FAILURE_WORKFLOW, NotificationStatus.EFFECTIVE_DATE)
+                .remainToStateWithWarning(TimelineElementCategory.ANALOG_SUCCESS_WORKFLOW, NotificationStatus.EFFECTIVE_DATE)
+                .remainToStateWithWarning(TimelineElementCategory.SEND_COURTESY_MESSAGE, NotificationStatus.EFFECTIVE_DATE)
+                .remainToStateWithWarning(TimelineElementCategory.SCHEDULE_REFINEMENT, NotificationStatus.EFFECTIVE_DATE)
+                .remainToStateWithWarning(TimelineElementCategory.SCHEDULE_DIGITAL_WORKFLOW, NotificationStatus.EFFECTIVE_DATE)
+                .remainToStateWithWarning(TimelineElementCategory.SCHEDULE_ANALOG_WORKFLOW, NotificationStatus.EFFECTIVE_DATE)
         ;
 
         // Viewed state
@@ -148,7 +150,18 @@ class StateMap {
                 .remainToStateWithWarning(TimelineElementCategory.SEND_DIGITAL_DOMICILE_FAILURE, NotificationStatus.VIEWED)
                 .remainToStateWithWarning(TimelineElementCategory.SEND_PAPER_FEEDBACK, NotificationStatus.VIEWED)
 
-        //TODO Da definire per i nuovi elementi di timeline
+                .remainToStateWithWarning(TimelineElementCategory.GET_ADDRESS, NotificationStatus.VIEWED)
+                .remainToStateWithWarning(TimelineElementCategory.PUBLIC_REGISTRY_CALL, NotificationStatus.VIEWED)
+                .remainToStateWithWarning(TimelineElementCategory.PUBLIC_REGISTRY_RESPONSE, NotificationStatus.VIEWED)
+                .remainToStateWithWarning(TimelineElementCategory.SEND_DIGITAL_FEEDBACK, NotificationStatus.VIEWED)
+                .remainToStateWithWarning(TimelineElementCategory.SEND_SIMPLE_REGISTERED_LETTER, NotificationStatus.VIEWED)
+                .remainToStateWithWarning(TimelineElementCategory.DIGITAL_SUCCESS_WORKFLOW, NotificationStatus.VIEWED)
+                .remainToStateWithWarning(TimelineElementCategory.DIGITAL_FAILURE_WORKFLOW, NotificationStatus.VIEWED)
+                .remainToStateWithWarning(TimelineElementCategory.ANALOG_SUCCESS_WORKFLOW, NotificationStatus.VIEWED)
+                .remainToStateWithWarning(TimelineElementCategory.SEND_COURTESY_MESSAGE, NotificationStatus.VIEWED)
+                .remainToStateWithWarning(TimelineElementCategory.SCHEDULE_REFINEMENT, NotificationStatus.VIEWED)
+                .remainToStateWithWarning(TimelineElementCategory.SCHEDULE_DIGITAL_WORKFLOW, NotificationStatus.VIEWED)
+                .remainToStateWithWarning(TimelineElementCategory.SCHEDULE_ANALOG_WORKFLOW, NotificationStatus.VIEWED)
         ;
 
         // Paid state
@@ -163,9 +176,22 @@ class StateMap {
                 .withTimelineGoToState(TimelineElementCategory.REFINEMENT, NotificationStatus.PAID)
                 .remainToStateWithWarning(TimelineElementCategory.SEND_DIGITAL_DOMICILE_FAILURE, NotificationStatus.PAID)
                 .remainToStateWithWarning(TimelineElementCategory.SEND_PAPER_FEEDBACK, NotificationStatus.PAID)
-        //TODO Da definire per i nuovi elementi di timeline
+
+                .remainToStateWithWarning(TimelineElementCategory.GET_ADDRESS, NotificationStatus.PAID)
+                .remainToStateWithWarning(TimelineElementCategory.PUBLIC_REGISTRY_CALL, NotificationStatus.PAID)
+                .remainToStateWithWarning(TimelineElementCategory.PUBLIC_REGISTRY_RESPONSE, NotificationStatus.PAID)
+                .remainToStateWithWarning(TimelineElementCategory.SEND_DIGITAL_FEEDBACK, NotificationStatus.PAID)
+                .remainToStateWithWarning(TimelineElementCategory.SEND_SIMPLE_REGISTERED_LETTER, NotificationStatus.PAID)
+                .remainToStateWithWarning(TimelineElementCategory.DIGITAL_SUCCESS_WORKFLOW, NotificationStatus.PAID)
+                .remainToStateWithWarning(TimelineElementCategory.DIGITAL_FAILURE_WORKFLOW, NotificationStatus.PAID)
+                .remainToStateWithWarning(TimelineElementCategory.ANALOG_SUCCESS_WORKFLOW, NotificationStatus.PAID)
+                .remainToStateWithWarning(TimelineElementCategory.SEND_COURTESY_MESSAGE, NotificationStatus.PAID)
+                .remainToStateWithWarning(TimelineElementCategory.SCHEDULE_REFINEMENT, NotificationStatus.PAID)
+                .remainToStateWithWarning(TimelineElementCategory.SCHEDULE_DIGITAL_WORKFLOW, NotificationStatus.PAID)
+                .remainToStateWithWarning(TimelineElementCategory.SCHEDULE_ANALOG_WORKFLOW, NotificationStatus.PAID)
         ;
         this.fromState(NotificationStatus.UNREACHABLE)
+                .withTimelineGoToState(TimelineElementCategory.SCHEDULE_REFINEMENT, NotificationStatus.UNREACHABLE)
                 .withTimelineGoToState(TimelineElementCategory.NOTIFICATION_VIEWED, NotificationStatus.VIEWED)
                 .withTimelineGoToState(TimelineElementCategory.REFINEMENT, NotificationStatus.EFFECTIVE_DATE)
         ;
