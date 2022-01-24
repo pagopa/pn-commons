@@ -36,7 +36,7 @@ class AddressBookTestIT {
         String taxId = "CGNNMO80A02H501R";
 
         // WHEN
-        Optional<AddressBookEntry> response = client.getAddresses(taxId, null);
+        Optional<AddressBookEntry> response = client.getAddresses(taxId);
 
         // THEN
         Assertions.assertTrue(response.isPresent());
@@ -60,7 +60,7 @@ class AddressBookTestIT {
         String taxId = "CGNNMO80A01H501M";
 
         // WHEN
-        Optional<AddressBookEntry> response = client.getAddresses(taxId, null);
+        Optional<AddressBookEntry> response = client.getAddresses(taxId);
 
         // THEN
         Assertions.assertTrue(response.isPresent());
@@ -92,7 +92,7 @@ class AddressBookTestIT {
         String taxId = "CGNNMO80A03H501U";
 
         // WHEN
-        Optional<AddressBookEntry> response = client.getAddresses(taxId, null);
+        Optional<AddressBookEntry> response = client.getAddresses(taxId);
 
         // THEN
         Assertions.assertTrue(response.isPresent());
@@ -116,7 +116,7 @@ class AddressBookTestIT {
         String taxId = "IsNotATaxId";
 
         // WHEN
-        Optional<AddressBookEntry> response = client.getAddresses(taxId, null);
+        Optional<AddressBookEntry> response = client.getAddresses(taxId);
 
         // THEN
         Assertions.assertTrue(response.isEmpty());

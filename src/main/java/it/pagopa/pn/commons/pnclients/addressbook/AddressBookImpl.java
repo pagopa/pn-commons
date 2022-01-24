@@ -1,7 +1,6 @@
 package it.pagopa.pn.commons.pnclients.addressbook;
 
 import it.pagopa.pn.api.dto.addressbook.AddressBookEntry;
-import it.pagopa.pn.api.dto.notification.NotificationSender;
 import it.pagopa.pn.commons.exceptions.PnInternalException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -9,6 +8,8 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Optional;
 
+//@ConditionalOnProperty(name = "pn.legacy", havingValue = "true")
+@Deprecated
 @Component
 public class AddressBookImpl implements AddressBook {
 
@@ -20,7 +21,7 @@ public class AddressBookImpl implements AddressBook {
         restTemplate = new RestTemplate();
     }
 
-    public Optional<AddressBookEntry> getAddresses(String taxId, NotificationSender sender) {
+    public Optional<AddressBookEntry> getAddresses(String taxId) {
         String addressBookGetUrl = configs.getAddressBookBaseUrl() + "/" + taxId;
 
         ResponseEntity<AddressBookEntry> response;
