@@ -42,7 +42,7 @@ import java.util.UUID;
         CassandraDataAutoConfiguration.class
 })
 @EntityScan(basePackages = {"it.pagopa.pn"})
-public class CassandraDirectAccessTokenDaoTestIT {
+class CassandraDirectAccessTokenDaoTestIT {
 
     @Autowired
     private CassandraDirectAccessTokenDao dao;
