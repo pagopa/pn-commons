@@ -8,36 +8,37 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Optional;
 
+@Deprecated
 @Component
 public class AddressBookImpl implements AddressBook {
 
     private final RestTemplate restTemplate;
     private final MicroserviceClientsConfigs configs;
 
-    public AddressBookImpl( MicroserviceClientsConfigs configs) {
+    public AddressBookImpl(MicroserviceClientsConfigs configs) {
         this.configs = configs;
         restTemplate = new RestTemplate();
     }
 
-    public Optional<AddressBookEntry> getAddresses(String taxId ) {
+    public Optional<AddressBookEntry> getAddresses(String taxId) {
         String addressBookGetUrl = configs.getAddressBookBaseUrl() + "/" + taxId;
 
         ResponseEntity<AddressBookEntry> response;
-        response = this.restTemplate.getForEntity( addressBookGetUrl, AddressBookEntry.class );
+        response = this.restTemplate.getForEntity(addressBookGetUrl, AddressBookEntry.class);
 
-        if( response.getStatusCode().isError() ) {
-            throw new PnInternalException("Error calling url " + addressBookGetUrl + " status "+ response.getStatusCodeValue() );
+        if (response.getStatusCode().isError()) {
+            throw new PnInternalException("Error calling url " + addressBookGetUrl + " status " + response.getStatusCodeValue());
         }
 
         AddressBookEntry responseBody = response.getBody();
 
         // - Less null checking for callers
 
-        if( responseBody != null && responseBody.checkAllNull() ) {
+        if (responseBody != null && responseBody.checkAllNull()) {
             responseBody = null;
         }
 
-        return Optional.ofNullable( responseBody );
+        return Optional.ofNullable(responseBody);
     }
 
 }

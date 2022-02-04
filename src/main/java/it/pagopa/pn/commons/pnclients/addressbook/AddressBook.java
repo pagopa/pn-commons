@@ -4,7 +4,8 @@ import it.pagopa.pn.api.dto.addressbook.AddressBookEntry;
 
 import java.util.Optional;
 
+@Deprecated
 public interface AddressBook {
 
-    Optional<AddressBookEntry> getAddresses(String taxId );
+    Optional<AddressBookEntry> getAddresses(String taxId);
 }
