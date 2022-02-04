@@ -8,7 +8,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Optional;
 
-//@ConditionalOnProperty(name = "pn.legacy", havingValue = "true")
 @Deprecated
 @Component
 public class AddressBookImpl implements AddressBook {
