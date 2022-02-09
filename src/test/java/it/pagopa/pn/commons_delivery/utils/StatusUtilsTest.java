@@ -61,7 +61,7 @@ class StatusUtilsTest {
 
         // creare List<NotificationStatusHistoryElement>
         NotificationStatusHistoryElement historyElement = NotificationStatusHistoryElement.builder()
-                .status(NotificationStatus.RECEIVED)
+                .status(NotificationStatus.IN_VALIDATION)
                 .activeFrom(Instant.parse("2021-09-16T15:20:00.00Z"))
                 .build();
         NotificationStatusHistoryElement historyElement1 = NotificationStatusHistoryElement.builder()
@@ -144,7 +144,7 @@ class StatusUtilsTest {
 
         // creare List<NotificationStatusHistoryElement>
         NotificationStatusHistoryElement historyElement = NotificationStatusHistoryElement.builder()
-                .status(NotificationStatus.RECEIVED)
+                .status(NotificationStatus.IN_VALIDATION)
                 .activeFrom(Instant.parse("2021-09-16T15:20:00.00Z"))
                 .build();
         NotificationStatusHistoryElement historyElement1 = NotificationStatusHistoryElement.builder()
@@ -196,7 +196,7 @@ class StatusUtilsTest {
 
         // creare List<NotificationStatusHistoryElement>
         NotificationStatusHistoryElement historyElement1 = NotificationStatusHistoryElement.builder()
-                .status(NotificationStatus.RECEIVED)
+                .status(NotificationStatus.IN_VALIDATION)
                 .activeFrom(Instant.parse("2021-09-16T15:24:00.00Z"))
                 .build();
 
@@ -214,7 +214,7 @@ class StatusUtilsTest {
     @Test
     void emptyTimelineInitialStateTest() {
         //
-        Assertions.assertEquals(NotificationStatus.RECEIVED, statusUtils.getCurrentStatus(Collections.emptyList()));
+        Assertions.assertEquals(NotificationStatus.IN_VALIDATION, statusUtils.getCurrentStatus(Collections.emptyList()));
     }
 
     @Test

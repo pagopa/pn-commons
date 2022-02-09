@@ -168,7 +168,7 @@ class CassandraNotificationDaoSearchTestIT {
                 Instant.EPOCH,
                 Instant.EPOCH.plus(1, ChronoUnit.MINUTES),
                 null,
-                NotificationStatus.RECEIVED,
+                NotificationStatus.IN_VALIDATION,
                 null
         );
 
@@ -178,7 +178,7 @@ class CassandraNotificationDaoSearchTestIT {
                 Instant.EPOCH,
                 Instant.EPOCH.plus(1, ChronoUnit.MINUTES),
                 null,
-                NotificationStatus.RECEIVED,
+                NotificationStatus.IN_VALIDATION,
                 null
         );
 
@@ -190,7 +190,7 @@ class CassandraNotificationDaoSearchTestIT {
                 .collect(Collectors.toSet());
         Assertions.assertEquals(1, senderIds.size());
         Assertions.assertTrue(senderIds.contains(senderId));
-        Assertions.assertTrue(statuses.contains(NotificationStatus.RECEIVED));
+        Assertions.assertTrue(statuses.contains(NotificationStatus.IN_VALIDATION));
 
         Set<String> recipientIds = resultByRecipient.stream()
                 .map(row -> row.getRecipientId())
@@ -200,7 +200,7 @@ class CassandraNotificationDaoSearchTestIT {
                 .collect(Collectors.toSet());
         Assertions.assertEquals(1, recipientIds.size());
         Assertions.assertTrue(recipientIds.contains(recipientId));
-        Assertions.assertTrue(statusesByRecipient.contains(NotificationStatus.RECEIVED));
+        Assertions.assertTrue(statusesByRecipient.contains(NotificationStatus.IN_VALIDATION));
 
     }
 
@@ -245,7 +245,7 @@ class CassandraNotificationDaoSearchTestIT {
                 Instant.EPOCH,
                 Instant.EPOCH.plus(1, ChronoUnit.MINUTES),
                 recipientId,
-                NotificationStatus.RECEIVED,
+                NotificationStatus.IN_VALIDATION,
                 null
         );
 
@@ -305,7 +305,7 @@ class CassandraNotificationDaoSearchTestIT {
                 Instant.EPOCH,
                 Instant.EPOCH.plus(1, ChronoUnit.MINUTES),
                 null,
-                NotificationStatus.RECEIVED,
+                NotificationStatus.IN_VALIDATION,
                 subjectRegExp
         );
 
