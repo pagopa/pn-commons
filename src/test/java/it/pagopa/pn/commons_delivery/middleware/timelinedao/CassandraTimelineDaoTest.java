@@ -159,11 +159,6 @@ class CassandraTimelineDaoTest {
             store.remove(timelineElementEntityId);
         }
 
-        @Override
-        public Optional<TimelineElementEntity> update(TimelineElementEntity value) {
-            throw new UnsupportedOperationException();
-        }
-
 
         @Override
         public Set<TimelineElementEntity> findByIun(String iun) {

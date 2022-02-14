@@ -11,6 +11,4 @@ public interface KeyValueStore<K,V> {
     Optional<V> get(K key);
 
     void delete(K key);
-
-    Optional<V> update(V value);
 }

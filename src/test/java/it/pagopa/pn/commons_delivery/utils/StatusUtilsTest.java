@@ -64,7 +64,13 @@ class StatusUtilsTest {
                 .status(NotificationStatus.IN_VALIDATION)
                 .activeFrom(Instant.parse("2021-09-16T15:20:00.00Z"))
                 .build();
+        
         NotificationStatusHistoryElement historyElement1 = NotificationStatusHistoryElement.builder()
+                .status(NotificationStatus.ACCEPTED)
+                .activeFrom(Instant.parse("2021-09-16T15:24:00.00Z"))
+                .build();
+        
+        NotificationStatusHistoryElement historyElement2 = NotificationStatusHistoryElement.builder()
                 .status(NotificationStatus.DELIVERING)
                 .activeFrom(Instant.parse("2021-09-16T15:25:00.00Z"))
                 .build();
@@ -81,7 +87,7 @@ class StatusUtilsTest {
                 .activeFrom(Instant.parse("2021-09-16T17:30:00.00Z"))
                 .build();
         List<NotificationStatusHistoryElement> historyElementList = Arrays.asList(historyElement,
-                historyElement1, historyElement4, historyElement5, historyElement6);
+                historyElement1, historyElement2, historyElement4, historyElement5, historyElement6);
 
 
         // chiamare metodo di test
@@ -147,7 +153,13 @@ class StatusUtilsTest {
                 .status(NotificationStatus.IN_VALIDATION)
                 .activeFrom(Instant.parse("2021-09-16T15:20:00.00Z"))
                 .build();
+
         NotificationStatusHistoryElement historyElement1 = NotificationStatusHistoryElement.builder()
+                .status(NotificationStatus.ACCEPTED)
+                .activeFrom(Instant.parse("2021-09-16T15:24:00.00Z"))
+                .build();
+        
+        NotificationStatusHistoryElement historyElement2 = NotificationStatusHistoryElement.builder()
                 .status(NotificationStatus.DELIVERING)
                 .activeFrom(Instant.parse("2021-09-16T15:25:00.00Z"))
                 .build();
@@ -163,8 +175,8 @@ class StatusUtilsTest {
                 .status(NotificationStatus.PAID)
                 .activeFrom(Instant.parse("2021-09-16T17:30:00.00Z"))
                 .build();
-        List<NotificationStatusHistoryElement> historyElementList = Arrays.asList(historyElement,
-                historyElement1, historyElement4_1, historyElement5, historyElement6);
+        List<NotificationStatusHistoryElement> historyElementList = Arrays.asList(historyElement,historyElement1,
+                historyElement2, historyElement4_1, historyElement5, historyElement6);
 
         // chiamare metodo di test
         List<NotificationStatusHistoryElement> resHistoryElementList = statusUtils.getStatusHistory(
@@ -200,7 +212,12 @@ class StatusUtilsTest {
                 .activeFrom(Instant.parse("2021-09-16T15:24:00.00Z"))
                 .build();
 
-        List<NotificationStatusHistoryElement> historyElementList = Arrays.asList(historyElement1);
+        NotificationStatusHistoryElement historyElement2 = NotificationStatusHistoryElement.builder()
+                .status(NotificationStatus.ACCEPTED)
+                .activeFrom(Instant.parse("2021-09-16T15:24:00.00Z"))
+                .build();
+
+        List<NotificationStatusHistoryElement> historyElementList = Arrays.asList(historyElement1, historyElement2);
 
         // chiamare metodo di test
         List<NotificationStatusHistoryElement> resHistoryElementList = statusUtils.getStatusHistory(

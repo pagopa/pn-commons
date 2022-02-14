@@ -81,7 +81,7 @@ public class CassandraTimelineDao implements TimelineDao {
         if (notificationEntityOptional.isPresent()) {
 
             NotificationEntity notificationEntity = notificationEntityOptional.get();
- 
+
             // - Caricare la timeline corrente utilizzando il metodo getTimeline
             Set<TimelineElement> currentTimeline = this.getTimeline(iun);
 

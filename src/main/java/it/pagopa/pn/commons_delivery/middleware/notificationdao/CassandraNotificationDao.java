@@ -174,10 +174,4 @@ public class CassandraNotificationDao implements NotificationDao {
                 .build()
         );
     }
-    
-    @Override
-    public Optional<NotificationEntity> updateNotification(Notification notification){
-        NotificationEntity entity = dto2entityMapper.dto2Entity(notification);
-        return notificationEntityDao.update(entity);
-    }
 }
