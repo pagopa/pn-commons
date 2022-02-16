@@ -1,6 +1,7 @@
 package it.pagopa.pn.commons_delivery.middleware.notificationdao;
 
 import com.datastax.oss.driver.api.core.ConsistencyLevel;
+import it.pagopa.pn.api.dto.InputSearchNotificationDto;
 import it.pagopa.pn.api.dto.NotificationSearchRow;
 import it.pagopa.pn.api.dto.notification.Notification;
 import it.pagopa.pn.api.dto.notification.status.NotificationStatus;
@@ -74,31 +75,27 @@ public class CassandraNotificationDao implements NotificationDao {
     }
 
     @Override
-    public List<NotificationSearchRow> searchNotification(
-            boolean bySender, String senderReceiverId, Instant startDate, Instant endDate,
-            String filterId, NotificationStatus status, String subjectRegExp
-    ) {
-        Predicate<String> matchSubject = buildRegexpPredicate(subjectRegExp);
-        Predicate<String> matchFilter = buildFilterIdPredicate(filterId);
+    public List<NotificationSearchRow> searchNotification(InputSearchNotificationDto searchDto) {
+        Predicate<String> matchSubject = buildRegexpPredicate(searchDto.getSubjectRegExp());
+        Predicate<String> matchFilter = buildFilterIdPredicate(searchDto.getFilterId());
 
         List<NotificationSearchRow> result;
-        if (status != null) {
-            result = executeSearchNotificationQuery(bySender, senderReceiverId, startDate, endDate, status);
+        if (searchDto.getStatus() != null) {
+            result = executeSearchNotificationQuery(searchDto);
         } else {
             result = new ArrayList<>();
             for (NotificationStatus oneStatus : NotificationStatus.values()) {
-                List<NotificationSearchRow> oneStatusResult = executeSearchNotificationQuery(
-                        bySender, senderReceiverId, startDate, endDate, oneStatus);
+                searchDto.setStatus(oneStatus);
+                List<NotificationSearchRow> oneStatusResult = executeSearchNotificationQuery(searchDto);
                 result.addAll(oneStatusResult);
             }
         }
-
+        
         return result.stream()
-                .filter(row -> matchFilter.test(bySender ? row.getRecipientId() : row.getSenderId()))
+                .filter(row -> matchFilter.test(searchDto.isBySender() ? row.getRecipientId() : row.getSenderId()))
                 .filter(row -> matchSubject.test(row.getSubject()))
                 .sorted(Comparator.comparing(NotificationSearchRow::getSentAt))
                 .collect(Collectors.toList());
-
     }
 
     Predicate<String> buildRegexpPredicate(String subjectRegExp) {
@@ -123,13 +120,10 @@ public class CassandraNotificationDao implements NotificationDao {
         return matchSubject;
     }
 
-    private List<NotificationSearchRow> executeSearchNotificationQuery(
-            boolean bySender, String senderReceiverId, Instant startDate, Instant endDate,
-            NotificationStatus status
-    ) {
-        Query query = generateSearchNotificationQuery(bySender, senderReceiverId, startDate, endDate, status);
+    private List<NotificationSearchRow> executeSearchNotificationQuery(InputSearchNotificationDto searchDto) {
+        Query query = generateSearchNotificationQuery(searchDto);
 
-        if (bySender) {
+        if (searchDto.isBySender()) {
             return cassandraTemplate.select(query, NotificationBySenderEntity.class)
                     .stream().map(entity -> NotificationSearchRow.builder()
                             .iun(entity.getNotificationBySenderId().getIun())
@@ -158,17 +152,14 @@ public class CassandraNotificationDao implements NotificationDao {
         }
     }
 
-    private Query generateSearchNotificationQuery(
-            boolean bySender, String senderReceiverId, Instant startDate, Instant endDate,
-            NotificationStatus status
-    ) {
-        String entityIdProperty = bySender ? "notificationBySenderId" : "notificationByRecipientId";
-        String senderReceiverProperty = entityIdProperty + "." + (bySender ? "senderId" : "recipientId");
+    private Query generateSearchNotificationQuery(InputSearchNotificationDto searchDto) {
+        String entityIdProperty = searchDto.isBySender() ? "notificationBySenderId" : "notificationByRecipientId";
+        String senderReceiverProperty = entityIdProperty + "." + (searchDto.isBySender() ? "senderId" : "recipientId");
         return Query.query(
-                Criteria.where(entityIdProperty + ".notificationStatus").is(status),
-                Criteria.where(senderReceiverProperty).is(senderReceiverId),
-                Criteria.where(entityIdProperty + ".sentat").gte(startDate),
-                Criteria.where(entityIdProperty + ".sentat").lte(endDate)
+                Criteria.where(entityIdProperty + ".notificationStatus").is(searchDto.getStatus()),
+                Criteria.where(senderReceiverProperty).is(searchDto.getSenderReceiverId()),
+                Criteria.where(entityIdProperty + ".sentat").gte(searchDto.getStartDate()),
+                Criteria.where(entityIdProperty + ".sentat").lte(searchDto.getEndDate())
         ).queryOptions(QueryOptions.builder()
                 .consistencyLevel(ConsistencyLevel.LOCAL_QUORUM)
                 .build()

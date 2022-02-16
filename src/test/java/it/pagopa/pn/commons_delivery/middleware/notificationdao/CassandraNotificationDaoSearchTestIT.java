@@ -1,6 +1,7 @@
 package it.pagopa.pn.commons_delivery.middleware.notificationdao;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import it.pagopa.pn.api.dto.InputSearchNotificationDto;
 import it.pagopa.pn.api.dto.NotificationSearchRow;
 import it.pagopa.pn.api.dto.events.ServiceLevelType;
 import it.pagopa.pn.api.dto.notification.Notification;
@@ -35,7 +36,7 @@ import java.util.stream.Collectors;
 @ExtendWith(SpringExtension.class)
 @TestPropertySource(properties = {
         NotificationDao.IMPLEMENTATION_TYPE_PROPERTY_NAME + "=" + MiddlewareTypes.CASSANDRA,
-        "spring.data.cassandra.keyspace-name=pn_delivery_test",
+        "spring.data.cassandra.keyspace-name=pn_delivery_local",
         "spring.data.cassandra.cluster-name=cassandra",
         "spring.data.cassandra.local-datacenter=datacenter1",
         "spring.data.cassandra.contact-points=localhost",
@@ -95,25 +96,33 @@ class CassandraNotificationDaoSearchTestIT {
 
         dao.addNotification(n);
 
-        List<NotificationSearchRow> result = dao.searchNotification(
-                true,
-                senderId,
-                Instant.EPOCH,
-                Instant.EPOCH.plus(1, ChronoUnit.MINUTES),
-                null,
-                null,
-                null
-        );
+        InputSearchNotificationDto searchDtoSender = new InputSearchNotificationDto.Builder()
+                .bySender(true)
+                .senderReceiverId(senderId)
+                .startDate(Instant.EPOCH)
+                .endDate(Instant.EPOCH.plus(1, ChronoUnit.MINUTES))
+                .filterId(null)
+                .status(null)
+                .subjectRegExp(null)
+                .size(null)
+                .nextPagesKey(null)
+                .build();
 
-        List<NotificationSearchRow> resultByRecipient = dao.searchNotification(
-                false,
-                recipientId,
-                Instant.EPOCH,
-                Instant.EPOCH.plus(1, ChronoUnit.MINUTES),
-                null,
-                null,
-                null
-        );
+        List<NotificationSearchRow> result = dao.searchNotification(searchDtoSender);
+
+        InputSearchNotificationDto searchDtoRecipient = new InputSearchNotificationDto.Builder()
+                .bySender(false)
+                .senderReceiverId(recipientId)
+                .startDate(Instant.EPOCH)
+                .endDate(Instant.EPOCH.plus(1, ChronoUnit.MINUTES))
+                .filterId(null)
+                .status(null)
+                .subjectRegExp(null)
+                .size(null)
+                .nextPagesKey(null)
+                .build();
+
+        List<NotificationSearchRow> resultByRecipient = dao.searchNotification(searchDtoRecipient);
 
         Set<String> senderIds = result.stream()
                 .map(row -> row.getSenderId())
@@ -162,25 +171,33 @@ class CassandraNotificationDaoSearchTestIT {
 
         dao.addNotification(n);
 
-        List<NotificationSearchRow> result = dao.searchNotification(
-                true,
-                senderId,
-                Instant.EPOCH,
-                Instant.EPOCH.plus(1, ChronoUnit.MINUTES),
-                null,
-                NotificationStatus.RECEIVED,
-                null
-        );
+        InputSearchNotificationDto searchDtoSender = new InputSearchNotificationDto.Builder()
+                .bySender(true)
+                .senderReceiverId(senderId)
+                .startDate(Instant.EPOCH)
+                .endDate(Instant.EPOCH.plus(1, ChronoUnit.MINUTES))
+                .filterId(null)
+                .status(NotificationStatus.RECEIVED)
+                .subjectRegExp(null)
+                .size(null)
+                .nextPagesKey(null)
+                .build();
+        
+        List<NotificationSearchRow> result = dao.searchNotification(searchDtoSender);
 
-        List<NotificationSearchRow> resultByRecipient = dao.searchNotification(
-                false,
-                recipientId,
-                Instant.EPOCH,
-                Instant.EPOCH.plus(1, ChronoUnit.MINUTES),
-                null,
-                NotificationStatus.RECEIVED,
-                null
-        );
+        InputSearchNotificationDto searchDtoRecipient = new InputSearchNotificationDto.Builder()
+                .bySender(false)
+                .senderReceiverId(recipientId)
+                .startDate(Instant.EPOCH)
+                .endDate(Instant.EPOCH.plus(1, ChronoUnit.MINUTES))
+                .filterId(null)
+                .status(NotificationStatus.RECEIVED)
+                .subjectRegExp(null)
+                .size(null)
+                .nextPagesKey(null)
+                .build();
+        
+        List<NotificationSearchRow> resultByRecipient = dao.searchNotification(searchDtoRecipient);
 
         Set<String> senderIds = result.stream()
                 .map(row -> row.getSenderId())
@@ -203,8 +220,48 @@ class CassandraNotificationDaoSearchTestIT {
         Assertions.assertTrue(statusesByRecipient.contains(NotificationStatus.RECEIVED));
 
     }
+    /*
+    @Test
+    void addNotification() throws IdConflictException {
+        String senderId = "pa6";
+        String recipientId = "CodiceFiscale1";
+        Instant date = Instant.EPOCH;
+        
+        for(int i=0 ; i<20 ; i++){
+            Notification n = Notification.builder()
+                    .iun(UUID.randomUUID().toString())
+                    .sentAt(date)
+                    .physicalCommunicationType( ServiceLevelType.SIMPLE_REGISTERED_LETTER )
+                    .sender(NotificationSender.builder().paId(senderId).build())
+                    .recipients(Collections.singletonList(
+                                    NotificationRecipient.builder()
+                                            .taxId(recipientId)
+                                            .build()
+                            )
+                    )
+                    .documents(Collections.singletonList(
+                            NotificationAttachment.builder()
+                                    .body("body")
+                                    .digests(NotificationAttachment.Digests.builder()
+                                            .sha256("aaaa")
+                                            .build())
+                                    .contentType("content/type")
+                                    .ref( NotificationAttachment.Ref.builder()
+                                            .key("key")
+                                            .versionToken("v1")
+                                            .build()
+                                    )
+                                    .build()
+                    ))
+                    .build();
 
+            dao.addNotification(n);
 
+            date = date.plus(1, ChronoUnit.DAYS);
+        }
+
+    }
+*/
     @Test
     void recipientTest() throws IdConflictException {
         String senderId = "pa1";
@@ -239,15 +296,19 @@ class CassandraNotificationDaoSearchTestIT {
 
         dao.addNotification(n);
 
-        List<NotificationSearchRow> result = dao.searchNotification(
-                true,
-                senderId,
-                Instant.EPOCH,
-                Instant.EPOCH.plus(1, ChronoUnit.MINUTES),
-                recipientId,
-                NotificationStatus.RECEIVED,
-                null
-        );
+        InputSearchNotificationDto searchDtoRecipient = new InputSearchNotificationDto.Builder()
+                .bySender(true)
+                .senderReceiverId(senderId)
+                .startDate(Instant.EPOCH)
+                .endDate(Instant.EPOCH.plus(1, ChronoUnit.MINUTES))
+                .filterId(recipientId)
+                .status(NotificationStatus.RECEIVED)
+                .subjectRegExp(null)
+                .size(null)
+                .nextPagesKey(null)
+                .build();
+
+        List<NotificationSearchRow> result = dao.searchNotification(searchDtoRecipient);
 
         Set<String> senderIds = result.stream()
                 .map(row -> row.getSenderId())
@@ -299,15 +360,19 @@ class CassandraNotificationDaoSearchTestIT {
 
         dao.addNotification(n);
 
-        List<NotificationSearchRow> result = dao.searchNotification(
-                true,
-                senderId,
-                Instant.EPOCH,
-                Instant.EPOCH.plus(1, ChronoUnit.MINUTES),
-                null,
-                NotificationStatus.RECEIVED,
-                subjectRegExp
-        );
+        InputSearchNotificationDto searchDto = new InputSearchNotificationDto.Builder()
+                .bySender(true)
+                .senderReceiverId(senderId)
+                .startDate(Instant.EPOCH)
+                .endDate(Instant.EPOCH.plus(1, ChronoUnit.MINUTES))
+                .filterId(null)
+                .status(NotificationStatus.RECEIVED)
+                .subjectRegExp(subjectRegExp)
+                .size(null)
+                .nextPagesKey(null)
+                .build();
+
+        List<NotificationSearchRow> result = dao.searchNotification(searchDto);
 
 
         Set<String> senderIds = result.stream()
