@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 @ExtendWith(SpringExtension.class)
 @TestPropertySource(properties = {
         NotificationDao.IMPLEMENTATION_TYPE_PROPERTY_NAME + "=" + MiddlewareTypes.CASSANDRA,
-        "spring.data.cassandra.keyspace-name=pn_delivery_local",
+        "spring.data.cassandra.keyspace-name=pn_delivery_test",
         "spring.data.cassandra.cluster-name=cassandra",
         "spring.data.cassandra.local-datacenter=datacenter1",
         "spring.data.cassandra.contact-points=localhost",
@@ -220,48 +220,8 @@ class CassandraNotificationDaoSearchTestIT {
         Assertions.assertTrue(statusesByRecipient.contains(NotificationStatus.RECEIVED));
 
     }
-    /*
-    @Test
-    void addNotification() throws IdConflictException {
-        String senderId = "pa6";
-        String recipientId = "CodiceFiscale1";
-        Instant date = Instant.EPOCH;
-        
-        for(int i=0 ; i<20 ; i++){
-            Notification n = Notification.builder()
-                    .iun(UUID.randomUUID().toString())
-                    .sentAt(date)
-                    .physicalCommunicationType( ServiceLevelType.SIMPLE_REGISTERED_LETTER )
-                    .sender(NotificationSender.builder().paId(senderId).build())
-                    .recipients(Collections.singletonList(
-                                    NotificationRecipient.builder()
-                                            .taxId(recipientId)
-                                            .build()
-                            )
-                    )
-                    .documents(Collections.singletonList(
-                            NotificationAttachment.builder()
-                                    .body("body")
-                                    .digests(NotificationAttachment.Digests.builder()
-                                            .sha256("aaaa")
-                                            .build())
-                                    .contentType("content/type")
-                                    .ref( NotificationAttachment.Ref.builder()
-                                            .key("key")
-                                            .versionToken("v1")
-                                            .build()
-                                    )
-                                    .build()
-                    ))
-                    .build();
 
-            dao.addNotification(n);
 
-            date = date.plus(1, ChronoUnit.DAYS);
-        }
-
-    }
-*/
     @Test
     void recipientTest() throws IdConflictException {
         String senderId = "pa1";
