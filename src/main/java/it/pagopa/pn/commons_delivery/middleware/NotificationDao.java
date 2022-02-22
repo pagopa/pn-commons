@@ -1,5 +1,6 @@
 package it.pagopa.pn.commons_delivery.middleware;
 
+import it.pagopa.pn.api.dto.InputSearchNotificationDto;
 import it.pagopa.pn.api.dto.NotificationSearchRow;
 import it.pagopa.pn.api.dto.notification.Notification;
 import it.pagopa.pn.api.dto.notification.status.NotificationStatus;
@@ -17,8 +18,5 @@ public interface NotificationDao {
 
     Optional<Notification> getNotificationByIun(String iun);
 
-    List<NotificationSearchRow> searchNotification(
-            boolean bySender ,String senderReceiverId, Instant startDate, Instant endDate,
-            String filterId, NotificationStatus status, String subjectRegExp
-    );
+    List<NotificationSearchRow> searchNotification(InputSearchNotificationDto inputSearchNotificationDto);
 }
