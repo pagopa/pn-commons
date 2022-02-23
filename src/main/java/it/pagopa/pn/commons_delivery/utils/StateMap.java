@@ -11,7 +11,8 @@ import java.util.Map;
 
 @Slf4j
 class StateMap {
-
+    //TODO Da rivedere meglio gli stati
+    
     private final Map<MapKey, MapValue> mappings = new HashMap<>();
 
     public StateMap() {
