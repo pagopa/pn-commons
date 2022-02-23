@@ -96,9 +96,6 @@ class StateMap {
                 .withTimelineGoToState(TimelineElementCategory.NOTIFICATION_VIEWED, NotificationStatus.VIEWED)
                 .withTimelineGoToState(TimelineElementCategory.REFINEMENT, NotificationStatus.EFFECTIVE_DATE)
         ;
-        this.fromState(NotificationStatus.REFUSED)
-                .withTimelineGoToState(TimelineElementCategory.NOTIFICATION_VIEWED, NotificationStatus.VIEWED)
-        ;
     }
 
     NotificationStatus getStateTransition(NotificationStatus fromStatus, TimelineElementCategory timelineRowType) throws PnInternalException {
