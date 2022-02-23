@@ -18,7 +18,6 @@ import org.springframework.data.cassandra.core.query.Criteria;
 import org.springframework.data.cassandra.core.query.Query;
 import org.springframework.stereotype.Component;
 
-import java.time.Instant;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -77,7 +76,8 @@ public class CassandraNotificationDao implements NotificationDao {
     @Override
     public List<NotificationSearchRow> searchNotification(InputSearchNotificationDto searchDto) {
         Predicate<String> matchSubject = buildRegexpPredicate(searchDto.getSubjectRegExp());
-        Predicate<String> matchFilter = buildFilterIdPredicate(searchDto.getFilterId());
+        Predicate<String> matchFilter = buildEqualsPredicate(searchDto.getFilterId());
+        Predicate<String> matchIun = buildEqualsPredicate( searchDto.getIunMatch() );
 
         List<NotificationSearchRow> result;
         if (searchDto.getStatus() != null) {
@@ -94,6 +94,7 @@ public class CassandraNotificationDao implements NotificationDao {
         return result.stream()
                 .filter(row -> matchFilter.test(searchDto.isBySender() ? row.getRecipientId() : row.getSenderId()))
                 .filter(row -> matchSubject.test(row.getSubject()))
+                .filter(row -> matchIun.test(row.getIun()))
                 .sorted(Comparator.comparing(NotificationSearchRow::getSentAt))
                 .collect(Collectors.toList());
     }
@@ -110,14 +111,14 @@ public class CassandraNotificationDao implements NotificationDao {
     }
 
 
-    private Predicate<String> buildFilterIdPredicate(String filterId) {
-        Predicate<String> matchSubject;
-        if (filterId != null) {
-            matchSubject = filterId::equals;
+    private Predicate<String> buildEqualsPredicate(String filter) {
+        Predicate<String> matchPredicate;
+        if (filter != null) {
+            matchPredicate = filter::equals;
         } else {
-            matchSubject = x -> true;
+            matchPredicate = x -> true;
         }
-        return matchSubject;
+        return matchPredicate;
     }
 
     private List<NotificationSearchRow> executeSearchNotificationQuery(InputSearchNotificationDto searchDto) {

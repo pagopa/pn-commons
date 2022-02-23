@@ -347,6 +347,120 @@ class CassandraNotificationDaoSearchTestIT {
         Assertions.assertTrue(subjects.stream().allMatch(s -> s.matches(subjectRegExp)));
     }
 
+    @Test
+    void iunMatchTest() throws IdConflictException {
+        String senderId = "pa1";
+        String iun = UUID.randomUUID().toString();
+
+        Notification n = Notification.builder()
+                .iun(iun)
+                .sentAt(Instant.EPOCH.plus(1, ChronoUnit.MINUTES))
+                .sender(NotificationSender.builder().paId(senderId).build())
+                .recipients(Collections.singletonList(
+                                NotificationRecipient.builder()
+                                        .taxId("recipientId")
+                                        .build()
+                        )
+                )
+                .subject("Subject Test")
+                .physicalCommunicationType( ServiceLevelType.SIMPLE_REGISTERED_LETTER )
+                .documents(Collections.singletonList(
+                        NotificationAttachment.builder()
+                                .body("body")
+                                .digests(NotificationAttachment.Digests.builder()
+                                        .sha256("aaaa")
+                                        .build())
+                                .contentType("content/type")
+                                .ref( NotificationAttachment.Ref.builder()
+                                        .key("key")
+                                        .versionToken("v1")
+                                        .build()
+                                )
+                                .build()
+                ))
+                .build();
+
+        dao.addNotification(n);
+
+        InputSearchNotificationDto searchDto = new InputSearchNotificationDto.Builder()
+                .bySender(true)
+                .senderReceiverId(senderId)
+                .startDate(Instant.EPOCH)
+                .endDate(Instant.EPOCH.plus(1, ChronoUnit.MINUTES))
+                .filterId(null)
+                .status(NotificationStatus.RECEIVED)
+                .subjectRegExp(null)
+                .iunMatch(iun)
+                .size(null)
+                .nextPagesKey(null)
+                .build();
+
+        List<NotificationSearchRow> result = dao.searchNotification(searchDto);
+
+        Set<String> iuns = result.stream()
+                .map(row -> row.getIun())
+                .collect(Collectors.toSet());
+
+        Assertions.assertTrue(iuns.stream().allMatch(s -> s.matches(iun)));
+    }
+
+    @Test
+    void iunNoMatchTest() throws IdConflictException {
+        String senderId = "pa1";
+        String iun = UUID.randomUUID().toString();
+
+        Notification n = Notification.builder()
+                .iun(iun)
+                .sentAt(Instant.EPOCH.plus(1, ChronoUnit.MINUTES))
+                .sender(NotificationSender.builder().paId(senderId).build())
+                .recipients(Collections.singletonList(
+                                NotificationRecipient.builder()
+                                        .taxId("recipientId")
+                                        .build()
+                        )
+                )
+                .subject("Subject Test")
+                .physicalCommunicationType( ServiceLevelType.SIMPLE_REGISTERED_LETTER )
+                .documents(Collections.singletonList(
+                        NotificationAttachment.builder()
+                                .body("body")
+                                .digests(NotificationAttachment.Digests.builder()
+                                        .sha256("aaaa")
+                                        .build())
+                                .contentType("content/type")
+                                .ref( NotificationAttachment.Ref.builder()
+                                        .key("key")
+                                        .versionToken("v1")
+                                        .build()
+                                )
+                                .build()
+                ))
+                .build();
+
+        dao.addNotification(n);
+
+        InputSearchNotificationDto searchDto = new InputSearchNotificationDto.Builder()
+                .bySender(true)
+                .senderReceiverId(senderId)
+                .startDate(Instant.EPOCH)
+                .endDate(Instant.EPOCH.plus(1, ChronoUnit.MINUTES))
+                .filterId(null)
+                .status(NotificationStatus.RECEIVED)
+                .subjectRegExp(null)
+                .iunMatch("iun_No_Match")
+                .size(null)
+                .nextPagesKey(null)
+                .build();
+
+        List<NotificationSearchRow> result = dao.searchNotification(searchDto);
+
+        Set<String> iuns = result.stream()
+                .map(row -> row.getIun())
+                .collect(Collectors.toSet());
+
+        Assertions.assertEquals(0, iuns.size());
+    }
+
 
     @Configuration
     @EntityScan(basePackages = {"it.pagopa.pn"})
