@@ -4,6 +4,7 @@ import it.pagopa.pn.api.dto.notification.status.NotificationStatus;
 import it.pagopa.pn.api.dto.notification.status.NotificationStatusHistoryElement;
 import it.pagopa.pn.api.dto.notification.timeline.TimelineElement;
 import it.pagopa.pn.api.dto.notification.timeline.TimelineElementCategory;
+import it.pagopa.pn.api.dto.notification.timeline.TimelineInfoDto;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,7 +18,6 @@ import java.util.Set;
 class StatusUtilsTest {
     private StatusUtils statusUtils;
 
-
     @BeforeEach
     public void setup() {
         this.statusUtils = new StatusUtils();
@@ -25,38 +25,39 @@ class StatusUtilsTest {
 
     @Test
     void getTimelineHistoryTest() {
+        
         // creare TimelineElement
-        TimelineElement timelineElement1 = TimelineElement.builder()
+        TimelineInfoDto timelineElement1 = TimelineInfoDto.builder()
                 .timestamp(Instant.parse("2021-09-16T15:24:00.00Z"))
                 .category(TimelineElementCategory.REQUEST_ACCEPTED)
                 .build();
-        TimelineElement timelineElement2 = TimelineElement.builder()
+        TimelineInfoDto timelineElement2 = TimelineInfoDto.builder()
                 .timestamp(Instant.parse("2021-09-16T15:25:00.00Z"))
                 .category(TimelineElementCategory.NOTIFICATION_PATH_CHOOSE)
                 .build();
-        TimelineElement timelineElement3 = TimelineElement.builder()
+        TimelineInfoDto timelineElement3 = TimelineInfoDto.builder()
                 .timestamp(Instant.parse("2021-09-16T15:26:00.00Z"))
                 .category(TimelineElementCategory.SEND_DIGITAL_DOMICILE)
                 .build();
-        TimelineElement timelineElement4 = TimelineElement.builder()
+        TimelineInfoDto timelineElement4 = TimelineInfoDto.builder()
                 .timestamp(Instant.parse("2021-09-16T15:27:00.00Z"))
                 .category(TimelineElementCategory.SEND_DIGITAL_DOMICILE_FEEDBACK)
                 .build();
-        TimelineElement timelineElement5 = TimelineElement.builder()
+        TimelineInfoDto timelineElement5 = TimelineInfoDto.builder()
                 .timestamp(Instant.parse("2021-09-16T15:28:00.00Z"))
                 .category(TimelineElementCategory.END_OF_DIGITAL_DELIVERY_WORKFLOW)
                 .build();
-        TimelineElement timelineElement6 = TimelineElement.builder()
+        TimelineInfoDto timelineElement6 = TimelineInfoDto.builder()
                 .timestamp(Instant.parse("2021-09-16T17:00:00.00Z"))
                 .category(TimelineElementCategory.NOTIFICATION_VIEWED)
                 .build();
-        TimelineElement timelineElement7 = TimelineElement.builder()
+        TimelineInfoDto timelineElement7 = TimelineInfoDto.builder()
                 .timestamp(Instant.parse("2021-09-16T17:30:00.00Z"))
                 .category(TimelineElementCategory.PAYMENT)
                 .build();
 
         // creare List<TimelineElement>
-        Set<TimelineElement> timelineElementList = Set.of(timelineElement1, timelineElement2, timelineElement3,
+        Set<TimelineInfoDto> timelineElementList = Set.of(timelineElement1, timelineElement2, timelineElement3,
                 timelineElement4, timelineElement5, timelineElement6, timelineElement7);
 
         // creare List<NotificationStatusHistoryElement>
@@ -96,49 +97,49 @@ class StatusUtilsTest {
     @Test
     void getTimelineHistoryMoreRecipientTest() {
         // creare TimelineElement
-        TimelineElement timelineElement1 = TimelineElement.builder()
+        TimelineInfoDto timelineElement1 = TimelineInfoDto.builder()
                 .timestamp(Instant.parse("2021-09-16T15:24:00.00Z"))
                 .category(TimelineElementCategory.REQUEST_ACCEPTED)
                 .build();
-        TimelineElement timelineElement2 = TimelineElement.builder()
+        TimelineInfoDto timelineElement2 = TimelineInfoDto.builder()
                 .timestamp(Instant.parse("2021-09-16T15:25:00.00Z"))
                 .category(TimelineElementCategory.NOTIFICATION_PATH_CHOOSE)
                 .build();
-        TimelineElement timelineElement3 = TimelineElement.builder()
+        TimelineInfoDto timelineElement3 = TimelineInfoDto.builder()
                 .timestamp(Instant.parse("2021-09-16T15:26:00.00Z"))
                 .category(TimelineElementCategory.SEND_DIGITAL_DOMICILE)
                 .build();
-        TimelineElement timelineElement4 = TimelineElement.builder()
+        TimelineInfoDto timelineElement4 = TimelineInfoDto.builder()
                 .timestamp(Instant.parse("2021-09-16T15:27:00.00Z"))
                 .category(TimelineElementCategory.SEND_DIGITAL_DOMICILE_FEEDBACK)
                 .build();
-        TimelineElement timelineElement5 = TimelineElement.builder()
+        TimelineInfoDto timelineElement5 = TimelineInfoDto.builder()
                 .timestamp(Instant.parse("2021-09-16T15:28:00.00Z"))
                 .category(TimelineElementCategory.END_OF_DIGITAL_DELIVERY_WORKFLOW)
                 .build();
-        TimelineElement timelineElement3_1 = TimelineElement.builder()
+        TimelineInfoDto timelineElement3_1 = TimelineInfoDto.builder()
                 .timestamp(Instant.parse("2021-09-16T15:29:00.00Z"))
                 .category(TimelineElementCategory.SEND_DIGITAL_DOMICILE)
                 .build();
-        TimelineElement timelineElement4_1 = TimelineElement.builder()
+        TimelineInfoDto timelineElement4_1 = TimelineInfoDto.builder()
                 .timestamp(Instant.parse("2021-09-16T15:30:00.00Z"))
                 .category(TimelineElementCategory.SEND_DIGITAL_DOMICILE_FEEDBACK)
                 .build();
-        TimelineElement timelineElement5_1 = TimelineElement.builder()
+        TimelineInfoDto timelineElement5_1 = TimelineInfoDto.builder()
                 .timestamp(Instant.parse("2021-09-16T15:31:00.00Z"))
                 .category(TimelineElementCategory.END_OF_DIGITAL_DELIVERY_WORKFLOW)
                 .build();
-        TimelineElement timelineElement6 = TimelineElement.builder()
+        TimelineInfoDto timelineElement6 = TimelineInfoDto.builder()
                 .timestamp(Instant.parse("2021-09-16T17:00:00.00Z"))
                 .category(TimelineElementCategory.NOTIFICATION_VIEWED)
                 .build();
-        TimelineElement timelineElement7 = TimelineElement.builder()
+        TimelineInfoDto timelineElement7 = TimelineInfoDto.builder()
                 .timestamp(Instant.parse("2021-09-16T17:30:00.00Z"))
                 .category(TimelineElementCategory.PAYMENT)
                 .build();
 
         // creare List<TimelineElement>
-        Set<TimelineElement> timelineElementList = Set.of(timelineElement1, timelineElement2,
+        Set<TimelineInfoDto> timelineElementList = Set.of(timelineElement1, timelineElement2,
                 timelineElement3, timelineElement4, timelineElement5, timelineElement3_1, timelineElement4_1,
                 timelineElement5_1, timelineElement6, timelineElement7);
 
@@ -178,20 +179,20 @@ class StatusUtilsTest {
     @Test
     void getTimelineHistoryErrorTest() {
         // creare TimelineElement
-        TimelineElement timelineElement1 = TimelineElement.builder()
+        TimelineInfoDto timelineElement1 = TimelineInfoDto.builder()
                 .timestamp(Instant.parse("2021-09-16T15:24:00.00Z"))
                 .category(TimelineElementCategory.REQUEST_ACCEPTED)
                 .build();
-        TimelineElement timelineElement2 = TimelineElement.builder()
+        TimelineInfoDto timelineElement2 = TimelineInfoDto.builder()
                 .timestamp(Instant.parse("2021-09-16T15:25:00.00Z"))
                 .category(TimelineElementCategory.NOTIFICATION_VIEWED)
                 .build();
-        TimelineElement timelineElement3 = TimelineElement.builder()
+        TimelineInfoDto timelineElement3 = TimelineInfoDto.builder()
                 .timestamp(Instant.parse("2021-09-16T15:26:00.00Z"))
                 .category(TimelineElementCategory.PAYMENT)
                 .build();
 
-        Set<TimelineElement> timelineElementList = Set.of(timelineElement1,
+        Set<TimelineInfoDto> timelineElementList = Set.of(timelineElement1,
                 timelineElement2, timelineElement3);
 
         // creare List<NotificationStatusHistoryElement>
@@ -219,20 +220,20 @@ class StatusUtilsTest {
 
     @Test
     void getCurrentStatusTest() {
-        TimelineElement timelineElement1 = TimelineElement.builder()
+        TimelineInfoDto timelineElement1 = TimelineInfoDto.builder()
                 .timestamp(Instant.parse("2021-09-16T15:24:00.00Z"))
                 .category(TimelineElementCategory.REQUEST_ACCEPTED)
                 .build();
-        TimelineElement timelineElement2 = TimelineElement.builder()
+        TimelineInfoDto timelineElement2 = TimelineInfoDto.builder()
                 .timestamp(Instant.parse("2021-09-16T15:25:00.00Z"))
                 .category(TimelineElementCategory.NOTIFICATION_PATH_CHOOSE)
                 .build();
-        TimelineElement timelineElement3 = TimelineElement.builder()
+        TimelineInfoDto timelineElement3 = TimelineInfoDto.builder()
                 .timestamp(Instant.parse("2021-09-16T15:26:00.00Z"))
                 .category(TimelineElementCategory.SEND_DIGITAL_DOMICILE)
                 .build();
 
-        Set<TimelineElement> timelineElementList = Set.of(timelineElement1,
+        Set<TimelineInfoDto> timelineElementList = Set.of(timelineElement1,
                 timelineElement2, timelineElement3);
 
         List<NotificationStatusHistoryElement> resHistoryElementList = statusUtils.getStatusHistory(
