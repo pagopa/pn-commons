@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 @Component
 public class StatusUtils {
 
-    private static final NotificationStatus INITIAL_STATUS = NotificationStatus.RECEIVED;
+    private static final NotificationStatus INITIAL_STATUS = NotificationStatus.IN_VALIDATION;
     private static final Set<TimelineElementCategory> END_OF_DELIVERY_WORKFLOW = new HashSet<>(Arrays.asList(
       TimelineElementCategory.END_OF_DIGITAL_DELIVERY_WORKFLOW,
       TimelineElementCategory.END_OF_ANALOG_DELIVERY_WORKFLOW
