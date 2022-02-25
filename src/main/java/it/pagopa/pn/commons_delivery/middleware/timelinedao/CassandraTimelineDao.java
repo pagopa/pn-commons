@@ -3,6 +3,7 @@ package it.pagopa.pn.commons_delivery.middleware.timelinedao;
 import it.pagopa.pn.api.dto.notification.status.NotificationStatus;
 import it.pagopa.pn.api.dto.notification.status.NotificationStatusHistoryElement;
 import it.pagopa.pn.api.dto.notification.timeline.TimelineElement;
+import it.pagopa.pn.api.dto.notification.timeline.TimelineInfoDto;
 import it.pagopa.pn.commons.abstractions.impl.MiddlewareTypes;
 import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.commons_delivery.middleware.TimelineDao;
@@ -155,9 +156,17 @@ public class CassandraTimelineDao implements TimelineDao {
     private NotificationBySenderEntity computeSearchBySenderEntry(NotificationEntity notificationEntity, Set<TimelineElement> currentTimeline) {
         int numberOfRecipient = notificationEntity.getRecipientsOrder().size();
         Instant notificationCreatedAt = notificationEntity.getSentAt();
-
+        
+        //TODO Inserito per continuare a farlo funzionare, tutta la logica verrà eliminata nel task 749
+        Set<TimelineInfoDto> timelineInfoDto = currentTimeline.stream().map(elem ->
+                TimelineInfoDto.builder()
+                        .category(elem.getCategory())
+                        .timestamp(elem.getTimestamp())
+                        .build()
+        ).collect(Collectors.toSet());
+        
         List<NotificationStatusHistoryElement> historyElementList = statusUtils.getStatusHistory(
-                currentTimeline,
+                timelineInfoDto,
                 numberOfRecipient,
                 notificationCreatedAt);
 
@@ -183,8 +192,16 @@ public class CassandraTimelineDao implements TimelineDao {
         int numberOfRecipient = notificationEntity.getRecipientsOrder().size();
         Instant notificationCreatedAt = notificationEntity.getSentAt();
 
+        //TODO Inserito per continuare a farlo funzionare, tutta la logica verrà eliminata nel task 749
+        Set<TimelineInfoDto> timelineInfoDto = currentTimeline.stream().map(elem ->
+                TimelineInfoDto.builder()
+                        .category(elem.getCategory())
+                        .timestamp(elem.getTimestamp())
+                        .build()
+        ).collect(Collectors.toSet());
+        
         List<NotificationStatusHistoryElement> historyElementList = statusUtils.getStatusHistory(
-                currentTimeline,
+                timelineInfoDto,
                 numberOfRecipient,
                 notificationCreatedAt);
 

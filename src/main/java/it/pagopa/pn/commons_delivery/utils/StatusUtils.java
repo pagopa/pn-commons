@@ -4,6 +4,7 @@ import it.pagopa.pn.api.dto.notification.status.NotificationStatus;
 import it.pagopa.pn.api.dto.notification.status.NotificationStatusHistoryElement;
 import it.pagopa.pn.api.dto.notification.timeline.TimelineElement;
 import it.pagopa.pn.api.dto.notification.timeline.TimelineElementCategory;
+import it.pagopa.pn.api.dto.notification.timeline.TimelineInfoDto;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -30,9 +31,9 @@ public class StatusUtils {
     }
 
     public List<NotificationStatusHistoryElement> getStatusHistory( //
-                                                                      Set<TimelineElement> timelineElementList, //
-                                                                      int numberOfRecipients, //
-                                                                      Instant notificationCreatedAt //
+                                                                    Set<TimelineInfoDto> timelineElementList, //
+                                                                    int numberOfRecipients, //
+                                                                    Instant notificationCreatedAt //
     ) {
         List<NotificationStatusHistoryElement> timelineHistory = new ArrayList<>();
         timelineHistory.add( NotificationStatusHistoryElement.builder()
@@ -45,11 +46,11 @@ public class StatusUtils {
         int numberOfEndedDeliveryWorkflows = 0;
 
 
-        List<TimelineElement> timelineByTimestampSorted = timelineElementList.stream()
-                .sorted(Comparator.comparing(TimelineElement::getTimestamp))
+        List<TimelineInfoDto> timelineByTimestampSorted = timelineElementList.stream()
+                .sorted(Comparator.comparing(TimelineInfoDto::getTimestamp))
                 .collect(Collectors.toList());
 
-        for (TimelineElement timelineElement : timelineByTimestampSorted) {
+        for (TimelineInfoDto timelineElement : timelineByTimestampSorted) {
             TimelineElementCategory category = timelineElement.getCategory();
 
             if( END_OF_DELIVERY_WORKFLOW.contains( category ) ) {
