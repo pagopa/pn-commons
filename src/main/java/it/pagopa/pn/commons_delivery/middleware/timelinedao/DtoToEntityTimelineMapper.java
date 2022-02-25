@@ -35,7 +35,16 @@ public class DtoToEntityTimelineMapper {
                 .category( dto.getCategory() )
                 .timestamp( dto.getTimestamp() )
                 .details( detailsToJsonString( dto ) )
+                .legalFactId( legalFactIdsToJsonString ( dto ) )
                 .build();
+    }
+
+    private String legalFactIdsToJsonString(TimelineElement dto) {
+        try {
+            return objectMapper.writeValueAsString( dto.getLegalFactsIds() );
+        } catch (JsonProcessingException exc) {
+            throw new PnInternalException( "Writing timeline detail to storage", exc );
+        }
     }
 
 

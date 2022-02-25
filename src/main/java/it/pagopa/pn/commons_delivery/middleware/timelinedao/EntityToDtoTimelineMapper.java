@@ -3,6 +3,7 @@ package it.pagopa.pn.commons_delivery.middleware.timelinedao;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
+import it.pagopa.pn.api.dto.legalfacts.LegalFactsListEntryId;
 import it.pagopa.pn.api.dto.notification.timeline.TimelineElement;
 import it.pagopa.pn.api.dto.notification.timeline.TimelineElementCategory;
 import it.pagopa.pn.api.dto.notification.timeline.TimelineElementDetails;
@@ -10,6 +11,8 @@ import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.commons_delivery.model.notification.cassandra.TimelineElementEntity;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -31,7 +34,18 @@ public class EntityToDtoTimelineMapper {
                 .category( entity.getCategory() )
                 .timestamp( entity.getTimestamp() )
                 .details( parseDetailsFromJson( entity ))
+                .legalFactsIds( parseLegalFactIdsFromJson( entity ) )
                 .build();
+    }
+
+    private List<LegalFactsListEntryId> parseLegalFactIdsFromJson(TimelineElementEntity entity) {
+        try {
+            LegalFactsListEntryId[] legalFactsListEntryIds;
+            legalFactsListEntryIds = objectMapper.readValue( entity.getLegalFactId(), LegalFactsListEntryId[].class );
+            return legalFactsListEntryIds == null ? null : Arrays.asList( legalFactsListEntryIds );
+        } catch (JsonProcessingException exc) {
+            throw new PnInternalException( "Reading timeline detail from storage", exc );
+        }
     }
 
 
