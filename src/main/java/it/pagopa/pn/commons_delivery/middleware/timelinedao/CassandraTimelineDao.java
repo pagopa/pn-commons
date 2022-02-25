@@ -1,23 +1,21 @@
 package it.pagopa.pn.commons_delivery.middleware.timelinedao;
 
-import it.pagopa.pn.api.dto.notification.status.NotificationStatus;
-import it.pagopa.pn.api.dto.notification.status.NotificationStatusHistoryElement;
 import it.pagopa.pn.api.dto.notification.timeline.TimelineElement;
 import it.pagopa.pn.api.dto.notification.timeline.TimelineInfoDto;
+import it.pagopa.pn.api.dto.status.RequestUpdateStatusDto;
+import it.pagopa.pn.api.dto.status.ResponseUpdateStatusDto;
 import it.pagopa.pn.commons.abstractions.impl.MiddlewareTypes;
-import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.commons_delivery.middleware.TimelineDao;
-import it.pagopa.pn.commons_delivery.middleware.notificationdao.CassandraNotificationByRecipientEntityDao;
-import it.pagopa.pn.commons_delivery.middleware.notificationdao.CassandraNotificationBySenderEntityDao;
-import it.pagopa.pn.commons_delivery.middleware.notificationdao.CassandraNotificationEntityDao;
-import it.pagopa.pn.commons_delivery.model.notification.cassandra.*;
-import it.pagopa.pn.commons_delivery.utils.StatusUtils;
+import it.pagopa.pn.commons_delivery.model.notification.cassandra.TimelineElementEntity;
+import it.pagopa.pn.commons_delivery.model.notification.cassandra.TimelineElementEntityId;
+import it.pagopa.pn.commons_delivery.utils.PnDeliveryClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
-import java.time.Instant;
-import java.util.*;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -26,28 +24,19 @@ import java.util.stream.Collectors;
 public class CassandraTimelineDao implements TimelineDao {
 
     private final TimelineEntityDao entityDao;
-    private final CassandraNotificationEntityDao notificationEntityDao;
     private final DtoToEntityTimelineMapper dto2entity;
     private final EntityToDtoTimelineMapper entity2dto;
-    private final CassandraNotificationBySenderEntityDao notificationBySenderEntityDao;
-    private final CassandraNotificationByRecipientEntityDao notificationByRecipientEntityDao;
-    private final StatusUtils statusUtils;
-
+    private final PnDeliveryClient client;
+    
     public CassandraTimelineDao(
             TimelineEntityDao entityDao,
-            CassandraNotificationEntityDao notificationEntityDao,
-            CassandraNotificationBySenderEntityDao notificationBySenderEntityDao,
-            CassandraNotificationByRecipientEntityDao notificationByRecipientEntityDao,
             DtoToEntityTimelineMapper dto2entity,
             EntityToDtoTimelineMapper entity2dto,
-            StatusUtils statusUtils) {
+            PnDeliveryClient client) {
         this.entityDao = entityDao;
-        this.notificationEntityDao = notificationEntityDao;
-        this.notificationBySenderEntityDao = notificationBySenderEntityDao;
-        this.notificationByRecipientEntityDao = notificationByRecipientEntityDao;
         this.dto2entity = dto2entity;
         this.entity2dto = entity2dto;
-        this.statusUtils = statusUtils;
+        this.client = client;
     }
 
     @Override
@@ -75,151 +64,36 @@ public class CassandraTimelineDao implements TimelineDao {
 
     @Override
     public void addTimelineElement(TimelineElement dto) {
-        String iun = dto.getIun();
+        Set<TimelineElement> currentTimeline = this.getTimeline(dto.getIun());
 
-        // - Caricare i metadati della notifica utilizzando CassandraNotificationEntityDao
-        Optional<NotificationEntity> notificationEntityOptional = notificationEntityDao.get(iun);
-        if (notificationEntityOptional.isPresent()) {
+        RequestUpdateStatusDto requestDto = getRequestUpdateStatusDto(dto, currentTimeline);
 
-            NotificationEntity notificationEntity = notificationEntityOptional.get();
+        ResponseEntity<ResponseUpdateStatusDto> resp = client.updateState(requestDto);
 
-            // - Caricare la timeline corrente utilizzando il metodo getTimeline
-            Set<TimelineElement> currentTimeline = this.getTimeline(iun);
-
-            // - Calcolare lo stato corrente
-            NotificationBySenderEntity currentSearchBySenderEntry = computeSearchBySenderEntry(notificationEntity, currentTimeline);
-            NotificationStatus currentState = currentSearchBySenderEntry.getNotificationBySenderId().getNotificationStatus();
-            NotificationByRecipientEntity currentSearchByRecipientEntry = computeSearchByRecipientEntry(notificationEntity, currentTimeline);
-
-            // - aggiungere all'elenco della timeline il nuovo dto
-            currentTimeline.add(dto);
-
-            // - Calcolare il nuovo stato
-            NotificationBySenderEntity nextSearchBySenderEntry = computeSearchBySenderEntry(notificationEntity, currentTimeline);
-            NotificationStatus nextState = nextSearchBySenderEntry.getNotificationBySenderId().getNotificationStatus();
-            NotificationByRecipientEntity nextSearchByRecipientEntry = computeSearchByRecipientEntry(notificationEntity, currentTimeline);
-
-
-            // - se i due stati differiscono
-            if (!currentState.equals(nextState)) {
-                log.warn(" CAMBIAMENTO DI STATO " + currentState + " " + nextState);
-                addNewSearchEntries(nextSearchBySenderEntry, nextSearchByRecipientEntry, notificationEntity);
-                deleteOldSearchEntries(currentSearchBySenderEntry, currentSearchByRecipientEntry, notificationEntity);
-            }
-        } else {
-            throw new PnInternalException("Try to add timeline element for non existing iun " + dto.getIun());
+        if (resp.getStatusCode().is2xxSuccessful()) {
+            TimelineElementEntity entity = dto2entity.dtoToEntity(dto);
+            entityDao.put(entity);
+        }else {
+            log.error("Status not updated correctly - iun {} timelineId {}", dto.getIun() , dto.getElementId());
         }
-
-        TimelineElementEntity entity = dto2entity.dtoToEntity(dto);
-        entityDao.put(entity);
     }
 
-
-    private void deleteOldSearchEntries(NotificationBySenderEntity nextSearchBySenderEntry, NotificationByRecipientEntity nextSearchByRecipientEntry, NotificationEntity notificationEntity) {
-
-        for (String recipientId : notificationEntity.getRecipientsOrder()) {
-            notificationBySenderEntityDao.delete(
-                    nextSearchBySenderEntry.getNotificationBySenderId().toBuilder()
-                            .recipientId(recipientId)
-                            .build()
-            );
-            notificationByRecipientEntityDao.delete(
-                    nextSearchByRecipientEntry.getNotificationByRecipientId().toBuilder()
-                            .recipientId(recipientId)
-                            .build()
-            );
-        }
-
-    }
-
-    private void addNewSearchEntries(NotificationBySenderEntity currentSearchBySenderEntry, NotificationByRecipientEntity currentSearchByRecipientEntry, NotificationEntity notificationEntity) {
-
-        for (String recipientId : notificationEntity.getRecipientsOrder()) {
-            notificationBySenderEntityDao.put(currentSearchBySenderEntry.toBuilder()
-                    .notificationBySenderId(currentSearchBySenderEntry.getNotificationBySenderId()
-                            .toBuilder()
-                            .recipientId(recipientId)
-                            .build()
-                    )
-                    .build());
-            notificationByRecipientEntityDao.put(currentSearchByRecipientEntry.toBuilder()
-                    .notificationByRecipientId(currentSearchByRecipientEntry.getNotificationByRecipientId()
-                            .toBuilder()
-                            .recipientId(recipientId)
-                            .build()
-                    )
-                    .build());
-        }
-
-    }
-
-    private NotificationBySenderEntity computeSearchBySenderEntry(NotificationEntity notificationEntity, Set<TimelineElement> currentTimeline) {
-        int numberOfRecipient = notificationEntity.getRecipientsOrder().size();
-        Instant notificationCreatedAt = notificationEntity.getSentAt();
-        
-        //TODO Inserito per continuare a farlo funzionare, tutta la logica verrà eliminata nel task 749
-        Set<TimelineInfoDto> timelineInfoDto = currentTimeline.stream().map(elem ->
+    private RequestUpdateStatusDto getRequestUpdateStatusDto(TimelineElement dto, Set<TimelineElement> currentTimeline) {
+        Set<TimelineInfoDto> currentTimelineInfoDto = currentTimeline.stream().map(elem ->
                 TimelineInfoDto.builder()
                         .category(elem.getCategory())
                         .timestamp(elem.getTimestamp())
                         .build()
         ).collect(Collectors.toSet());
-        
-        List<NotificationStatusHistoryElement> historyElementList = statusUtils.getStatusHistory(
-                timelineInfoDto,
-                numberOfRecipient,
-                notificationCreatedAt);
 
-        NotificationStatusHistoryElement lastStatus;
-        lastStatus = historyElementList.get(historyElementList.size() - 1);
-
-        return NotificationBySenderEntity.builder()
-                .notificationBySenderId(NotificationBySenderEntityId.builder()
-                        .notificationStatus(lastStatus.getStatus())
-                        .senderId(notificationEntity.getSenderPaId())
-                        .sentat(notificationCreatedAt)
-                        .recipientId(null)
-                        .iun(notificationEntity.getIun())
-                        .build()
-                )
-                .paNotificationId(notificationEntity.getPaNotificationId())
-                .recipientsJson(notificationEntity.getRecipientsJson())
-                .subject(notificationEntity.getSubject())
+        return RequestUpdateStatusDto.builder()
+                .iun(dto.getIun())
+                .newTimelineElement(TimelineInfoDto.builder()
+                        .timestamp(dto.getTimestamp())
+                        .category(dto.getCategory())
+                        .build())
+                .currentTimeline(currentTimelineInfoDto)
                 .build();
     }
 
-    private NotificationByRecipientEntity computeSearchByRecipientEntry(NotificationEntity notificationEntity, Set<TimelineElement> currentTimeline) {
-        int numberOfRecipient = notificationEntity.getRecipientsOrder().size();
-        Instant notificationCreatedAt = notificationEntity.getSentAt();
-
-        //TODO Inserito per continuare a farlo funzionare, tutta la logica verrà eliminata nel task 749
-        Set<TimelineInfoDto> timelineInfoDto = currentTimeline.stream().map(elem ->
-                TimelineInfoDto.builder()
-                        .category(elem.getCategory())
-                        .timestamp(elem.getTimestamp())
-                        .build()
-        ).collect(Collectors.toSet());
-        
-        List<NotificationStatusHistoryElement> historyElementList = statusUtils.getStatusHistory(
-                timelineInfoDto,
-                numberOfRecipient,
-                notificationCreatedAt);
-
-        NotificationStatusHistoryElement lastStatus;
-        lastStatus = historyElementList.get(historyElementList.size() - 1);
-
-        return NotificationByRecipientEntity.builder()
-                .paNotificationId(notificationEntity.getPaNotificationId())
-                .recipientsJson(notificationEntity.getRecipientsJson())
-                .subject(notificationEntity.getSubject())
-                .notificationByRecipientId(
-                        NotificationByRecipientEntityId.builder()
-                                .notificationStatus(lastStatus.getStatus())
-                                .senderId(notificationEntity.getSenderPaId())
-                                .sentat(notificationCreatedAt)
-                                .iun(notificationEntity.getIun())
-                                .build()
-                )
-                .build();
-    }
 }
