@@ -177,7 +177,7 @@ class CassandraNotificationDaoSearchTestIT {
                 .startDate(Instant.EPOCH)
                 .endDate(Instant.EPOCH.plus(1, ChronoUnit.MINUTES))
                 .filterId(null)
-                .status(NotificationStatus.RECEIVED)
+                .status(NotificationStatus.IN_VALIDATION)
                 .subjectRegExp(null)
                 .size(null)
                 .nextPagesKey(null)
@@ -191,7 +191,7 @@ class CassandraNotificationDaoSearchTestIT {
                 .startDate(Instant.EPOCH)
                 .endDate(Instant.EPOCH.plus(1, ChronoUnit.MINUTES))
                 .filterId(null)
-                .status(NotificationStatus.RECEIVED)
+                .status(NotificationStatus.IN_VALIDATION)
                 .subjectRegExp(null)
                 .size(null)
                 .nextPagesKey(null)
@@ -207,7 +207,7 @@ class CassandraNotificationDaoSearchTestIT {
                 .collect(Collectors.toSet());
         Assertions.assertEquals(1, senderIds.size());
         Assertions.assertTrue(senderIds.contains(senderId));
-        Assertions.assertTrue(statuses.contains(NotificationStatus.RECEIVED));
+        Assertions.assertTrue(statuses.contains(NotificationStatus.IN_VALIDATION));
 
         Set<String> recipientIds = resultByRecipient.stream()
                 .map(row -> row.getRecipientId())
@@ -217,7 +217,7 @@ class CassandraNotificationDaoSearchTestIT {
                 .collect(Collectors.toSet());
         Assertions.assertEquals(1, recipientIds.size());
         Assertions.assertTrue(recipientIds.contains(recipientId));
-        Assertions.assertTrue(statusesByRecipient.contains(NotificationStatus.RECEIVED));
+        Assertions.assertTrue(statusesByRecipient.contains(NotificationStatus.IN_VALIDATION));
 
     }
 
@@ -262,7 +262,7 @@ class CassandraNotificationDaoSearchTestIT {
                 .startDate(Instant.EPOCH)
                 .endDate(Instant.EPOCH.plus(1, ChronoUnit.MINUTES))
                 .filterId(recipientId)
-                .status(NotificationStatus.RECEIVED)
+                .status(NotificationStatus.IN_VALIDATION)
                 .subjectRegExp(null)
                 .size(null)
                 .nextPagesKey(null)
@@ -326,7 +326,7 @@ class CassandraNotificationDaoSearchTestIT {
                 .startDate(Instant.EPOCH)
                 .endDate(Instant.EPOCH.plus(1, ChronoUnit.MINUTES))
                 .filterId(null)
-                .status(NotificationStatus.RECEIVED)
+                .status(NotificationStatus.IN_VALIDATION)
                 .subjectRegExp(subjectRegExp)
                 .size(null)
                 .nextPagesKey(null)

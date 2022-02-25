@@ -56,11 +56,11 @@ public class CassandraNotificationDao implements NotificationDao {
     @Override
     public void addNotification(Notification notification) throws IdConflictException {
         dto2SearchEntityMapper
-                .dto2SenderEntity(notification, NotificationStatus.RECEIVED)
+                .dto2SenderEntity(notification, NotificationStatus.IN_VALIDATION)
                 .forEach( notificationBySenderEntityDao::put );
         
         dto2SearchEntityMapper
-                .dto2RecipientEntity(notification, NotificationStatus.RECEIVED)
+                .dto2RecipientEntity(notification, NotificationStatus.IN_VALIDATION)
                 .forEach( notificationByRecipientEntityDao::put );
         
         NotificationEntity entity = dto2entityMapper.dto2Entity(notification);
