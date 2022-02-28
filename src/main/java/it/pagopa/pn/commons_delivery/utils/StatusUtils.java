@@ -35,24 +35,20 @@ public class StatusUtils {
                                                                     int numberOfRecipients, //
                                                                     Instant notificationCreatedAt //
     ) {
-        List<NotificationStatusHistoryElement> timelineHistory = new ArrayList<>();
-        timelineHistory.add( NotificationStatusHistoryElement.builder()
-                .status( INITIAL_STATUS )
-                .activeFrom( notificationCreatedAt )
-                .build()
-            );
-
-        NotificationStatus currentState = INITIAL_STATUS;
-        int numberOfEndedDeliveryWorkflows = 0;
-
-
         List<TimelineInfoDto> timelineByTimestampSorted = timelineElementList.stream()
                 .sorted(Comparator.comparing(TimelineInfoDto::getTimestamp))
                 .collect(Collectors.toList());
 
+        List<NotificationStatusHistoryElement> timelineHistory = new ArrayList<>();
+
+        List<String> relatedTimelineElements = new ArrayList<>();
+        Instant currentStateStart = notificationCreatedAt;
+        NotificationStatus currentState = INITIAL_STATUS;
+        int numberOfEndedDeliveryWorkflows = 0;
+
+
         for (TimelineInfoDto timelineElement : timelineByTimestampSorted) {
             TimelineElementCategory category = timelineElement.getCategory();
-
             if( END_OF_DELIVERY_WORKFLOW.contains( category ) ) {
                 numberOfEndedDeliveryWorkflows += 1;
             }
@@ -62,13 +58,27 @@ public class StatusUtils {
 
             if (!Objects.equals(currentState, nextState)) {
                 NotificationStatusHistoryElement statusHistoryElement = NotificationStatusHistoryElement.builder()
-                        .status( nextState )
-                        .activeFrom( timelineElement.getTimestamp() )
+                        .status( currentState )
+                        .activeFrom( currentStateStart )
+                        .relatedTimelineElements( relatedTimelineElements )
                         .build();
                 timelineHistory.add(statusHistoryElement);
+
+                relatedTimelineElements = new ArrayList<>();
+                currentStateStart = timelineElement.getTimestamp();
             }
+
+            relatedTimelineElements.add( timelineElement.getElementId() );
+
             currentState = nextState;
         }
+
+        NotificationStatusHistoryElement statusHistoryElement = NotificationStatusHistoryElement.builder()
+                .status( currentState )
+                .activeFrom( currentStateStart )
+                .relatedTimelineElements( relatedTimelineElements )
+                .build();
+        timelineHistory.add(statusHistoryElement);
 
         return timelineHistory;
     }
