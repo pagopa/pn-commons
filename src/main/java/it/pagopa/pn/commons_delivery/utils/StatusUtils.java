@@ -4,6 +4,7 @@ import it.pagopa.pn.api.dto.notification.status.NotificationStatus;
 import it.pagopa.pn.api.dto.notification.status.NotificationStatusHistoryElement;
 import it.pagopa.pn.api.dto.notification.timeline.TimelineElement;
 import it.pagopa.pn.api.dto.notification.timeline.TimelineElementCategory;
+import it.pagopa.pn.api.dto.notification.timeline.TimelineInfoDto;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -30,28 +31,24 @@ public class StatusUtils {
     }
 
     public List<NotificationStatusHistoryElement> getStatusHistory( //
-                                                                      Set<TimelineElement> timelineElementList, //
-                                                                      int numberOfRecipients, //
-                                                                      Instant notificationCreatedAt //
+                                                                    Set<TimelineInfoDto> timelineElementList, //
+                                                                    int numberOfRecipients, //
+                                                                    Instant notificationCreatedAt //
     ) {
-        List<NotificationStatusHistoryElement> timelineHistory = new ArrayList<>();
-        timelineHistory.add( NotificationStatusHistoryElement.builder()
-                .status( INITIAL_STATUS )
-                .activeFrom( notificationCreatedAt )
-                .build()
-            );
+        List<TimelineInfoDto> timelineByTimestampSorted = timelineElementList.stream()
+                .sorted(Comparator.comparing(TimelineInfoDto::getTimestamp))
+                .collect(Collectors.toList());
 
+        List<NotificationStatusHistoryElement> timelineHistory = new ArrayList<>();
+
+        List<String> relatedTimelineElements = new ArrayList<>();
+        Instant currentStateStart = notificationCreatedAt;
         NotificationStatus currentState = INITIAL_STATUS;
         int numberOfEndedDeliveryWorkflows = 0;
 
 
-        List<TimelineElement> timelineByTimestampSorted = timelineElementList.stream()
-                .sorted(Comparator.comparing(TimelineElement::getTimestamp))
-                .collect(Collectors.toList());
-
-        for (TimelineElement timelineElement : timelineByTimestampSorted) {
+        for (TimelineInfoDto timelineElement : timelineByTimestampSorted) {
             TimelineElementCategory category = timelineElement.getCategory();
-
             if( END_OF_DELIVERY_WORKFLOW.contains( category ) ) {
                 numberOfEndedDeliveryWorkflows += 1;
             }
@@ -61,13 +58,27 @@ public class StatusUtils {
 
             if (!Objects.equals(currentState, nextState)) {
                 NotificationStatusHistoryElement statusHistoryElement = NotificationStatusHistoryElement.builder()
-                        .status( nextState )
-                        .activeFrom( timelineElement.getTimestamp() )
+                        .status( currentState )
+                        .activeFrom( currentStateStart )
+                        .relatedTimelineElements( relatedTimelineElements )
                         .build();
                 timelineHistory.add(statusHistoryElement);
+
+                relatedTimelineElements = new ArrayList<>();
+                currentStateStart = timelineElement.getTimestamp();
             }
+
+            relatedTimelineElements.add( timelineElement.getElementId() );
+
             currentState = nextState;
         }
+
+        NotificationStatusHistoryElement statusHistoryElement = NotificationStatusHistoryElement.builder()
+                .status( currentState )
+                .activeFrom( currentStateStart )
+                .relatedTimelineElements( relatedTimelineElements )
+                .build();
+        timelineHistory.add(statusHistoryElement);
 
         return timelineHistory;
     }

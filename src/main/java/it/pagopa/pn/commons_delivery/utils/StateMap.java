@@ -31,6 +31,8 @@ class StateMap {
                 .withTimelineGoToState(TimelineElementCategory.SCHEDULE_ANALOG_WORKFLOW, NotificationStatus.DELIVERING)
                 .withTimelineGoToState(TimelineElementCategory.SEND_DIGITAL_DOMICILE, NotificationStatus.DELIVERING)
                 .withTimelineGoToState(TimelineElementCategory.SEND_ANALOG_DOMICILE, NotificationStatus.DELIVERING)
+                .withTimelineGoToState(TimelineElementCategory.NOTIFICATION_VIEWED, NotificationStatus.VIEWED)
+                .withTimelineGoToState(TimelineElementCategory.PAYMENT, NotificationStatus.PAID)
         ;
 
         // Delivering state
