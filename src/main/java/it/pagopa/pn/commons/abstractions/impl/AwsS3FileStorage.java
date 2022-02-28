@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import it.pagopa.pn.api.dto.notification.NotificationAttachment;
 import org.apache.commons.lang3.StringUtils;
 
 import it.pagopa.pn.commons.abstractions.FileData;
@@ -11,6 +12,12 @@ import it.pagopa.pn.commons.abstractions.FileStorage;
 import it.pagopa.pn.commons.configs.RuntimeMode;
 import it.pagopa.pn.commons.configs.aws.AwsConfigs;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.InvalidMediaTypeException;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.core.waiters.WaiterResponse;
@@ -100,6 +107,44 @@ public class AwsS3FileStorage implements FileStorage {
                     .build();
             }).collect(Collectors.toList());
 
+    }
+
+    @Override
+    public HttpHeaders headers() {
+            HttpHeaders headers = new HttpHeaders();
+            headers.add( "Cache-Control", "no-cache, no-store, must-revalidate" );
+            headers.add( "Pragma", "no-cache" );
+            headers.add( "Expires", "0" );
+            return headers;
+    }
+
+    public ResponseEntity<Resource> loadAttachment(NotificationAttachment.Ref attachmentRef) {
+        String attachmentKey = attachmentRef.getKey();
+        String savedVersionId = attachmentRef.getVersionToken();
+
+        FileData fileData = this.getFileVersion( attachmentKey, savedVersionId );
+
+        ResponseEntity<Resource> response = ResponseEntity.ok()
+                .headers( this.headers() )
+                .contentLength( fileData.getContentLength() )
+                .contentType( extractMediaType( fileData.getContentType() ) )
+                .body( new InputStreamResource(fileData.getContent() ) );
+
+        log.debug("AttachmentKey: response={}", response);
+        return response;
+    }
+
+    private MediaType extractMediaType(String contentType ) {
+        MediaType mediaType = MediaType.APPLICATION_OCTET_STREAM;
+
+        try {
+            if ( StringUtils.isNotBlank( contentType ) ) {
+                mediaType = MediaType.parseMediaType( contentType );
+            }
+        } catch (InvalidMediaTypeException exc)  {
+            // using default
+        }
+        return mediaType;
     }
 
     private HeadObjectResponse loadMetadata( S3Object s3Obj ) {
