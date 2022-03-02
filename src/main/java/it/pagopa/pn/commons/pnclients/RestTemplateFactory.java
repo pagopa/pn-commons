@@ -20,7 +20,7 @@ public class RestTemplateFactory {
 
     @Bean
     @Qualifier("withTracing")
-    public RestTemplate restTemplate(){
+    public RestTemplate restTemplateWithTracing(){
         RestTemplate template = new RestTemplate();
         List<ClientHttpRequestInterceptor> interceptors
                 = template.getInterceptors();
