@@ -2,6 +2,7 @@ package it.pagopa.pn.commons_delivery.utils;
 
 import it.pagopa.pn.api.dto.legalfacts.LegalFactType;
 import it.pagopa.pn.api.dto.legalfacts.LegalFactsListEntry;
+import it.pagopa.pn.api.dto.legalfacts.LegalFactsListEntryId;
 import it.pagopa.pn.api.dto.notification.NotificationAttachment;
 import it.pagopa.pn.commons.abstractions.FileData;
 import org.apache.commons.lang3.StringUtils;
@@ -55,9 +56,11 @@ public class LegalfactsMetadataUtils {
 
         return LegalFactsListEntry.builder()
                 .iun( iun )
-                .legalFactId( legalFactName + "~" + versionId )
+                .legalFactsId( LegalFactsListEntryId.builder()
+                        .key( legalFactName + "~" + versionId )
+                        .type( LegalFactType.valueOf(legalfactTypeString) )
+                        .build() )
                 .taxId(taxId)
-                .type(LegalFactType.valueOf(legalfactTypeString))
                 .build();
     }
 

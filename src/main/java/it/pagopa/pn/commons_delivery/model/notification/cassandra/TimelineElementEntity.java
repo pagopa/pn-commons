@@ -21,6 +21,7 @@ public class TimelineElementEntity {
 
     private Instant timestamp;
     private TimelineElementCategory category;
+    private String legalFactId;
     private String details;
 
 }
