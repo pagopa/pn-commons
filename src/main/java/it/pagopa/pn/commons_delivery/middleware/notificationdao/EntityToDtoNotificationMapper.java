@@ -115,11 +115,12 @@ public class EntityToDtoNotificationMapper {
         return result;
     }
 
-    private NotificationAttachment buildAttachment(String key, String version, String sha256, String contentType ) {
+    private NotificationAttachment buildAttachment(String key, String version, String sha256, String contentType, String title ) {
          NotificationAttachment notificationAttachment = buildAttachment(key, version, sha256);
          if ( notificationAttachment != null ){
              notificationAttachment = notificationAttachment.toBuilder()
                      .contentType(contentType)
+                     .title( title )
                      .build();
          }
         return notificationAttachment;
@@ -130,14 +131,16 @@ public class EntityToDtoNotificationMapper {
         List<String> documentsKeys = entity.getDocumentsKeys();
         List<String> documentsVersionIds = entity.getDocumentsVersionIds();
         List<String> documentsContentTypes = entity.getDocumentsContentTypes();
+        List<String> documentsTitles = entity.getDocumentsTitles();
 
         int lengthShas = documentsDigestsSha256 == null ? 0 : documentsDigestsSha256.size();
         int lengthKeys = documentsKeys == null ? 0 : documentsKeys.size();
         int lengthVersionIds = documentsVersionIds == null ? 0 : documentsVersionIds.size();
         int lengthContentTypes = documentsContentTypes == null ? 0 : documentsContentTypes.size();
-        if ( lengthShas != lengthKeys || lengthKeys != lengthVersionIds || lengthVersionIds != lengthContentTypes  ) {
+        int lengthTitles = documentsTitles == null ? 0 : documentsTitles.size();
+        if ( lengthShas != lengthKeys || lengthKeys != lengthVersionIds || lengthVersionIds != lengthContentTypes || lengthTitles != lengthContentTypes  ) {
             throw new PnInternalException(" Notification entity with iun " + entity.getIun() +
-                    " hash different quantity of document versions, sha256s, keys and content types");
+                    " hash different quantity of document versions, sha256s, keys, content types and titles");
         }
 
         // - Three different list with one information each instead of a list of object:
@@ -148,7 +151,8 @@ public class EntityToDtoNotificationMapper {
                     documentsKeys.get( d ),
                     documentsVersionIds.get( d ),
                     documentsDigestsSha256.get( d ),
-                    documentsContentTypes.get( d )
+                    documentsContentTypes.get( d ),
+                    documentsTitles.get( d )
                 );
             result.add( notificationAttachment );
         }
