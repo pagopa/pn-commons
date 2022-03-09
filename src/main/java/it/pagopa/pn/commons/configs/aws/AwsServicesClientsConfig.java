@@ -9,8 +9,10 @@ import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.awscore.client.builder.AwsClientBuilder;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedAsyncClient;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.aws.mcs.auth.SigV4AuthProvider;
@@ -40,6 +42,15 @@ public class AwsServicesClientsConfig {
                 .build();
     }
 
+    @Bean
+    public DynamoDbEnhancedClient dynamoDbEnhancedClient() {
+        return DynamoDbEnhancedClient.builder()
+                .dynamoDbClient(
+                        configureBuilder( DynamoDbClient.builder() )
+                )
+                .build();
+    }
+    
     @Bean
     public SqsClient sqsClient() {
         return configureBuilder( SqsClient.builder() );
