@@ -10,6 +10,7 @@ import org.springframework.data.cassandra.core.InsertOptions;
 
 import java.util.Optional;
 
+@Deprecated
 public abstract class AbstractCassandraKeyValueStore<K, V> implements KeyValueStore<K, V> {
 
     private static final InsertOptions INSERT_OPTIONS = InsertOptions.builder()
