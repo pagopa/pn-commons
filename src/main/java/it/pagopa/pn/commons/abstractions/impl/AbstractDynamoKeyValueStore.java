@@ -1,13 +1,12 @@
 package it.pagopa.pn.commons.abstractions.impl;
 
-import it.pagopa.pn.commons.abstractions.IdConflictException;
-import it.pagopa.pn.commons.abstractions.KeyValueStoreNew;
+import it.pagopa.pn.commons.abstractions.KeyValueStore;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 import software.amazon.awssdk.enhanced.dynamodb.Key;
 
 import java.util.Optional;
 
-public class AbstractDynamoKeyValueStore <T> implements KeyValueStoreNew<T, Key> {
+public abstract class AbstractDynamoKeyValueStore <T> implements KeyValueStore<Key,T> {
     protected final DynamoDbTable<T> table;
 
     public AbstractDynamoKeyValueStore(DynamoDbTable<T> table) {
@@ -17,15 +16,6 @@ public class AbstractDynamoKeyValueStore <T> implements KeyValueStoreNew<T, Key>
     @Override
     public void put(T value) {
         table.putItem(value);
-    }
-
-    @Override
-    public void putIfAbsent(T value, Key key) throws IdConflictException {
-        if(get(key).isEmpty()){
-            put(value);
-        }else {
-            throw new IdConflictException(key);
-        }
     }
 
     @Override

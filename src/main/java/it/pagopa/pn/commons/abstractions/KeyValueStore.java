@@ -2,7 +2,6 @@ package it.pagopa.pn.commons.abstractions;
 
 import java.util.Optional;
 
-@Deprecated
 public interface KeyValueStore<K,V> {
 
     void put(V value);
