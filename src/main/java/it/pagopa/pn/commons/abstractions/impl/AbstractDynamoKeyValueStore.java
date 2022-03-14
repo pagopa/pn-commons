@@ -9,7 +9,7 @@ import java.util.Optional;
 public abstract class AbstractDynamoKeyValueStore <T> implements KeyValueStore<Key,T> {
     protected final DynamoDbTable<T> table;
 
-    public AbstractDynamoKeyValueStore(DynamoDbTable<T> table) {
+    protected AbstractDynamoKeyValueStore(DynamoDbTable<T> table) {
         this.table = table;
     }
 
