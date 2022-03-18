@@ -34,20 +34,26 @@ public class AwsServicesClientsConfig {
     }
 
     @Bean
-    public DynamoDbEnhancedAsyncClient dynamoDbEnhancedAsyncClient() {
+    public DynamoDbAsyncClient dynamoDbAsyncClient() {
+        return this.configureBuilder( DynamoDbAsyncClient.builder() );
+    }
+
+    @Bean
+    public DynamoDbEnhancedAsyncClient dynamoDbEnhancedAsyncClient( DynamoDbAsyncClient baseAsyncClient) {
         return DynamoDbEnhancedAsyncClient.builder()
-                .dynamoDbClient(
-                        configureBuilder( DynamoDbAsyncClient.builder() )
-                    )
+                .dynamoDbClient( baseAsyncClient )
                 .build();
     }
 
     @Bean
-    public DynamoDbEnhancedClient dynamoDbEnhancedClient() {
+    public DynamoDbClient dynamoDbClient() {
+        return configureBuilder( DynamoDbClient.builder() );
+    }
+
+    @Bean
+    public DynamoDbEnhancedClient dynamoDbEnhancedClient( DynamoDbClient baseClient ) {
         return DynamoDbEnhancedClient.builder()
-                .dynamoDbClient(
-                        configureBuilder( DynamoDbClient.builder() )
-                )
+                .dynamoDbClient( baseClient )
                 .build();
     }
     
