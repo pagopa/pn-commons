@@ -97,5 +97,10 @@
 			<artifactId>httpclient</artifactId>
 			<version>4.5.13</version>
 		</dependency>
+		<dependency>
+			<groupId>net.logstash.logback</groupId>
+			<artifactId>logstash-logback-encoder</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 </project>
