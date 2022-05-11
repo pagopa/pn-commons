@@ -3,6 +3,7 @@ package it.pagopa.pn.commons.utils;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
@@ -22,6 +23,10 @@ public abstract class DateUtils {
     }
 
     public static Instant convertDateToInstant(Date dateToConvert){
+        return dateToConvert != null ? dateToConvert.toInstant() : null;
+    }
+
+    public static Instant convertOffsetDateTimeToInstant(OffsetDateTime dateToConvert){
         return dateToConvert != null ? dateToConvert.toInstant() : null;
     }
 }
