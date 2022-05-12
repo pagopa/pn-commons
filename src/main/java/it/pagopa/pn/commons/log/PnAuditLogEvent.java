@@ -8,7 +8,6 @@ public class PnAuditLogEvent {
     PnAuditLogEventType type;
     @With
     String format;
-    @With
     Object[] arguments;
 
     public PnAuditLogEvent(PnAuditLogEventType type, String message) {
@@ -20,6 +19,10 @@ public class PnAuditLogEvent {
         this.type = type;
         this.format = format;
         this.arguments = arguments;
+    }
+
+    public PnAuditLogEvent withArgument(Object... arguments) {
+        return new PnAuditLogEvent(type, format, arguments);
     }
 
 }

@@ -35,7 +35,15 @@ class PnAuditLogTest {
         // call method under test
         PnAuditLog.logBefore(event2);
         //---- Call to business method
-        PnAuditLog.logAfter(event2, true);
+        PnAuditLog.logAfterSuccess(event2);
+
+        // create AuditEvents
+        PnAuditLogEvent event3 = new PnAuditLogEvent(PnAuditLogEventType.AUD_NT_ARR, "Test3");
+
+        // call method under test
+        PnAuditLog.logBefore(event3);
+        //---- Call to business method
+        PnAuditLog.logAfterFailure(event3.withFormat("ERROR in calling method {}").withArgument("pippo"));
 
         // JUnit assertions
         List<ILoggingEvent> logsList = listAppender.list;
@@ -54,5 +62,13 @@ class PnAuditLogTest {
         assertEquals("AUDIT5Y", logsList.get(3).getMarker().getName());
         assertEquals("INFO", logsList.get(3).getLevel().toString());
         assertEquals("[AUD_ACC_LOGIN] - After - Test format 1 = pippo", logsList.get(3).getFormattedMessage());
+
+        assertEquals("AUDIT10Y", logsList.get(4).getMarker().getName());
+        assertEquals("INFO", logsList.get(4).getLevel().toString());
+        assertEquals("[AUD_NT_ARR] - Before - Test3", logsList.get(4).getFormattedMessage());
+
+        assertEquals("AUDIT10Y", logsList.get(5).getMarker().getName());
+        assertEquals("ERROR", logsList.get(5).getLevel().toString());
+        assertEquals("[AUD_NT_ARR] - After - ERROR in calling method pippo", logsList.get(5).getFormattedMessage());
     }
 }
