@@ -22,7 +22,7 @@ class PnAuditLogTest {
 
         // add the appender to the logger
         // addAppender is outdated now
-        PnAuditLog.logger.addAppender(listAppender);
+        PnAuditLog.getLogger().addAppender(listAppender);
 
         // create AuditEvents
         PnAuditLogEvent event1 = new PnAuditLogEvent(PnAuditLogEventType.AUD_NT_ARR, "Test1");
