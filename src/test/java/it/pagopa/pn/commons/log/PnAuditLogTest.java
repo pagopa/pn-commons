@@ -41,11 +41,11 @@ class PnAuditLogTest {
         List<ILoggingEvent> logsList = listAppender.list;
         assertEquals("AUDIT10Y", logsList.get(0).getMarker().getName());
         assertEquals("INFO", logsList.get(0).getLevel().toString());
-        assertEquals("[AUD_NT_ARR] - Before - ERROR in calling method", logsList.get(0).getFormattedMessage());
+        assertEquals("[AUD_NT_ARR] - Before - Test1", logsList.get(0).getFormattedMessage());
 
         assertEquals("AUDIT10Y", logsList.get(1).getMarker().getName());
         assertEquals("ERROR", logsList.get(1).getLevel().toString());
-        assertEquals("[AUD_NT_ARR] - After - Test1", logsList.get(1).getFormattedMessage());
+        assertEquals("[AUD_NT_ARR] - After - ERROR in calling method", logsList.get(1).getFormattedMessage());
 
         assertEquals("AUDIT5Y", logsList.get(2).getMarker().getName());
         assertEquals("INFO", logsList.get(2).getLevel().toString());
