@@ -15,6 +15,12 @@ public class PnAuditLog {
         log(pnAuditLogEvent, "Before", true);
     }
 
+    public static void logAfterSuccess(PnAuditLogEvent pnAuditLogEvent) {
+        logAfter(pnAuditLogEvent, true);
+    }
+    public static void logAfterFailure(PnAuditLogEvent pnAuditLogEvent) {
+        logAfter(pnAuditLogEvent,  false);
+    }
     public static void logAfter(PnAuditLogEvent pnAuditLogEvent, boolean success) {
         log(pnAuditLogEvent, "After", success);
     }
@@ -23,7 +29,7 @@ public class PnAuditLog {
         if (logger.isInfoEnabled()) {
             StringBuilder format = new StringBuilder()
                     .append("[{}] - {} - ")
-                    .append(pnAuditLogEvent.format == null ? pnAuditLogEvent.message : pnAuditLogEvent.format);
+                    .append(pnAuditLogEvent.format);
             int argumentsLength = (pnAuditLogEvent.arguments == null ? 2 : pnAuditLogEvent.arguments.length +2);
             Object[] arguments = new Object[argumentsLength];
             arguments[0] = pnAuditLogEvent.type.toString();

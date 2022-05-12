@@ -6,15 +6,14 @@ import lombok.With;
 @Builder
 public class PnAuditLogEvent {
     PnAuditLogEventType type;
-    String message;
-    String format;
-    Object[] arguments;
     @With
-    boolean failure;
+    String format;
+    @With
+    Object[] arguments;
 
     public PnAuditLogEvent(PnAuditLogEventType type, String message) {
         this.type = type;
-        this.message = message;
+        this.format = message;
     }
 
     public PnAuditLogEvent(PnAuditLogEventType type, String format, Object... arguments) {
@@ -22,4 +21,5 @@ public class PnAuditLogEvent {
         this.format = format;
         this.arguments = arguments;
     }
+
 }

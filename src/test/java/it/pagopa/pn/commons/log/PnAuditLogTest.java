@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class PnAuditLogTest {
 
     @Test
-    void testMarker() {
+    void testAuditLog() {
 
         // create and start a ListAppender
         ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
@@ -25,26 +25,32 @@ class PnAuditLogTest {
 
         // create AuditEvents
         PnAuditLogEvent event1 = new PnAuditLogEvent(PnAuditLogEventType.AUD_NT_ARR, "Test1");
-        PnAuditLogEvent event2 = new PnAuditLogEvent(PnAuditLogEventType.AUD_ACC_LOGIN, "Test format {} = {}", "1", "pippo");
 
         // call method under test
         PnAuditLog.logBefore(event1);
-        PnAuditLog.logAfter(event1, false);
+        //---- Call to business method
+        PnAuditLog.logAfter(event1.withFormat("ERROR in calling method"), false);
 
+        PnAuditLogEvent event2 = new PnAuditLogEvent(PnAuditLogEventType.AUD_ACC_LOGIN, "Test format {} = {}", "1", "pippo");
+        // call method under test
         PnAuditLog.logBefore(event2);
+        //---- Call to business method
         PnAuditLog.logAfter(event2, true);
 
         // JUnit assertions
         List<ILoggingEvent> logsList = listAppender.list;
         assertEquals("AUDIT10Y", logsList.get(0).getMarker().getName());
         assertEquals("INFO", logsList.get(0).getLevel().toString());
-        assertEquals("[AUD_NT_ARR] - Before - Test1", logsList.get(0).getFormattedMessage());
+        assertEquals("[AUD_NT_ARR] - Before - ERROR in calling method", logsList.get(0).getFormattedMessage());
+
         assertEquals("AUDIT10Y", logsList.get(1).getMarker().getName());
         assertEquals("ERROR", logsList.get(1).getLevel().toString());
         assertEquals("[AUD_NT_ARR] - After - Test1", logsList.get(1).getFormattedMessage());
+
         assertEquals("AUDIT5Y", logsList.get(2).getMarker().getName());
         assertEquals("INFO", logsList.get(2).getLevel().toString());
         assertEquals("[AUD_ACC_LOGIN] - Before - Test format 1 = pippo", logsList.get(2).getFormattedMessage());
+
         assertEquals("AUDIT5Y", logsList.get(3).getMarker().getName());
         assertEquals("INFO", logsList.get(3).getLevel().toString());
         assertEquals("[AUD_ACC_LOGIN] - After - Test format 1 = pippo", logsList.get(3).getFormattedMessage());
