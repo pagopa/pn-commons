@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PnAuditLogTest {
 
@@ -27,48 +28,54 @@ class PnAuditLogTest {
         PnAuditLogEvent event1 = new PnAuditLogEvent(PnAuditLogEventType.AUD_NT_ARR, "Test1");
 
         // call method under test
-        PnAuditLog.logBefore(event1);
+        event1.log();
         //---- Call to business method
-        PnAuditLog.logAfter(event1.withFormat("ERROR in calling method"), false);
+        event1.generateResult(false, "ERROR in calling method").log();
 
         PnAuditLogEvent event2 = new PnAuditLogEvent(PnAuditLogEventType.AUD_ACC_LOGIN, "Test format {} = {}", "1", "pippo");
         // call method under test
-        PnAuditLog.logBefore(event2);
+        event2.log();
         //---- Call to business method
-        PnAuditLog.logAfterSuccess(event2);
+       event2.generateResultSuccess().log();
 
         // create AuditEvents
         PnAuditLogEvent event3 = new PnAuditLogEvent(PnAuditLogEventType.AUD_NT_ARR, "Test3");
 
         // call method under test
-        PnAuditLog.logBefore(event3);
+        event3.log();
         //---- Call to business method
-        PnAuditLog.logAfterFailure(event3.withFormat("ERROR in calling method {}").withArgument("pippo"));
+        event3.generateResult(false, "ERROR in calling method {}", "pippo").log();
 
         // JUnit assertions
         List<ILoggingEvent> logsList = listAppender.list;
         assertEquals("AUDIT10Y", logsList.get(0).getMarker().getName());
         assertEquals("INFO", logsList.get(0).getLevel().toString());
-        assertEquals("[AUD_NT_ARR] - Before - Test1", logsList.get(0).getFormattedMessage());
+        assertTrue(logsList.get(0).getFormattedMessage().startsWith("[AUD_NT_ARR] BEFORE"));
+        assertTrue(logsList.get(0).getFormattedMessage().endsWith(" - Test1"));
 
         assertEquals("AUDIT10Y", logsList.get(1).getMarker().getName());
         assertEquals("ERROR", logsList.get(1).getLevel().toString());
-        assertEquals("[AUD_NT_ARR] - After - ERROR in calling method", logsList.get(1).getFormattedMessage());
+        assertTrue(logsList.get(1).getFormattedMessage().startsWith("[AUD_NT_ARR] RESULT"));
+        assertTrue(logsList.get(1).getFormattedMessage().endsWith(" - ERROR in calling method"));
 
         assertEquals("AUDIT5Y", logsList.get(2).getMarker().getName());
         assertEquals("INFO", logsList.get(2).getLevel().toString());
-        assertEquals("[AUD_ACC_LOGIN] - Before - Test format 1 = pippo", logsList.get(2).getFormattedMessage());
+        assertTrue(logsList.get(2).getFormattedMessage().startsWith("[AUD_ACC_LOGIN] BEFORE"));
+        assertTrue(logsList.get(2).getFormattedMessage().endsWith(" - Test format 1 = pippo"));
 
         assertEquals("AUDIT5Y", logsList.get(3).getMarker().getName());
         assertEquals("INFO", logsList.get(3).getLevel().toString());
-        assertEquals("[AUD_ACC_LOGIN] - After - Test format 1 = pippo", logsList.get(3).getFormattedMessage());
+        assertTrue(logsList.get(3).getFormattedMessage().startsWith("[AUD_ACC_LOGIN] RESULT"));
+        assertTrue(logsList.get(3).getFormattedMessage().endsWith(" - Test format 1 = pippo"));
 
         assertEquals("AUDIT10Y", logsList.get(4).getMarker().getName());
         assertEquals("INFO", logsList.get(4).getLevel().toString());
-        assertEquals("[AUD_NT_ARR] - Before - Test3", logsList.get(4).getFormattedMessage());
+        assertTrue(logsList.get(4).getFormattedMessage().startsWith("[AUD_NT_ARR] BEFORE"));
+        assertTrue(logsList.get(4).getFormattedMessage().endsWith(" - Test3"));
 
         assertEquals("AUDIT10Y", logsList.get(5).getMarker().getName());
         assertEquals("ERROR", logsList.get(5).getLevel().toString());
-        assertEquals("[AUD_NT_ARR] - After - ERROR in calling method pippo", logsList.get(5).getFormattedMessage());
+        assertTrue(logsList.get(5).getFormattedMessage().startsWith("[AUD_NT_ARR] RESULT"));
+        assertTrue(logsList.get(5).getFormattedMessage().endsWith(" - ERROR in calling method pippo"));
     }
 }

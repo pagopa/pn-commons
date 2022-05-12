@@ -1,48 +1,42 @@
 package it.pagopa.pn.commons.log;
 
+import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PnAuditLog {
 
     private PnAuditLog() {
         throw new UnsupportedOperationException();
     }
-
-    static final Logger logger = (Logger) LoggerFactory.getLogger(PnAuditLog.class);
-
-    public static void logBefore(PnAuditLogEvent pnAuditLogEvent) {
-        log(pnAuditLogEvent, "Before", true);
+    private static class LazyHolder {
+        public static final Logger INSTANCE = (Logger) LoggerFactory.getLogger(PnAuditLog.class);
     }
 
-    public static void logAfterSuccess(PnAuditLogEvent pnAuditLogEvent) {
-        logAfter(pnAuditLogEvent, true);
-    }
-    public static void logAfterFailure(PnAuditLogEvent pnAuditLogEvent) {
-        logAfter(pnAuditLogEvent,  false);
-    }
-    public static void logAfter(PnAuditLogEvent pnAuditLogEvent, boolean success) {
-        log(pnAuditLogEvent, "After", success);
-    }
-
-    private static void log(PnAuditLogEvent pnAuditLogEvent, String prefix, boolean success) {
-        if (logger.isInfoEnabled()) {
+    static void log(PnAuditLogEvent pnAuditLogEvent) {
+        String prefix = (pnAuditLogEvent.originEvent == null ? "BEFORE" : "RESULT");
+        Level level = (pnAuditLogEvent.success ? Level.INFO : Level.ERROR);
+        Logger logger = LazyHolder.INSTANCE;
+        if (logger.isEnabledFor(level)) {
             StringBuilder format = new StringBuilder()
-                    .append("[{}] - {} - ")
-                    .append(pnAuditLogEvent.format);
-            int argumentsLength = (pnAuditLogEvent.arguments == null ? 2 : pnAuditLogEvent.arguments.length +2);
-            Object[] arguments = new Object[argumentsLength];
-            arguments[0] = pnAuditLogEvent.type.toString();
-            arguments[1] = prefix;
+                    .append("[{}] {} {}<-{} - {}")
+                    .append(pnAuditLogEvent.message);
+            ArrayList<Object> arguments = new ArrayList<>(pnAuditLogEvent.arguments == null ? 4 : pnAuditLogEvent.arguments.length + 4);
+            arguments.add(pnAuditLogEvent.type.toString());
+            arguments.add(prefix);
+            arguments.add(pnAuditLogEvent.uuid.toString());
+            arguments.add(pnAuditLogEvent.originEvent == null ? "origin" : pnAuditLogEvent.originEvent.uuid.toString());
             if ((pnAuditLogEvent.arguments != null) && (pnAuditLogEvent.arguments.length > 0)) {
-                System.arraycopy(pnAuditLogEvent.arguments, 0, arguments, 2, pnAuditLogEvent.arguments.length);
+                arguments.addAll(List.of(pnAuditLogEvent.arguments));
             }
-            if (success) {
-                logger.info(pnAuditLogEvent.type.marker, format.toString(), arguments);
+            if (pnAuditLogEvent.success) {
+                logger.info(pnAuditLogEvent.type.marker, format.toString(), arguments.toArray());
             } else {
-                logger.error(pnAuditLogEvent.type.marker, format.toString(), arguments);
+                logger.error(pnAuditLogEvent.type.marker, format.toString(), arguments.toArray());
             }
         }
     }
-
 }

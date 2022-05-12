@@ -1,28 +1,52 @@
 package it.pagopa.pn.commons.log;
 
-import lombok.Builder;
-import lombok.With;
+import java.util.UUID;
 
-@Builder
 public class PnAuditLogEvent {
+    PnAuditLogEvent originEvent;
     PnAuditLogEventType type;
-    @With
-    String format;
+    String message;
     Object[] arguments;
+    boolean success = true;
+    UUID uuid;
 
     public PnAuditLogEvent(PnAuditLogEventType type, String message) {
         this.type = type;
-        this.format = message;
+        this.message = message;
+        this.uuid = UUID.randomUUID();
     }
 
-    public PnAuditLogEvent(PnAuditLogEventType type, String format, Object... arguments) {
+    public PnAuditLogEvent(PnAuditLogEventType type, String message, Object... arguments) {
         this.type = type;
-        this.format = format;
+        this.message = message;
         this.arguments = arguments;
+        this.uuid = UUID.randomUUID();
+    }
+    public PnAuditLogEvent generateResultSuccess() {
+        return generateResult(true, this.message);
     }
 
-    public PnAuditLogEvent withArgument(Object... arguments) {
-        return new PnAuditLogEvent(type, format, arguments);
+    public PnAuditLogEvent generateResultFailure(String message) {
+        return generateResult(false, message);
     }
 
+    public PnAuditLogEvent generateResult(boolean success, String message) {
+        PnAuditLogEvent resultEvent = new PnAuditLogEvent(type, message);
+        resultEvent.originEvent = this;
+        resultEvent.success = success;
+        resultEvent.arguments = this.arguments;
+        return resultEvent;
+    }
+
+    public PnAuditLogEvent generateResult(boolean success, String message, Object... arguments) {
+        PnAuditLogEvent resultEvent = new PnAuditLogEvent(type, message, arguments);
+        resultEvent.originEvent = this;
+        resultEvent.success = success;
+        return resultEvent;
+    }
+
+    public void log() {
+        PnAuditLog.log(this);
+    }
+    
 }
