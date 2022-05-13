@@ -4,11 +4,11 @@ import java.util.UUID;
 
 public class PnAuditLogEvent {
     private PnAuditLogEvent originEvent;
-    private PnAuditLogEventType type;
-    private String message;
-    private Object[] arguments;
+    private final PnAuditLogEventType type;
+    private final String message;
+    private final Object[] arguments;
     private Boolean success;
-    private String uuid;
+    private final String uuid;
 
     Object[] getArguments() {
         return arguments;
