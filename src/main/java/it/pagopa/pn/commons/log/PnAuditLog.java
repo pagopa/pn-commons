@@ -11,6 +11,9 @@ import java.util.List;
 
 public class PnAuditLog {
 
+    public static final String AUDIT_TYPE = "aud_type";
+    public static final String AUDIT_UUID = "aud_orig";
+
     private PnAuditLog() {
         throw new UnsupportedOperationException();
     }
@@ -31,12 +34,12 @@ public class PnAuditLog {
         if (logger.isEnabledFor(level)) {
 
             // - Prepara messaggio
-            String format = "[{}] {} {}<-{} - " + pnAuditLogEvent.getMessage();
+            String format = "[{}] {} - " + pnAuditLogEvent.getMessage();
 
             // - Prepara parametri del messaggio
             Object[] eventArguments = pnAuditLogEvent.getArguments();
             int eventArgumentsLength = ( eventArguments == null ? 0 : eventArguments.length);
-            ArrayList<Object> arguments = new ArrayList<>( eventArgumentsLength + 4);
+            ArrayList<Object> arguments = new ArrayList<>( eventArgumentsLength + 2);
 
             // Event Type
             PnAuditLogEventType auditLogEventType = pnAuditLogEvent.getType();
@@ -46,23 +49,22 @@ public class PnAuditLog {
             String prefix = computePrefix( pnAuditLogEvent );
             arguments.add( prefix );
 
-            // uuid
-            arguments.add( pnAuditLogEvent.getUuid() );
-
-            // origin reference
-            PnAuditLogEvent originEvent = pnAuditLogEvent.getOriginEvent();
-            String originString =  originEvent == null ? "origin" : originEvent.getUuid();
-            arguments.add( originString );
-
             // event specific arguments
             if ( eventArguments != null ) {
                 arguments.addAll(List.of( eventArguments ));
             }
-
-            if ( Level.INFO.equals( level )) {
-                logger.info( auditLogEventType.marker, format, arguments.toArray());
-            } else {
-                logger.error( auditLogEventType.marker, format, arguments.toArray());
+            try {
+                MDC.put(AUDIT_TYPE, pnAuditLogEvent.getType().toString());
+                String originUuid =  (pnAuditLogEvent.getOriginEvent() == null ? pnAuditLogEvent.getUuid() : pnAuditLogEvent.getOriginEvent().getUuid());
+                MDC.put(AUDIT_UUID, originUuid);
+                if (Level.INFO.equals(level)) {
+                    logger.info(auditLogEventType.marker, format, arguments.toArray());
+                } else {
+                    logger.error(auditLogEventType.marker, format, arguments.toArray());
+                }
+            } finally {
+                MDC.remove(AUDIT_TYPE);
+                MDC.remove(AUDIT_UUID);
             }
         }
     }
@@ -73,10 +75,8 @@ public class PnAuditLog {
         if( pnAuditLogEvent.getOriginEvent() == null ) {
             prefix = "BEFORE";
         }
-        else if(pnAuditLogEvent.getSuccess()) {
-            prefix = "SUCCESS";
-        } else {
-            prefix = "FAILURE";
+        else {
+            prefix = (pnAuditLogEvent.getSuccess() ? "SUCCESS": "FAILURE");
         }
         return prefix;
     }

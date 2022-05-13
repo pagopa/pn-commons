@@ -2,88 +2,110 @@ package it.pagopa.pn.commons.log;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
+import static it.pagopa.pn.commons.log.PnAuditLog.AUDIT_TYPE;
 import static it.pagopa.pn.commons.log.PnAuditLogEventType.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 class PnAuditLogTest {
+    ListAppender<ILoggingEvent> listAppender;
+    PnAuditLogBuilder auditLogger;
 
-    @Test
-    void testAuditLog() {
-
+    @BeforeEach
+    void setupLog() {
+        listAppender = new ListAppender<>();
         // create and start a ListAppender
-        ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
         listAppender.start();
 
         // add the appender to the logger
         // addAppender is outdated now
         PnAuditLog.getLogger().addAppender(listAppender);
+        auditLogger = new PnAuditLogBuilder();
+    }
 
-        //
-        PnAuditLogBuilder auditLogger = new PnAuditLogBuilder();
-
+    @Test
+    void testAuditLog1() {
         // create AuditEvents
-        PnAuditLogEvent event1 = auditLogger.before( AUD_NT_ARR, "Test1");
+        PnAuditLogEvent logEvent = auditLogger.before( AUD_NT_ARR, "Test1");
 
         // call method under test
-        event1.log();
+        logEvent.log();
         //---- Call to business method
-        event1.generateResult(false, "ERROR in calling method").log();
+        logEvent.generateResult(false, "ERROR in calling method").log();
+        // JUnit assertions
+        List<ILoggingEvent> logsList = listAppender.list;
+        final ILoggingEvent loggingEvent1 = logsList.get(0);
+        assertEquals("AUDIT10Y", loggingEvent1.getMarker().getName());
+        assertEquals("INFO", loggingEvent1.getLevel().toString());
+        assertEquals("AUD_NT_ARR", loggingEvent1.getMDCPropertyMap().get(AUDIT_TYPE));
+        assertTrue(loggingEvent1.getFormattedMessage().startsWith("[AUD_NT_ARR] BEFORE"));
+        assertTrue(loggingEvent1.getFormattedMessage().endsWith(" - Test1"));
+
+        final ILoggingEvent loggingEvent2 = logsList.get(1);
+        assertEquals("AUDIT10Y", loggingEvent2.getMarker().getName());
+        assertEquals("ERROR", loggingEvent2.getLevel().toString());
+        assertEquals("AUD_NT_ARR", loggingEvent2.getMDCPropertyMap().get(AUDIT_TYPE));
+        assertTrue(loggingEvent2.getFormattedMessage().startsWith("[AUD_NT_ARR] FAILURE"));
+        assertTrue(loggingEvent2.getFormattedMessage().endsWith(" - ERROR in calling method"));
+    }
+
+    @Test
+    void testAuditLog2() {
+        PnAuditLogEvent logEvent = auditLogger.before(
+                        AUD_ACC_LOGIN,
+                        "Test format {} = {}",
+                        "1", "pippo"
+                )
+                // call method under test
+                .log();
 
 
-        PnAuditLogEvent event2 = auditLogger.before(
-                AUD_ACC_LOGIN,
-                "Test format {} = {}",
-                "1", "pippo"
-            )
-            // call method under test
-            .log();
+        logEvent.generateSuccess().log();
 
+        List<ILoggingEvent> logsList = listAppender.list;
 
-        event2.generateSuccess().log();
+        final ILoggingEvent loggingEvent3 = logsList.get(0);
+        assertEquals("AUDIT5Y", loggingEvent3.getMarker().getName());
+        assertEquals("INFO", loggingEvent3.getLevel().toString());
+        assertEquals("AUD_ACC_LOGIN", loggingEvent3.getMDCPropertyMap().get(AUDIT_TYPE));
+        assertTrue(loggingEvent3.getFormattedMessage().startsWith("[AUD_ACC_LOGIN] BEFORE"));
+        assertTrue(loggingEvent3.getFormattedMessage().endsWith(" - Test format 1 = pippo"));
 
+        final ILoggingEvent loggingEvent4 = logsList.get(1);
+        assertEquals("AUDIT5Y", loggingEvent4.getMarker().getName());
+        assertEquals("INFO", loggingEvent4.getLevel().toString());
+        assertEquals("AUD_ACC_LOGIN", loggingEvent4.getMDCPropertyMap().get(AUDIT_TYPE));
+        assertTrue(loggingEvent4.getFormattedMessage().startsWith("[AUD_ACC_LOGIN] SUCCESS"));
+        assertTrue(loggingEvent4.getFormattedMessage().endsWith(" - OK"));
+    }
+
+    @Test
+    void testAuditLog3() {
         // create AuditEvents
-        PnAuditLogEvent event3 = auditLogger.before( AUD_NT_ARR, "Test3")
+        PnAuditLogEvent logEvent = auditLogger.before( AUD_NT_ARR, "Test3")
                 // call method under test
                 .log();
         //---- Call to business method
-        event3.generateFailure("ERROR in calling method {}", "pippo").log();
+        logEvent.generateFailure("ERROR in calling method {}", "pippo").log();
 
-        // JUnit assertions
         List<ILoggingEvent> logsList = listAppender.list;
-        assertEquals("AUDIT10Y", logsList.get(0).getMarker().getName());
-        assertEquals("INFO", logsList.get(0).getLevel().toString());
-        assertTrue(logsList.get(0).getFormattedMessage().startsWith("[AUD_NT_ARR] BEFORE"));
-        assertTrue(logsList.get(0).getFormattedMessage().endsWith(" - Test1"));
 
-        assertEquals("AUDIT10Y", logsList.get(1).getMarker().getName());
-        assertEquals("ERROR", logsList.get(1).getLevel().toString());
-        assertTrue(logsList.get(1).getFormattedMessage().startsWith("[AUD_NT_ARR] FAILURE"));
-        assertTrue(logsList.get(1).getFormattedMessage().endsWith(" - ERROR in calling method"));
+        final ILoggingEvent loggingEvent5 = logsList.get(0);
+        assertEquals("AUDIT10Y", loggingEvent5.getMarker().getName());
+        assertEquals("INFO", loggingEvent5.getLevel().toString());
+        assertEquals("AUD_NT_ARR", loggingEvent5.getMDCPropertyMap().get(AUDIT_TYPE));
+        assertTrue(loggingEvent5.getFormattedMessage().startsWith("[AUD_NT_ARR] BEFORE"));
+        assertTrue(loggingEvent5.getFormattedMessage().endsWith(" - Test3"));
 
-        assertEquals("AUDIT5Y", logsList.get(2).getMarker().getName());
-        assertEquals("INFO", logsList.get(2).getLevel().toString());
-        assertTrue(logsList.get(2).getFormattedMessage().startsWith("[AUD_ACC_LOGIN] BEFORE"));
-        assertTrue(logsList.get(2).getFormattedMessage().endsWith(" - Test format 1 = pippo"));
-
-        assertEquals("AUDIT5Y", logsList.get(3).getMarker().getName());
-        assertEquals("INFO", logsList.get(3).getLevel().toString());
-        assertTrue(logsList.get(3).getFormattedMessage().startsWith("[AUD_ACC_LOGIN] SUCCESS"));
-        assertTrue(logsList.get(3).getFormattedMessage().endsWith(" - OK"));
-
-        assertEquals("AUDIT10Y", logsList.get(4).getMarker().getName());
-        assertEquals("INFO", logsList.get(4).getLevel().toString());
-        assertTrue(logsList.get(4).getFormattedMessage().startsWith("[AUD_NT_ARR] BEFORE"));
-        assertTrue(logsList.get(4).getFormattedMessage().endsWith(" - Test3"));
-
-        assertEquals("AUDIT10Y", logsList.get(5).getMarker().getName());
-        assertEquals("ERROR", logsList.get(5).getLevel().toString());
-        assertTrue(logsList.get(5).getFormattedMessage().startsWith("[AUD_NT_ARR] FAILURE"));
-        assertTrue(logsList.get(5).getFormattedMessage().endsWith(" - ERROR in calling method pippo"));
+        final ILoggingEvent loggingEvent6 = logsList.get(1);
+        assertEquals("AUDIT10Y", loggingEvent6.getMarker().getName());
+        assertEquals("ERROR", loggingEvent6.getLevel().toString());
+        assertEquals("AUD_NT_ARR", loggingEvent6.getMDCPropertyMap().get(AUDIT_TYPE));
+        assertTrue(loggingEvent6.getFormattedMessage().startsWith("[AUD_NT_ARR] FAILURE"));
+        assertTrue(loggingEvent6.getFormattedMessage().endsWith(" - ERROR in calling method pippo"));
     }
 }
