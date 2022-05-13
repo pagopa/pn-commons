@@ -2,7 +2,9 @@ package it.pagopa.pn.commons.log;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,27 +21,63 @@ public class PnAuditLog {
     static Logger getLogger() {
         return LazyHolder.INSTANCE;
     }
+
     static void log(PnAuditLogEvent pnAuditLogEvent) {
-        String prefix = (pnAuditLogEvent.originEvent == null ? "BEFORE" : "RESULT");
-        Level level = (pnAuditLogEvent.success ? Level.INFO : Level.ERROR);
+
+        Level level = (Boolean.FALSE.equals( pnAuditLogEvent.getSuccess()) ? Level.ERROR : Level.INFO);
+
         Logger logger = LazyHolder.INSTANCE;
+
         if (logger.isEnabledFor(level)) {
-            StringBuilder format = new StringBuilder()
-                    .append("[{}] {} {}<-{} - ")
-                    .append(pnAuditLogEvent.message);
-            ArrayList<Object> arguments = new ArrayList<>(pnAuditLogEvent.arguments == null ? 4 : pnAuditLogEvent.arguments.length + 4);
-            arguments.add(pnAuditLogEvent.type.toString());
-            arguments.add(prefix);
-            arguments.add(pnAuditLogEvent.uuid.toString());
-            arguments.add(pnAuditLogEvent.originEvent == null ? "origin" : pnAuditLogEvent.originEvent.uuid.toString());
-            if ((pnAuditLogEvent.arguments != null) && (pnAuditLogEvent.arguments.length > 0)) {
-                arguments.addAll(List.of(pnAuditLogEvent.arguments));
+
+            // - Prepara messaggio
+            String format = "[{}] {} {}<-{} - " + pnAuditLogEvent.getMessage();
+
+            // - Prepara parametri del messaggio
+            Object[] eventArguments = pnAuditLogEvent.getArguments();
+            int eventArgumentsLength = ( eventArguments == null ? 0 : eventArguments.length);
+            ArrayList<Object> arguments = new ArrayList<>( eventArgumentsLength + 4);
+
+            // Event Type
+            PnAuditLogEventType auditLogEventType = pnAuditLogEvent.getType();
+            arguments.add( auditLogEventType.toString() );
+
+            // prefix
+            String prefix = computePrefix( pnAuditLogEvent );
+            arguments.add( prefix );
+
+            // uuid
+            arguments.add( pnAuditLogEvent.getUuid() );
+
+            // origin reference
+            PnAuditLogEvent originEvent = pnAuditLogEvent.getOriginEvent();
+            String originString =  originEvent == null ? "origin" : originEvent.getUuid();
+            arguments.add( originString );
+
+            // event specific arguments
+            if ( eventArguments != null ) {
+                arguments.addAll(List.of( eventArguments ));
             }
-            if (pnAuditLogEvent.success) {
-                logger.info(pnAuditLogEvent.type.marker, format.toString(), arguments.toArray());
+
+            if ( Level.INFO.equals( level )) {
+                logger.info( auditLogEventType.marker, format, arguments.toArray());
             } else {
-                logger.error(pnAuditLogEvent.type.marker, format.toString(), arguments.toArray());
+                logger.error( auditLogEventType.marker, format, arguments.toArray());
             }
         }
+    }
+
+    @NotNull
+    private static String computePrefix(PnAuditLogEvent pnAuditLogEvent) {
+        String prefix;
+        if( pnAuditLogEvent.getOriginEvent() == null ) {
+            prefix = "BEFORE";
+        }
+        else if(pnAuditLogEvent.getSuccess()) {
+            prefix = "SUCCESS";
+        } else {
+            prefix = "FAILURE";
+        }
+        return prefix;
     }
 }

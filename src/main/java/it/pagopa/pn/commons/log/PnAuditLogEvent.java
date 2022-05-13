@@ -3,39 +3,49 @@ package it.pagopa.pn.commons.log;
 import java.util.UUID;
 
 public class PnAuditLogEvent {
-    PnAuditLogEvent originEvent;
-    PnAuditLogEventType type;
-    String message;
-    Object[] arguments;
-    boolean success = true;
-    UUID uuid;
+    private PnAuditLogEvent originEvent;
+    private PnAuditLogEventType type;
+    private String message;
+    private Object[] arguments;
+    private Boolean success;
+    private String uuid;
 
-    public PnAuditLogEvent(PnAuditLogEventType type, String message) {
-        this.type = type;
-        this.message = message;
-        this.uuid = UUID.randomUUID();
+    Object[] getArguments() {
+        return arguments;
+    }
+    PnAuditLogEventType getType() {
+        return type;
+    }
+    PnAuditLogEvent getOriginEvent() {
+        return originEvent;
+    }
+    String getMessage() {
+        return message;
+    }
+    String getUuid() {
+        return uuid;
+    }
+    Boolean getSuccess() {
+        return success;
     }
 
     public PnAuditLogEvent(PnAuditLogEventType type, String message, Object... arguments) {
         this.type = type;
         this.message = message;
         this.arguments = arguments;
-        this.uuid = UUID.randomUUID();
-    }
-    public PnAuditLogEvent generateResultSuccess() {
-        return generateResult(true, this.message);
+        this.uuid = UUID.randomUUID().toString();
     }
 
-    public PnAuditLogEvent generateResultFailure(String message) {
-        return generateResult(false, message);
+    public PnAuditLogEvent generateSuccess() {
+        return generateResult(true, "OK");
     }
 
-    public PnAuditLogEvent generateResult(boolean success, String message) {
-        PnAuditLogEvent resultEvent = new PnAuditLogEvent(type, message);
-        resultEvent.originEvent = this;
-        resultEvent.success = success;
-        resultEvent.arguments = this.arguments;
-        return resultEvent;
+    public PnAuditLogEvent generateSuccess(String message, Object... arguments) {
+        return generateResult(true, message, arguments);
+    }
+
+    public PnAuditLogEvent generateFailure(String message, Object... arguments) {
+        return generateResult(false, message, arguments);
     }
 
     public PnAuditLogEvent generateResult(boolean success, String message, Object... arguments) {
@@ -45,8 +55,9 @@ public class PnAuditLogEvent {
         return resultEvent;
     }
 
-    public void log() {
+    public PnAuditLogEvent log() {
         PnAuditLog.log(this);
+        return this;
     }
-    
+
 }
