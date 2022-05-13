@@ -26,7 +26,4 @@ public abstract class DateUtils {
         return dateToConvert != null ? dateToConvert.toInstant() : null;
     }
 
-    public static Instant convertOffsetDateTimeToInstant(OffsetDateTime dateToConvert){
-        return dateToConvert != null ? dateToConvert.toInstant() : null;
-    }
 }
