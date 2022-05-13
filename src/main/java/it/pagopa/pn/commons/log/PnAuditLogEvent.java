@@ -25,8 +25,8 @@ public class PnAuditLogEvent {
     String getUuid() {
         return uuid;
     }
-    Boolean getSuccess() {
-        return success;
+    boolean getSuccess() {
+        return (success==null) || (success);
     }
 
     public PnAuditLogEvent(PnAuditLogEventType type, String message, Object... arguments) {
