@@ -2,11 +2,35 @@ package it.pagopa.pn.commons.log;
 
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Component
 public class PnAuditLogBuilder {
+    private PnAuditLogEventType type;
+    private String msg;
+    private Object[] arguments;
+    private Map<String, String> mdcMap;
 
-    public PnAuditLogEvent before(PnAuditLogEventType type, String msg, Object ... arguments) {
-        return new PnAuditLogEvent( type, msg, arguments );
+    public PnAuditLogBuilder before(PnAuditLogEventType type, String msg, Object ... arguments) {
+        this.type = type;
+        this.msg = msg;
+        this.arguments = arguments;
+        this.mdcMap = new HashMap<>();
+        return this;
     }
 
+    public PnAuditLogEvent build() {
+        return new PnAuditLogEvent(type, mdcMap, msg, arguments );
+    }
+
+    public PnAuditLogBuilder iun(String iun) {
+        mdcMap.put("iun", iun);
+        return this;
+    }
+
+    public PnAuditLogBuilder mdcEntry(String key, String value) {
+        this.mdcMap.put(key, value);
+        return this;
+    }
 }

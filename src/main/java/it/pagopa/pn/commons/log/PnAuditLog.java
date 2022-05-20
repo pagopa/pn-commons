@@ -8,6 +8,7 @@ import org.slf4j.MDC;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class PnAuditLog {
 
@@ -53,7 +54,11 @@ public class PnAuditLog {
             if ( eventArguments != null ) {
                 arguments.addAll(List.of( eventArguments ));
             }
+            Set<String> mdcKeySet = pnAuditLogEvent.getMdc().keySet();
             try {
+                for (String key : mdcKeySet) {
+                    MDC.put(key, pnAuditLogEvent.getMdc().get(key));
+                }
                 MDC.put(AUDIT_TYPE, pnAuditLogEvent.getType().toString());
                 String originUuid =  (pnAuditLogEvent.getOriginEvent() == null ? pnAuditLogEvent.getUuid() : pnAuditLogEvent.getOriginEvent().getUuid());
                 MDC.put(AUDIT_UUID, originUuid);
@@ -65,6 +70,9 @@ public class PnAuditLog {
             } finally {
                 MDC.remove(AUDIT_TYPE);
                 MDC.remove(AUDIT_UUID);
+                for (String key : mdcKeySet) {
+                    MDC.remove(key);
+                }
             }
         }
     }
