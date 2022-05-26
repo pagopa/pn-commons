@@ -26,7 +26,7 @@ class CassandraKeyValueStoreTestIT {
 	@Autowired
 	private TestCassandraKeyValueStore kvStore;
 
-	@Test
+	// @Test PReparazione rimozione cassandra
 	void successPutAndGetToCassandra() {
 
 		kvStore.delete( BEAN_ID );

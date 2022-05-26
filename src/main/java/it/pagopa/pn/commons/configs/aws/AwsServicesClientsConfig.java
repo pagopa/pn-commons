@@ -27,10 +27,6 @@ public class AwsServicesClientsConfig {
 
     public AwsServicesClientsConfig(AwsConfigs props, RuntimeMode runtimeMode) {
         this.props = props;
-
-        if( RuntimeMode.DEVELOPMENT.equals( runtimeMode) ) {
-            setAwsCredentialPropertiesInSystem();
-        }
     }
 
     @Bean
@@ -102,16 +98,6 @@ public class AwsServicesClientsConfig {
         }
 
         return builder.build();
-    }
-
-
-    private void setAwsCredentialPropertiesInSystem() {
-        if( StringUtils.isNotBlank( props.getAccessKeyId() ) ) {
-            System.setProperty( "aws.accessKeyId", props.getAccessKeyId() );
-        }
-        if( StringUtils.isNotBlank( props.getSecretAccessKey() ) ) {
-            System.setProperty( "aws.secretAccessKey", props.getSecretAccessKey() );
-        }
     }
 
 }
