@@ -1,6 +1,5 @@
 package it.pagopa.pn.commons.configs.aws;
 
-import it.pagopa.pn.commons.configs.RuntimeMode;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -25,12 +24,8 @@ public class AwsServicesClientsConfig {
 
     private final AwsConfigs props;
 
-    public AwsServicesClientsConfig(AwsConfigs props, RuntimeMode runtimeMode) {
+    public AwsServicesClientsConfig(AwsConfigs props ) {
         this.props = props;
-
-        if( RuntimeMode.DEVELOPMENT.equals( runtimeMode) ) {
-            setAwsCredentialPropertiesInSystem();
-        }
     }
 
     @Bean
@@ -102,16 +97,6 @@ public class AwsServicesClientsConfig {
         }
 
         return builder.build();
-    }
-
-
-    private void setAwsCredentialPropertiesInSystem() {
-        if( StringUtils.isNotBlank( props.getAccessKeyId() ) ) {
-            System.setProperty( "aws.accessKeyId", props.getAccessKeyId() );
-        }
-        if( StringUtils.isNotBlank( props.getSecretAccessKey() ) ) {
-            System.setProperty( "aws.secretAccessKey", props.getSecretAccessKey() );
-        }
     }
 
 }
