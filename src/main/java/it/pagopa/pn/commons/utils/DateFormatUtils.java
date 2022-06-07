@@ -15,4 +15,9 @@ public abstract class DateFormatUtils {
                 .withZone(ZoneId.systemDefault())
                 .format(dateToFormat);
     }
+
+    @NotNull
+    public static Instant getInstantFromString(String dateToFormat, String pattern) {
+        return Instant.from( DateTimeFormatter.ofPattern(pattern).withZone(ZoneId.of("UTC") ).parse(dateToFormat));
+    }
 }
