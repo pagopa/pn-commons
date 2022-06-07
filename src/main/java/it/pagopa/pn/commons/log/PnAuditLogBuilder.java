@@ -29,6 +29,21 @@ public class PnAuditLogBuilder {
         return this;
     }
 
+    public PnAuditLogBuilder uid(String uid) {
+        mdcMap.put("uid", uid);
+        return this;
+    }
+
+    public PnAuditLogBuilder cxId(String cxId) {
+        mdcMap.put("cx_id", cxId);
+        return this;
+    }
+
+    public PnAuditLogBuilder cxType(String cxType) {
+        mdcMap.put("cx_type", cxType);
+        return this;
+    }
+
     public PnAuditLogBuilder mdcEntry(String key, String value) {
         this.mdcMap.put(key, value);
         return this;
