@@ -1,5 +1,6 @@
 package it.pagopa.pn.commons.log;
 
+import java.util.Map;
 import java.util.UUID;
 
 public class PnAuditLogEvent {
@@ -9,6 +10,7 @@ public class PnAuditLogEvent {
     private final Object[] arguments;
     private Boolean success;
     private final String uuid;
+    private final Map<String, String> mdc;
 
     Object[] getArguments() {
         return arguments;
@@ -29,8 +31,9 @@ public class PnAuditLogEvent {
         return (success==null) || (success);
     }
 
-    public PnAuditLogEvent(PnAuditLogEventType type, String message, Object... arguments) {
+    public PnAuditLogEvent(PnAuditLogEventType type, Map<String, String> mdc, String message, Object... arguments) {
         this.type = type;
+        this.mdc = mdc;
         this.message = message;
         this.arguments = arguments;
         this.uuid = UUID.randomUUID().toString();
@@ -49,7 +52,7 @@ public class PnAuditLogEvent {
     }
 
     public PnAuditLogEvent generateResult(boolean success, String message, Object... arguments) {
-        PnAuditLogEvent resultEvent = new PnAuditLogEvent(type, message, arguments);
+        PnAuditLogEvent resultEvent = new PnAuditLogEvent(type, mdc, message, arguments);
         resultEvent.originEvent = this;
         resultEvent.success = success;
         return resultEvent;
@@ -60,4 +63,7 @@ public class PnAuditLogEvent {
         return this;
     }
 
+    public Map<String, String> getMdc() {
+        return mdc;
+    }
 }

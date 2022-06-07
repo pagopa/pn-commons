@@ -30,7 +30,7 @@ class PnAuditLogTest {
     @Test
     void testAuditLog1() {
         // create AuditEvents
-        PnAuditLogEvent logEvent = auditLogger.before( AUD_NT_ARR, "Test1");
+        PnAuditLogEvent logEvent = auditLogger.before( AUD_NT_ARR, "Test1").iun("CNZS-RZBB-HJAT-202205-E-1").build();
 
         // call method under test
         logEvent.log();
@@ -44,6 +44,8 @@ class PnAuditLogTest {
         assertEquals("AUD_NT_ARR", loggingEvent1.getMDCPropertyMap().get(AUDIT_TYPE));
         assertTrue(loggingEvent1.getFormattedMessage().startsWith("[AUD_NT_ARR] BEFORE"));
         assertTrue(loggingEvent1.getFormattedMessage().endsWith(" - Test1"));
+        assertEquals("CNZS-RZBB-HJAT-202205-E-1", logEvent.getMdc().get("iun"));
+
 
         final ILoggingEvent loggingEvent2 = logsList.get(1);
         assertEquals("AUDIT10Y", loggingEvent2.getMarker().getName());
@@ -51,6 +53,7 @@ class PnAuditLogTest {
         assertEquals("AUD_NT_ARR", loggingEvent2.getMDCPropertyMap().get(AUDIT_TYPE));
         assertTrue(loggingEvent2.getFormattedMessage().startsWith("[AUD_NT_ARR] FAILURE"));
         assertTrue(loggingEvent2.getFormattedMessage().endsWith(" - ERROR in calling method"));
+        assertEquals("CNZS-RZBB-HJAT-202205-E-1",logEvent.getMdc().get("iun"));
     }
 
     @Test
@@ -59,7 +62,8 @@ class PnAuditLogTest {
                         AUD_ACC_LOGIN,
                         "Test format {} = {}",
                         "1", "pippo"
-                )
+                ).mdcEntry("CUSTOM_MDC", "CUSTOM_VALUE")
+                .build()
                 // call method under test
                 .log();
 
@@ -74,6 +78,7 @@ class PnAuditLogTest {
         assertEquals("AUD_ACC_LOGIN", loggingEvent3.getMDCPropertyMap().get(AUDIT_TYPE));
         assertTrue(loggingEvent3.getFormattedMessage().startsWith("[AUD_ACC_LOGIN] BEFORE"));
         assertTrue(loggingEvent3.getFormattedMessage().endsWith(" - Test format 1 = pippo"));
+        assertEquals("CUSTOM_VALUE",logEvent.getMdc().get("CUSTOM_MDC"));
 
         final ILoggingEvent loggingEvent4 = logsList.get(1);
         assertEquals("AUDIT5Y", loggingEvent4.getMarker().getName());
@@ -81,12 +86,14 @@ class PnAuditLogTest {
         assertEquals("AUD_ACC_LOGIN", loggingEvent4.getMDCPropertyMap().get(AUDIT_TYPE));
         assertTrue(loggingEvent4.getFormattedMessage().startsWith("[AUD_ACC_LOGIN] SUCCESS"));
         assertTrue(loggingEvent4.getFormattedMessage().endsWith(" - OK"));
+        assertEquals("CUSTOM_VALUE",logEvent.getMdc().get("CUSTOM_MDC"));
     }
 
     @Test
     void testAuditLog3() {
         // create AuditEvents
         PnAuditLogEvent logEvent = auditLogger.before( AUD_NT_ARR, "Test3")
+                .build()
                 // call method under test
                 .log();
         //---- Call to business method
