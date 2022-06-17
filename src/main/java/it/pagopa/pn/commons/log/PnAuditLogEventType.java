@@ -1,23 +1,25 @@
 package it.pagopa.pn.commons.log;
 
 /**
- * See documentations https://pagopa.atlassian.net/wiki/spaces/PN/pages/498466884/Audit+Logs
+ * See documentations <a href="https://pagopa.atlassian.net/wiki/spaces/PN/pages/498466884/Audit+Logs">Audit Logs</a>
  */
 public enum PnAuditLogEventType {
     AUD_ACC_LOGIN(PnAuditLogMarker.AUDIT5Y),
     AUD_ACC_LOGOUT(PnAuditLogMarker.AUDIT5Y),
     AUD_NT_PRELOAD(PnAuditLogMarker.AUDIT10Y),
-    AUD_NT_LOAD(PnAuditLogMarker.AUDIT10Y),
+    AUD_NT_LOAD(PnAuditLogMarker.AUDIT10Y), //Load is direct on S3 bucket, cannot be cached by PN code.
     AUD_NT_INSERT(PnAuditLogMarker.AUDIT10Y),
     AUD_NT_CHECK(PnAuditLogMarker.AUDIT10Y),
     AUD_NT_VALID(PnAuditLogMarker.AUDIT10Y),
     AUD_NT_ARR(PnAuditLogMarker.AUDIT10Y),
     AUD_NT_STATUS(PnAuditLogMarker.AUDIT10Y),
     AUD_NT_NEWDOC(PnAuditLogMarker.AUDIT10Y),
+    AUD_NT_SEARCH_RCP(PnAuditLogMarker.AUDIT5Y),
     AUD_NT_VIEW_RPC(PnAuditLogMarker.AUDIT10Y),
     AUD_NT_DOCOPEN_RCP(PnAuditLogMarker.AUDIT10Y),
     AUD_NT_ATCHOPEN_RCP(PnAuditLogMarker.AUDIT5Y),
     AUD_NT_LEGALOPEN_RCP(PnAuditLogMarker.AUDIT5Y),
+    AUD_NT_SEARCH_SND(PnAuditLogMarker.AUDIT5Y),
     AUD_NT_VIEW_SND(PnAuditLogMarker.AUDIT5Y),
     AUD_NT_DOCOPEN_SND(PnAuditLogMarker.AUDIT5Y),
     AUD_NT_ATCHOPEN_SND(PnAuditLogMarker.AUDIT5Y),
