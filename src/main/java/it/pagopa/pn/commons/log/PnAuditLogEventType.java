@@ -1,5 +1,8 @@
 package it.pagopa.pn.commons.log;
 
+/**
+ * See documentations https://pagopa.atlassian.net/wiki/spaces/PN/pages/498466884/Audit+Logs
+ */
 public enum PnAuditLogEventType {
     AUD_ACC_LOGIN(PnAuditLogMarker.AUDIT5Y),
     AUD_ACC_LOGOUT(PnAuditLogMarker.AUDIT5Y),
@@ -13,9 +16,11 @@ public enum PnAuditLogEventType {
     AUD_NT_NEWDOC(PnAuditLogMarker.AUDIT10Y),
     AUD_NT_VIEW_RPC(PnAuditLogMarker.AUDIT10Y),
     AUD_NT_DOCOPEN_RCP(PnAuditLogMarker.AUDIT10Y),
-    AUD_NT_LEGALOPEN_RCP(PnAuditLogMarker.AUDIT10Y),
+    AUD_NT_ATCHOPEN_RCP(PnAuditLogMarker.AUDIT5Y),
+    AUD_NT_LEGALOPEN_RCP(PnAuditLogMarker.AUDIT5Y),
     AUD_NT_VIEW_SND(PnAuditLogMarker.AUDIT5Y),
     AUD_NT_DOCOPEN_SND(PnAuditLogMarker.AUDIT5Y),
+    AUD_NT_ATCHOPEN_SND(PnAuditLogMarker.AUDIT5Y),
     AUD_NT_LEGALOPEN_SND(PnAuditLogMarker.AUDIT5Y),
     AUD_NT_PAYMENT(PnAuditLogMarker.AUDIT10Y),
     AUD_NT_REQCOST(PnAuditLogMarker.AUDIT10Y),
@@ -33,6 +38,14 @@ public enum PnAuditLogEventType {
     AUD_UC_INSUP(PnAuditLogMarker.AUDIT10Y),
     AUD_AN_SEND(PnAuditLogMarker.AUDIT10Y),
     AUD_AN_RECEIVE(PnAuditLogMarker.AUDIT10Y),
+    AUD_DD_SEND(PnAuditLogMarker.AUDIT10Y),
+    AUD_DD_RECEIVE(PnAuditLogMarker.AUDIT10Y),
+    AUD_AD_SEND_SMS(PnAuditLogMarker.AUDIT5Y),
+    AUD_AD_RECEIVE_SMS(PnAuditLogMarker.AUDIT5Y),
+    AUD_AD_SEND_EMAIL(PnAuditLogMarker.AUDIT5Y),
+    AUD_AD_RECEIVE_EMAIL(PnAuditLogMarker.AUDIT5Y),
+    AUD_AD_SEND_IO(PnAuditLogMarker.AUDIT5Y),
+    AUD_AD_RECEIVE_IO(PnAuditLogMarker.AUDIT5Y),
     AUD_DL_CREATE(PnAuditLogMarker.AUDIT10Y),
     AUD_DL_ACCEPT(PnAuditLogMarker.AUDIT10Y),
     AUD_DL_REJECT(PnAuditLogMarker.AUDIT10Y),
