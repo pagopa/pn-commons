@@ -4,7 +4,6 @@ import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
@@ -32,7 +31,8 @@ public class RestTemplateFactory {
         return template;
     }
 
-    //TODO: interceptor per il trace verso external channel
+
+    //TODO: interceptor per il trace verso altri MS
     @Value("${pn.log.trace-id-header}")
     private String traceIdHeader;
 
