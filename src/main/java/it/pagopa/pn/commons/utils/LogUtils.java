@@ -16,7 +16,7 @@ public class LogUtils {
         //mask first part
         String strId;
         if(parts[0].length() < 4)
-            strId = maskString(parts[0], 0, parts[0].length(), '*');
+            strId = "***";
         else
             strId = maskString(parts[0], 1, parts[0].length()-1, '*');
 
