@@ -2,6 +2,7 @@ package it.pagopa.pn.commons.pnclients;
 
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.util.StringUtils;
 import org.springframework.web.reactive.function.client.ClientRequest;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -26,9 +27,15 @@ public abstract class CommonBaseClient {
 
     private Mono<ClientRequest> traceIdFilter(ClientRequest request) {
         String traceId = MDC.get("trace_id");
-        return Mono.just(ClientRequest.from(request)
-                            .header(traceIdHeader, traceId)
-                            .build());
+        if (StringUtils.hasText(traceIdHeader) && StringUtils.hasText(traceId))
+        {
+            return Mono.just(ClientRequest.from(request)
+                    .header(traceIdHeader, traceId)
+                    .build());
+        }
+        else
+            return Mono.just(request);
+
     }
 
 }
