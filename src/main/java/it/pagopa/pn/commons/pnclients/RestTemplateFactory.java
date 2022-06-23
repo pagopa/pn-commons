@@ -32,7 +32,7 @@ public class RestTemplateFactory {
     }
 
 
-    //TODO: interceptor per il trace verso altri MS
+    // interceptor per il trace verso altri MS
     @Value("${pn.log.trace-id-header}")
     private String traceIdHeader;
 

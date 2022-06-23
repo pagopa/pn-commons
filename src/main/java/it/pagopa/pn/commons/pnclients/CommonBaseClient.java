@@ -1,5 +1,6 @@
 package it.pagopa.pn.commons.pnclients;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
@@ -8,6 +9,7 @@ import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+@Slf4j
 public abstract class CommonBaseClient {
 
     protected CommonBaseClient(){
@@ -34,7 +36,10 @@ public abstract class CommonBaseClient {
                     .build());
         }
         else
+        {
+            log.warn("missing trace_id");
             return Mono.just(request);
+        }
 
     }
 
