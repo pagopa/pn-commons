@@ -6,9 +6,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
+import reactor.core.publisher.Hooks;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.Operators;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 /**
@@ -21,6 +26,21 @@ public class MDCWebFilter implements WebFilter {
 
     @Value("${pn.log.trace-id-header}")
     private String traceIdHeader;
+
+
+    private String MDC_CONTEXT_REACTOR_KEY = MDCWebFilter.class.getName();
+
+    @PostConstruct
+    private void contextOperatorHook() {
+        Hooks.onEachOperator(MDC_CONTEXT_REACTOR_KEY,
+                Operators.lift((scannable, coreSubscriber) -> new MdcContextLifter<>(coreSubscriber))
+        );
+    }
+
+    @PreDestroy
+    private void cleanupHook() {
+        Hooks.resetOnEachOperator(MDC_CONTEXT_REACTOR_KEY);
+    }
 
     @Override
     public Mono<Void> filter(ServerWebExchange serverWebExchange, WebFilterChain webFilterChain) {
@@ -36,6 +56,14 @@ public class MDCWebFilter implements WebFilter {
 
         return webFilterChain.filter(serverWebExchange)
                 .doFirst(mdcSetter)
-                .doFinally(mdcCleaner);
+                .contextWrite(ctx -> {
+                    List<String> traceIdHeaders = serverWebExchange.getRequest().getHeaders().get(traceIdHeader);
+                    if (traceIdHeaders != null) {
+                        return ctx.put(MDC_TRACE_ID_KEY, traceIdHeaders.get(0));
+                    }
+                    else
+                        return ctx.put(MDC_TRACE_ID_KEY, "trace_id:" + UUID.randomUUID().toString());
+                }).doFinally(mdcCleaner)
+                ;
     }
 }
