@@ -1,8 +1,17 @@
 package it.pagopa.pn.commons.abstractions;
 
-public class IdConflictException extends Exception {
+import java.util.Map;
 
-    public <V> IdConflictException(V value) {
-        super( "Duplicated Id on key value store " + value );
+public class IdConflictException extends RuntimeException {
+
+    private final transient Map<String,String> keyValueMap;
+
+    public IdConflictException(Map<String, String> keyValueMap) {
+        super(keyValueMap.toString());
+        this.keyValueMap = keyValueMap;
+    }
+
+    public Map<String, String> getKeyValueMap() {
+        return keyValueMap;
     }
 }
