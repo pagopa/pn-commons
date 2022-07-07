@@ -4,6 +4,7 @@ import it.pagopa.pn.api.dto.addressbook.AddressBookEntry;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.platform.commons.util.StringUtils;
@@ -18,6 +19,7 @@ import java.util.Optional;
 @TestPropertySource("classpath:/application-test.properties")
 @EnableConfigurationProperties(value = MicroserviceClientsConfigs.class)
 @Slf4j
+@Disabled
 class AddressBookTestIT {
 
     private AddressBook client;

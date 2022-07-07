@@ -21,6 +21,11 @@ public class RestTemplateFactory {
     @Qualifier("withTracing")
     public RestTemplate restTemplateWithTracing(){
         RestTemplate template = new RestTemplate();
+        enrichWithTracing(template);
+        return template;
+    }
+
+    public void enrichWithTracing(RestTemplate template) {
         List<ClientHttpRequestInterceptor> interceptors
                 = template.getInterceptors();
         if (CollectionUtils.isEmpty(interceptors)) {
@@ -28,7 +33,6 @@ public class RestTemplateFactory {
         }
         interceptors.add(new RestTemplateHeaderModifierInterceptor());
         template.setInterceptors(interceptors);
-        return template;
     }
 
 
