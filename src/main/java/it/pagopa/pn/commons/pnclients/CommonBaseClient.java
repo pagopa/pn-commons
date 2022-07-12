@@ -7,6 +7,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.reactive.function.client.ClientRequest;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
 @Slf4j
@@ -43,4 +44,19 @@ public abstract class CommonBaseClient {
 
     }
 
+
+    protected String elabExceptionMessage(Throwable x)
+    {
+        try {
+            String message = x.getMessage()==null?"":x.getMessage();
+            if (x instanceof WebClientResponseException)
+            {
+                message += ";" + ((WebClientResponseException)x).getResponseBodyAsString();
+            }
+            return  message;
+        } catch (Exception e) {
+            log.error("exception reading body", e);
+            return x.getMessage();
+        }
+    }
 }
