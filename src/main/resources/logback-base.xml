@@ -2,9 +2,7 @@
 <!DOCTYPE xml>
 <configuration scan="true" scanPeriod="30 seconds" >
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
-            <includeMdcKeyName>trace_id</includeMdcKeyName>
-        </encoder>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
     </appender>
     <logger name="it.pagopa.pn" level="DEBUG" />
     <root level="INFO">
