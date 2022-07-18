@@ -14,7 +14,7 @@ public enum PnAuditLogEventType {
     AUD_NT_ARR(PnAuditLogMarker.AUDIT10Y),
     AUD_NT_TIMELINE(PnAuditLogMarker.AUDIT10Y),
     AUD_NT_STATUS(PnAuditLogMarker.AUDIT10Y),
-    AUD_NT_NEWDOC(PnAuditLogMarker.AUDIT10Y),
+    AUD_NT_NEWLEGAL(PnAuditLogMarker.AUDIT10Y),
     AUD_NT_SEARCH_RCP(PnAuditLogMarker.AUDIT5Y),
     AUD_NT_VIEW_RPC(PnAuditLogMarker.AUDIT10Y),
     AUD_NT_DOCOPEN_RCP(PnAuditLogMarker.AUDIT10Y),
