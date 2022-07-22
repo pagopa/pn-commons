@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 import java.util.Set;
 
 public class PnAuditLog {
@@ -52,7 +52,7 @@ public class PnAuditLog {
 
             // event specific arguments
             if ( eventArguments != null ) {
-                arguments.addAll(List.of( eventArguments ));
+                arguments.addAll( Arrays.asList(eventArguments) );
             }
             Set<String> mdcKeySet = pnAuditLogEvent.getMdc().keySet();
             try {
