@@ -85,7 +85,6 @@ class PnAuditLogTest {
         assertEquals("INFO", loggingEvent4.getLevel().toString());
         assertEquals("AUD_ACC_LOGIN", loggingEvent4.getMDCPropertyMap().get(AUDIT_TYPE));
         assertTrue(loggingEvent4.getFormattedMessage().startsWith("[AUD_ACC_LOGIN] SUCCESS"));
-        assertTrue(loggingEvent4.getFormattedMessage().endsWith(" - OK"));
         assertEquals("CUSTOM_VALUE",logEvent.getMdc().get("CUSTOM_MDC"));
     }
 
