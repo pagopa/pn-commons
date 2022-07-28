@@ -42,9 +42,9 @@ public class PnRuntimeException extends RuntimeException implements IPnException
     public PnRuntimeException(@NotNull String message,@NotNull String description, int status,@NotNull List<ProblemError> problemErrorList, Throwable cause) {
         super(message, cause);
         problem = new Problem();
-        problem.setTitle(message);
-        problem.setDetail(description);
-        problem.setStatus(status);
+        problem.setTitle(message.substring(0, Math.min(message.length(), 64)));
+        problem.setDetail(description.substring(0, Math.min(description.length(), 4096)));
+        problem.setStatus(status<100?100:(Math.min(status, 600)));
         problem.setTimestamp(Instant.now().atOffset(ZoneOffset.UTC));
 
         // non deve mai essere vuoto, quindi se per qualche motivo lo è, aggiungo un errore generico
