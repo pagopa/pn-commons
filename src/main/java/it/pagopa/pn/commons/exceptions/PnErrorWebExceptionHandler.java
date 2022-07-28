@@ -24,11 +24,7 @@ import reactor.util.annotation.NonNull;
 @Slf4j
 public class PnErrorWebExceptionHandler implements ErrorWebExceptionHandler {
 
-  private final ObjectMapper objectMapper;
-
-  public PnErrorWebExceptionHandler(ObjectMapper objectMapper) {
-    this.objectMapper = objectMapper;
-  }
+  private final ObjectMapper objectMapper = new ObjectMapper();
 
   @Override
   @NonNull
