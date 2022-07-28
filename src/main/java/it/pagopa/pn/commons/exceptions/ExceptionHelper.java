@@ -34,9 +34,9 @@ public class ExceptionHelper {
 
         res = ((IPnException) ex).getProblem();
         if (res.getStatus() >= 500)
-            log.error("pn-exception " + res.getStatus() + " catched", ex);
+            log.error("pn-exception " + res.getStatus() + " catched problem={}", res, ex);
         else
-            log.warn("pn-exception " + res.getStatus() + " catched", ex);
+            log.warn("pn-exception " + res.getStatus() + " catched problem={}", res, ex);
 
         return res;
     }
