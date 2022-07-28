@@ -22,6 +22,8 @@ public class RestTemplateFactory {
     public RestTemplate restTemplateWithTracing(){
         RestTemplate template = new RestTemplate();
         enrichWithTracing(template);
+        template.setErrorHandler(new RestTemplateResponseErrorHandler());
+        
         return template;
     }
 
