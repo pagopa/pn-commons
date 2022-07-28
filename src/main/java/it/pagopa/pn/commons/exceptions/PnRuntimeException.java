@@ -10,6 +10,7 @@ import org.slf4j.MDC;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static it.pagopa.pn.commons.exceptions.ExceptionHelper.ERROR_CODE_GENERIC_ERROR;
 
@@ -54,7 +55,11 @@ public class PnRuntimeException extends RuntimeException implements IPnException
                             .code(ERROR_CODE_GENERIC_ERROR)
                     .build());
         }
-        problem.setErrors(problemErrorList);
+        problem.setErrors(problemErrorList.stream().map(problemError -> {
+                    if (problemError.getDetail()!=null)
+                        problemError.setDetail(problemError.getDetail().substring(0, Math.min(problemError.getDetail().length(), 1024)));
+                    return problemError;
+                }).collect(Collectors.toList()));
 
         try {
             problem.setTraceId(MDC.get(MDC_TRACE_ID_KEY));
