@@ -7,6 +7,7 @@ import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 
 import javax.validation.ConstraintViolation;
+import javax.validation.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -19,15 +20,6 @@ public class ExceptionHelper {
     public static final String ERROR_CODE_INVALID_PARAMETER = "PN_INVALID_PARAMETER";
 
     private ExceptionHelper(){}
-
-    public static HttpStatus getHttpStatusFromException(Throwable ex){
-        if (ex instanceof PnRuntimeException)
-        {
-            return HttpStatus.resolve(((PnRuntimeException) ex).getStatus());
-        }
-        else
-            return HttpStatus.INTERNAL_SERVER_ERROR;
-    }
 
     public static Problem handleException(Throwable ex){
         // gestione exception e generazione fault
@@ -54,7 +46,15 @@ public class ExceptionHelper {
         return constraintViolations.stream().map(constraintViolation -> ProblemError.builder()
                 .code(ERROR_CODE_INVALID_PARAMETER)
                 .detail(constraintViolation.getMessage())
-                .element(constraintViolation.getPropertyPath().toString())
+                .element(getNameFromPath(constraintViolation.getPropertyPath()))
                 .build()).collect(Collectors.toList());
+    }
+
+    private static String getNameFromPath(Path path){
+        String fieldName = null;
+        for (Path.Node node : path) {
+            fieldName = node.getName();
+        }
+        return fieldName;
     }
 }

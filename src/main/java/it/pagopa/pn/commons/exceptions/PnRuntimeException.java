@@ -6,9 +6,11 @@ import it.pagopa.pn.common.rest.error.v1.dto.ProblemError;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.MDC;
+import org.springframework.http.HttpStatus;
 
 import java.time.Instant;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,6 +45,14 @@ public class PnRuntimeException extends RuntimeException implements IPnException
     public PnRuntimeException(@NotNull String message,@NotNull String description, int status,@NotNull List<ProblemError> problemErrorList, Throwable cause) {
         super(message, cause);
         problem = new Problem();
+
+        if (message == null)
+            message = HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase();
+        if (description == null)
+            description = HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase();
+        if (problemErrorList == null)
+            problemErrorList = new ArrayList<>();
+
         problem.setTitle(message.substring(0, Math.min(message.length(), 64)));
         problem.setDetail(description.substring(0, Math.min(description.length(), 4096)));
         problem.setStatus(status<100?100:(Math.min(status, 600)));
