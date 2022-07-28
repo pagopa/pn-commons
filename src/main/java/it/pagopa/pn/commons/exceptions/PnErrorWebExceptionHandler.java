@@ -3,6 +3,7 @@ package it.pagopa.pn.commons.exceptions;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import it.pagopa.pn.common.rest.error.v1.dto.Problem;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.reactive.error.ErrorWebExceptionHandler;
 import org.springframework.core.io.buffer.DataBuffer;
@@ -14,18 +15,18 @@ import reactor.core.publisher.Mono;
 import reactor.util.annotation.NonNull;
 
 /**
- * Handler pensato per essere attivato dai microservizi tramite:
+ * Handler pensato per essere attivato dai microservizi REACTIVE tramite:
  *
  * @Component
  * @Order(-2)
  *
  */
 @Slf4j
-public class GlobalErrorHandler implements ErrorWebExceptionHandler {
+public class PnErrorWebExceptionHandler implements ErrorWebExceptionHandler {
 
   private final ObjectMapper objectMapper;
 
-  public GlobalErrorHandler(ObjectMapper objectMapper) {
+  public PnErrorWebExceptionHandler(ObjectMapper objectMapper) {
     this.objectMapper = objectMapper;
   }
 
@@ -33,12 +34,13 @@ public class GlobalErrorHandler implements ErrorWebExceptionHandler {
   @NonNull
   public Mono<Void> handle(@NonNull ServerWebExchange serverWebExchange, @NonNull Throwable throwable) {
 
+    Problem problem = ExceptionHelper.handleException(throwable);
+
     DataBufferFactory bufferFactory = serverWebExchange.getResponse().bufferFactory();
-    HttpStatus status = ExceptionHelper.getHttpStatusFromException(throwable);
-    serverWebExchange.getResponse().setStatusCode(status);
+    serverWebExchange.getResponse().setStatusCode(HttpStatus.resolve(problem.getStatus()));
     DataBuffer dataBuffer;
     try {
-      dataBuffer = bufferFactory.wrap(objectMapper.writeValueAsBytes(ExceptionHelper.handleException(throwable, status)));
+      dataBuffer = bufferFactory.wrap(objectMapper.writeValueAsBytes(problem));
     } catch (JsonProcessingException e) {
       dataBuffer = bufferFactory.wrap("".getBytes());
     }

@@ -1,6 +1,7 @@
 package it.pagopa.pn.commons.exceptions;
 
 import it.pagopa.pn.common.rest.error.v1.dto.ProblemError;
+import org.springframework.http.HttpStatus;
 
 import javax.validation.ConstraintViolation;
 import java.util.Collections;
@@ -23,6 +24,6 @@ public class PnValidationException extends PnRuntimeException {
     }
 
     public PnValidationException(String message, List<ProblemError> problemErrorList, Throwable cause) {
-        super( "Invalid request", message, 400, problemErrorList, cause  );
+        super( HttpStatus.BAD_REQUEST.getReasonPhrase(), message, HttpStatus.BAD_REQUEST.value(), problemErrorList, cause  );
     }
 }
