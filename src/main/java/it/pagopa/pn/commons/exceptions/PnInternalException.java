@@ -10,12 +10,12 @@ public class PnInternalException extends PnRuntimeException {
 
     @Deprecated
     public PnInternalException(String message) {
-        this(message, ExceptionHelper.ERROR_CODE_GENERIC_ERROR, null);
+        this(message, PnExceptionsCodes.ERROR_CODE_PN_GENERIC_ERROR, null);
     }
 
     @Deprecated
     public PnInternalException(String message, Throwable cause) {
-        this(message, ExceptionHelper.ERROR_CODE_GENERIC_ERROR, cause);
+        this(message, PnExceptionsCodes.ERROR_CODE_PN_GENERIC_ERROR, cause);
     }
 
     public PnInternalException(String message, String errorCode) {

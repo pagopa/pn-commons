@@ -1,17 +1,29 @@
 package it.pagopa.pn.commons.exceptions;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Path;
+import javax.validation.*;
+import javax.validation.constraints.Max;
 import javax.validation.metadata.ConstraintDescriptor;
+import javax.validation.metadata.ValidateUnwrappedValue;
+import java.lang.annotation.Annotation;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class ConstraintViolationImpl< T > implements ConstraintViolation< T > {
 
     private final String message;
     private final Path path;
+    private final Annotation annotation;
 
-    public ConstraintViolationImpl(String message, Path path) {
+    public ConstraintViolationImpl(String message, Class annotationclazz, Path path) {
         this.message = message;
         this.path = path;
+        this.annotation = new Annotation() {
+            @Override
+            public Class<? extends Annotation> annotationType() {
+                return annotationclazz;
+            }
+        };
     }
 
     @Override
@@ -61,7 +73,62 @@ public class ConstraintViolationImpl< T > implements ConstraintViolation< T > {
 
     @Override
     public ConstraintDescriptor<?> getConstraintDescriptor() {
-        return null;
+        return new ConstraintDescriptor<Annotation>() {
+            @Override
+            public Annotation getAnnotation() {
+                return annotation;
+            }
+
+            @Override
+            public String getMessageTemplate() {
+                return null;
+            }
+
+            @Override
+            public Set<Class<?>> getGroups() {
+                return null;
+            }
+
+            @Override
+            public Set<Class<? extends Payload>> getPayload() {
+                return null;
+            }
+
+            @Override
+            public ConstraintTarget getValidationAppliesTo() {
+                return null;
+            }
+
+            @Override
+            public List<Class<? extends ConstraintValidator<Annotation, ?>>> getConstraintValidatorClasses() {
+                return null;
+            }
+
+            @Override
+            public Map<String, Object> getAttributes() {
+                return null;
+            }
+
+            @Override
+            public Set<ConstraintDescriptor<?>> getComposingConstraints() {
+                return null;
+            }
+
+            @Override
+            public boolean isReportAsSingleViolation() {
+                return false;
+            }
+
+            @Override
+            public ValidateUnwrappedValue getValueUnwrapping() {
+                return null;
+            }
+
+            @Override
+            public <U> U unwrap(Class<U> aClass) {
+                return null;
+            }
+        };
     }
 
     @Override

@@ -1,10 +1,12 @@
 package it.pagopa.pn.commons.exceptions;
 
 import it.pagopa.pn.commons.exceptions.dto.ProblemError;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
 import javax.validation.ConstraintViolation;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -14,15 +16,49 @@ import java.util.Set;
  */
 public class PnValidationException extends PnRuntimeException {
 
-    public PnValidationException(String validationTargetId, Set<ConstraintViolation> validationErrors) {
-        this("Some parameters are invalid", ExceptionHelper.generateProblemErrorsFromConstraintViolation(validationErrors), null  );
+
+
+    @Deprecated
+    public <T> PnValidationException(String validationTargetId, Set<ConstraintViolation<T>> validationErrors) {
+        this("Some parameters are invalid", new ExceptionHelper(Optional.empty()).generateProblemErrorsFromConstraintViolation(validationErrors), null  );
     }
 
-    public PnValidationException(String message, List<ProblemError> problemErrorList) {
+    PnValidationException(String message, List<ProblemError> problemErrorList) {
         this( message,  problemErrorList, null  );
     }
 
-    public PnValidationException(String message, List<ProblemError> problemErrorList, Throwable cause) {
+    PnValidationException(String message, List<ProblemError> problemErrorList, Throwable cause) {
         super( HttpStatus.BAD_REQUEST.getReasonPhrase(), message, HttpStatus.BAD_REQUEST.value(), problemErrorList, cause  );
+    }
+
+    public static class PnValidationExceptionBuilder<T>
+    {
+        @Autowired
+        private ExceptionHelper exceptionHelper;
+
+        private Set<ConstraintViolation<T>> validationErrors;
+        private Throwable cause;
+        private String message;
+
+        public PnValidationExceptionBuilder() {
+        }
+
+        public PnValidationExceptionBuilder validationErrors(Set<ConstraintViolation<T>> validationErrors) {
+            this.validationErrors = validationErrors;
+            return this;
+        }
+        public PnValidationExceptionBuilder cause(Throwable cause) {
+            this.cause = cause;
+            return this;
+        }
+        public PnValidationExceptionBuilder message(String message) {
+            this.message = message;
+            return this;
+        }
+
+        //Return the finally consrcuted PnValidationException object
+        public PnValidationException build() {
+            return new PnValidationException(message, exceptionHelper.generateProblemErrorsFromConstraintViolation(this.validationErrors), cause );
+        }
     }
 }

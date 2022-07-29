@@ -27,9 +27,11 @@ import java.time.OffsetDateTime;
 @Slf4j
 public class PnErrorWebExceptionHandler implements ErrorWebExceptionHandler {
 
+  private final ExceptionHelper exceptionHelper;
   private final ObjectMapper objectMapper = new ObjectMapper();
 
-  public PnErrorWebExceptionHandler(){
+  public PnErrorWebExceptionHandler(ExceptionHelper exceptionHelper){
+    this.exceptionHelper = exceptionHelper;
     objectMapper.findAndRegisterModules();
     objectMapper
       .configOverride(OffsetDateTime.class)
@@ -40,7 +42,7 @@ public class PnErrorWebExceptionHandler implements ErrorWebExceptionHandler {
   @NonNull
   public Mono<Void> handle(@NonNull ServerWebExchange serverWebExchange, @NonNull Throwable throwable) {
 
-    Problem problem = ExceptionHelper.handleException(throwable);
+    Problem problem = exceptionHelper.handleException(throwable);
 
     DataBufferFactory bufferFactory = serverWebExchange.getResponse().bufferFactory();
     serverWebExchange.getResponse().setStatusCode(HttpStatus.resolve(problem.getStatus()));
@@ -49,7 +51,7 @@ public class PnErrorWebExceptionHandler implements ErrorWebExceptionHandler {
       dataBuffer = bufferFactory.wrap(objectMapper.writeValueAsBytes(problem));
     } catch (JsonProcessingException e) {
       log.error("cannot output problem", e);
-      dataBuffer = bufferFactory.wrap(ExceptionHelper.generateFallbackProblem().getBytes());
+      dataBuffer = bufferFactory.wrap(exceptionHelper.generateFallbackProblem().getBytes());
     }
     serverWebExchange.getResponse().getHeaders().setContentType(MediaType.APPLICATION_JSON);
     return serverWebExchange.getResponse().writeWith(Mono.just(dataBuffer));

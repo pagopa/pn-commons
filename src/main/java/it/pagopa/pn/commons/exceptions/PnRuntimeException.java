@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static it.pagopa.pn.commons.exceptions.ExceptionHelper.ERROR_CODE_GENERIC_ERROR;
+import static it.pagopa.pn.commons.exceptions.PnExceptionsCodes.ERROR_CODE_PN_GENERIC_ERROR;
 
 /**
  * Eccezione base da estendere all'occorrenza, genera già in automatico il problem da ritornare
@@ -61,7 +61,7 @@ public class PnRuntimeException extends RuntimeException implements IPnException
         if (problemErrorList.isEmpty())
         {
             problemErrorList.add(it.pagopa.pn.commons.exceptions.dto.ProblemError.builder()
-                            .code(ERROR_CODE_GENERIC_ERROR)
+                            .code(ERROR_CODE_PN_GENERIC_ERROR)
                     .build());
         }
         problem.setErrors(problemErrorList.stream().map(problemError -> {
@@ -82,8 +82,6 @@ public class PnRuntimeException extends RuntimeException implements IPnException
             log.warn("Cannot get traceid", e);
         }
     }
-
-    public int getStatus(){ return problem.getStatus(); }
 
     public Problem getProblem() {
         return problem;

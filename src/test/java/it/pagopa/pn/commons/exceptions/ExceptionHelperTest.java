@@ -3,26 +3,34 @@ package it.pagopa.pn.commons.exceptions;
 import it.pagopa.pn.common.rest.error.v1.dto.Problem;
 import it.pagopa.pn.commons.exceptions.dto.ProblemError;
 import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ElementKind;
-import javax.validation.Path;
-
+import javax.validation.*;
+import javax.validation.constraints.Max;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class ExceptionHelperTest {
+
+
+    ExceptionHelper exceptionHelper;
+
+    @BeforeEach
+    public void init(){
+        this.exceptionHelper = new ExceptionHelper(Optional.empty());
+    }
 
 
     @Test
     void handlePnInternalException() {
 
         //When
-        Problem res = ExceptionHelper.handleException(new PnInternalException("some message"));
+        Problem res = exceptionHelper.handleException(new PnInternalException("some message"));
 
         //Then
         assertNotNull(res);
@@ -30,7 +38,7 @@ class ExceptionHelperTest {
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), res.getStatus());
         assertNotNull(res.getTimestamp());
         assertNotNull(res.getErrors());
-        assertEquals(ExceptionHelper.ERROR_CODE_GENERIC_ERROR, res.getErrors().get(0).getCode());
+        assertEquals(PnExceptionsCodes.ERROR_CODE_PN_GENERIC_ERROR, res.getErrors().get(0).getCode());
     }
 
 
@@ -38,7 +46,7 @@ class ExceptionHelperTest {
     void handlePnRuntimeException() {
 
         //When
-        Problem res = ExceptionHelper.handleException(new PnRuntimeException("some message", "some desc", 404, "NOT_FOUND", null,null));
+        Problem res = exceptionHelper.handleException(new PnRuntimeException("some message", "some desc", 404, "NOT_FOUND", null,null));
 
         //Then
         assertNotNull(res);
@@ -54,7 +62,7 @@ class ExceptionHelperTest {
     void handlePnRuntimeException1() {
 
         //When
-        Problem res = ExceptionHelper.handleException(new PnRuntimeException("some message", "some desc", 404, new ArrayList<ProblemError>(), null));
+        Problem res = exceptionHelper.handleException(new PnRuntimeException("some message", "some desc", 404, new ArrayList<ProblemError>(), null));
 
         //Then
         assertNotNull(res);
@@ -62,19 +70,25 @@ class ExceptionHelperTest {
         assertEquals(404, res.getStatus());
         assertNotNull(res.getTimestamp());
         assertNotNull(res.getErrors());
-        assertEquals( ExceptionHelper.ERROR_CODE_GENERIC_ERROR, res.getErrors().get(0).getCode());
+        assertEquals( PnExceptionsCodes.ERROR_CODE_PN_GENERIC_ERROR, res.getErrors().get(0).getCode());
     }
 
 
     @Test
     void handlePnValidationException() {
         // Given
-        Set<ConstraintViolation> constraintViolations = new HashSet<>();
-        constraintViolations.add(generateConstraintViolation("some message1", "param1"));
-        constraintViolations.add(generateConstraintViolation("some message2", "param2"));
+        TestValidation val = new TestValidation();
+        val.innerobjects = new TestValidation[2];
+        val.innerobjects[0] = new TestValidation();
+        val.innerobjects[0].notnullvalue = "valido";
+        val.innerobjects[1] = new TestValidation();
 
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        Validator validator = factory.getValidator();
+
+        Set<ConstraintViolation<TestValidation>> constraintViolations =  validator.validate(val);
         //When
-        Problem res = ExceptionHelper.handleException(new PnValidationException("some message", constraintViolations));
+        Problem res = exceptionHelper.handleException(new PnValidationException("some message", constraintViolations));
 
         //Then
         assertNotNull(res);
@@ -86,32 +100,40 @@ class ExceptionHelperTest {
 
 
 
-        assertEquals(ExceptionHelper.ERROR_CODE_INVALID_PARAMETER, res.getErrors().get(0).getCode());
-        assertEquals(ExceptionHelper.ERROR_CODE_INVALID_PARAMETER, res.getErrors().get(1).getCode());
-
-        assertEquals(List.of("param1", "param2"), res.getErrors().stream().map(it.pagopa.pn.common.rest.error.v1.dto.ProblemError::getElement).sorted().collect(Collectors.toList()));
-        assertEquals(List.of("some message1", "some message2"), res.getErrors().stream().map(it.pagopa.pn.common.rest.error.v1.dto.ProblemError::getDetail).sorted().collect(Collectors.toList()));
+        assertEquals(List.of(PnExceptionsCodes.ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_REQUIRED, PnExceptionsCodes.ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_REQUIRED), res.getErrors().stream().map(it.pagopa.pn.common.rest.error.v1.dto.ProblemError::getCode).sorted().collect(Collectors.toList()));
+        assertEquals(List.of("innerobjects[1].notnullvalue", "notnullvalue"), res.getErrors().stream().map(it.pagopa.pn.common.rest.error.v1.dto.ProblemError::getElement).sorted().collect(Collectors.toList()));
 
     }
 
     @Test
-    void generateProblemErrorsFromConstraintViolation() {
-        Set<ConstraintViolation> constraintViolations = new HashSet<>();
-        constraintViolations.add(generateConstraintViolation("some message1", "param1"));
-        constraintViolations.add(generateConstraintViolation("some message2", "param2"));
+    void generateProblemErrorsFromConstraintViolationRealValidation() {
+        TestValidation val = new TestValidation();
+        val.innerobjects = new TestValidation[2];
+        val.innerobjects[0] = new TestValidation();
+        val.innerobjects[0].notnullvalue = "valido";
+        val.innerobjects[1] = new TestValidation();
 
-        List<ProblemError> res = ExceptionHelper.generateProblemErrorsFromConstraintViolation(constraintViolations);
-        assertEquals(ExceptionHelper.ERROR_CODE_INVALID_PARAMETER, res.get(0).getCode());
-        assertEquals(ExceptionHelper.ERROR_CODE_INVALID_PARAMETER, res.get(1).getCode());
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        Validator validator = factory.getValidator();
 
-        assertEquals(List.of("param1", "param2"), res.stream().map(ProblemError::getElement).sorted().collect(Collectors.toList()));
-        assertEquals(List.of("some message1", "some message2"), res.stream().map(ProblemError::getDetail).sorted().collect(Collectors.toList()));
+        Set<ConstraintViolation<TestValidation>> constraintViolations =  validator.validate(val);
+
+        List<ProblemError> res = exceptionHelper.generateProblemErrorsFromConstraintViolation(constraintViolations);
+
+        assertEquals(List.of(PnExceptionsCodes.ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_REQUIRED,PnExceptionsCodes.ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_REQUIRED), res.stream().map(ProblemError::getCode).sorted().collect(Collectors.toList()));
+        assertEquals(List.of("innerobjects[1].notnullvalue", "notnullvalue"), res.stream().map(ProblemError::getElement).sorted().collect(Collectors.toList()));
 
     }
 
-    private ConstraintViolation generateConstraintViolation(String message, String element)
+    private class TestValidation{
+        public @javax.validation.constraints.NotNull String notnullvalue;
+        @Valid
+        public TestValidation[] innerobjects;
+    }
+
+    private ConstraintViolation generateConstraintViolation(String message, String element, Class annotationClass)
     {
-        return  new ConstraintViolationImpl(message, new Path() {
+        return  new ConstraintViolationImpl(message, annotationClass, new Path() {
             @NotNull
             @Override
             public Iterator<Node> iterator() {
