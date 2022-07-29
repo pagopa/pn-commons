@@ -49,7 +49,7 @@ public class PnErrorWebExceptionHandler implements ErrorWebExceptionHandler {
       dataBuffer = bufferFactory.wrap(objectMapper.writeValueAsBytes(problem));
     } catch (JsonProcessingException e) {
       log.error("cannot output problem", e);
-      dataBuffer = bufferFactory.wrap("".getBytes());
+      dataBuffer = bufferFactory.wrap(ExceptionHelper.generateFallbackProblem().getBytes());
     }
     serverWebExchange.getResponse().getHeaders().setContentType(MediaType.APPLICATION_JSON);
     return serverWebExchange.getResponse().writeWith(Mono.just(dataBuffer));

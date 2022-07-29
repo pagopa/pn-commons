@@ -1,16 +1,15 @@
 package it.pagopa.pn.commons.exceptions;
 
 import it.pagopa.pn.common.rest.error.v1.dto.Problem;
-import it.pagopa.pn.common.rest.error.v1.dto.ProblemError;
+import it.pagopa.pn.commons.exceptions.dto.ProblemError;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
-import org.springframework.http.HttpStatus;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Path;
-import java.util.ArrayList;
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -39,6 +38,29 @@ public class ExceptionHelper {
             log.warn("pn-exception " + res.getStatus() + " catched problem={}", res, ex);
 
         return res;
+    }
+
+    public static String generateFallbackProblem(){
+        String fallback = "{\n" +
+                "    \"status\": 500,\n" +
+                "    \"title\": \"Internal Server Error\",\n" +
+                "    \"detail\": \"Cannot output problem\",\n" +
+                "    \"traceId\": \"{traceid}\",\n" +
+                "    \"timestamp\": \"{timestamp}\",\n" +
+                "    \"errors\": [\n" +
+                "        {\n" +
+                "            \"code\": \"{errorcode}\",\n" +
+                "            \"element\": null,\n" +
+                "            \"detail\": null\n" +
+                "        }\n" +
+                "    ]\n" +
+                "}";
+
+        fallback = fallback.replace("{traceid}", UUID.randomUUID().toString());
+        fallback = fallback.replace("{timestamp}", Instant.now().toString());
+        fallback = fallback.replace("{errorcode}", ERROR_CODE_GENERIC_ERROR);
+
+        return fallback;
     }
 
     public static List<ProblemError> generateProblemErrorsFromConstraintViolation(Set<ConstraintViolation> constraintViolations)

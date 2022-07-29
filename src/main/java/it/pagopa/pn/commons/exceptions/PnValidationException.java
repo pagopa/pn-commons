@@ -1,10 +1,9 @@
 package it.pagopa.pn.commons.exceptions;
 
-import it.pagopa.pn.common.rest.error.v1.dto.ProblemError;
+import it.pagopa.pn.commons.exceptions.dto.ProblemError;
 import org.springframework.http.HttpStatus;
 
 import javax.validation.ConstraintViolation;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 

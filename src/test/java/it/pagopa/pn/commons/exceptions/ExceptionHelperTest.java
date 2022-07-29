@@ -1,7 +1,7 @@
 package it.pagopa.pn.commons.exceptions;
 
 import it.pagopa.pn.common.rest.error.v1.dto.Problem;
-import it.pagopa.pn.common.rest.error.v1.dto.ProblemError;
+import it.pagopa.pn.commons.exceptions.dto.ProblemError;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -89,8 +89,8 @@ class ExceptionHelperTest {
         assertEquals(ExceptionHelper.ERROR_CODE_INVALID_PARAMETER, res.getErrors().get(0).getCode());
         assertEquals(ExceptionHelper.ERROR_CODE_INVALID_PARAMETER, res.getErrors().get(1).getCode());
 
-        assertEquals(List.of("param1", "param2"), res.getErrors().stream().map(ProblemError::getElement).sorted().collect(Collectors.toList()));
-        assertEquals(List.of("some message1", "some message2"), res.getErrors().stream().map(ProblemError::getDetail).sorted().collect(Collectors.toList()));
+        assertEquals(List.of("param1", "param2"), res.getErrors().stream().map(it.pagopa.pn.common.rest.error.v1.dto.ProblemError::getElement).sorted().collect(Collectors.toList()));
+        assertEquals(List.of("some message1", "some message2"), res.getErrors().stream().map(it.pagopa.pn.common.rest.error.v1.dto.ProblemError::getDetail).sorted().collect(Collectors.toList()));
 
     }
 

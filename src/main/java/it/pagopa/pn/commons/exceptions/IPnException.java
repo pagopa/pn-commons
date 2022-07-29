@@ -15,5 +15,7 @@ public interface IPnException {
      * Ritorna il codice http da usare nella risposta in base all'exception
      * @return intero contenente il codice http della risposta
      */
-    int getStatus();
+    default int getStatus() {
+        return getProblem().getStatus();
+    }
 }
