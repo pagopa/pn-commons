@@ -24,11 +24,11 @@ public class PnValidationException extends PnRuntimeException {
         this("Some parameters are invalid", new ExceptionHelper(Optional.empty()).generateProblemErrorsFromConstraintViolation(validationErrors), null  );
     }
 
-    PnValidationException(String message, List<ProblemError> problemErrorList) {
+    protected PnValidationException(String message, List<ProblemError> problemErrorList) {
         this( message,  problemErrorList, null  );
     }
 
-    PnValidationException(String message, List<ProblemError> problemErrorList, Throwable cause) {
+    protected PnValidationException(String message, List<ProblemError> problemErrorList, Throwable cause) {
         super( HttpStatus.BAD_REQUEST.getReasonPhrase(), message, HttpStatus.BAD_REQUEST.value(), problemErrorList, cause  );
     }
 

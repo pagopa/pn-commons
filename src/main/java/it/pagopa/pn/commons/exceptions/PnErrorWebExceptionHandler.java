@@ -22,6 +22,7 @@ import java.time.OffsetDateTime;
  *
  * @Component
  * @Order(-2)
+ * @Import(ExceptionHelper.class
  *
  */
 @Slf4j

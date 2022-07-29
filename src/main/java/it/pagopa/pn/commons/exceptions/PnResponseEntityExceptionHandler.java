@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
  * Handler pensato per essere attivato dai microservizi CLASSICI tramite:
  *
  * @org.springframework.web.bind.annotation.ControllerAdvice
+ * @Import(ExceptionHelper.class
  */
 @Slf4j
 public class PnResponseEntityExceptionHandler {
