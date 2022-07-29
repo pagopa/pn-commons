@@ -3,6 +3,7 @@ package it.pagopa.pn.commons.exceptions;
 import it.pagopa.pn.commons.exceptions.dto.ProblemError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.util.CollectionUtils;
 
 import javax.validation.ConstraintViolation;
 import java.util.List;
@@ -37,6 +38,7 @@ public class PnValidationException extends PnRuntimeException {
         private ExceptionHelper exceptionHelper;
 
         private Set<ConstraintViolation<T>> validationErrors;
+        private List<ProblemError> problemErrorList;
         private Throwable cause;
         private String message;
 
@@ -45,6 +47,10 @@ public class PnValidationException extends PnRuntimeException {
 
         public PnValidationExceptionBuilder validationErrors(Set<ConstraintViolation<T>> validationErrors) {
             this.validationErrors = validationErrors;
+            return this;
+        }
+        public PnValidationExceptionBuilder problemErrorList(List<ProblemError> problemErrorList) {
+            this.problemErrorList = problemErrorList;
             return this;
         }
         public PnValidationExceptionBuilder cause(Throwable cause) {
@@ -58,7 +64,10 @@ public class PnValidationException extends PnRuntimeException {
 
         //Return the finally consrcuted PnValidationException object
         public PnValidationException build() {
-            return new PnValidationException(message, exceptionHelper.generateProblemErrorsFromConstraintViolation(this.validationErrors), cause );
+            if (CollectionUtils.isEmpty(problemErrorList))
+                return new PnValidationException(message, exceptionHelper.generateProblemErrorsFromConstraintViolation(this.validationErrors), cause );
+            else
+                return new PnValidationException(message, problemErrorList, cause );
         }
     }
 }
