@@ -40,7 +40,7 @@ public class PnAuditLogEvent {
     }
 
     public PnAuditLogEvent generateSuccess() {
-        return generateResult(true, this.message);
+        return generateResult(true, this.message, this.arguments);
     }
 
     public PnAuditLogEvent generateSuccess(String message, Object... arguments) {
