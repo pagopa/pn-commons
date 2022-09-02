@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Path;
+import javax.validation.metadata.ConstraintDescriptor;
 import java.lang.annotation.Annotation;
 import java.time.Instant;
 import java.util.*;
@@ -18,14 +19,13 @@ import static it.pagopa.pn.commons.exceptions.PnExceptionsCodes.*;
 @Component
 public class ExceptionHelper {
 
-    private Map<String, String> validationMap = new HashMap<>();
+    private final Map<String, String> validationMap = new HashMap<>();
 
     public ExceptionHelper(Optional<IValidationCustomMapper> customValidationMapper){
 
         initValidationMap();
 
-        if (customValidationMapper.isPresent())
-            validationMap.putAll(customValidationMapper.get().getValidationCodeCustomMapping());
+        customValidationMapper.ifPresent(iValidationCustomMapper -> validationMap.putAll(iValidationCustomMapper.getValidationCodeCustomMapping()));
 
     }
 
@@ -76,15 +76,16 @@ public class ExceptionHelper {
 
     public <T> List<ProblemError> generateProblemErrorsFromConstraintViolation(Set<ConstraintViolation<T>> constraintViolations)
     {
-        return constraintViolations.stream().map(constraintViolation -> ProblemError.builder()
-                .code(getCodeFromAnnotation(constraintViolation.getConstraintDescriptor().getAnnotation()))
+        return constraintViolations.stream().map(constraintViolation ->
+                ProblemError.builder()
+                .code(getCodeFromAnnotation(constraintViolation.getConstraintDescriptor() == null?null:constraintViolation.getConstraintDescriptor().getAnnotation()))
                 .detail(constraintViolation.getMessage())
-                .element(constraintViolation.getPropertyPath().toString())
+                .element(constraintViolation.getPropertyPath()==null?null:constraintViolation.getPropertyPath().toString())
                 .build()).collect(Collectors.toList());
     }
 
     private String getCodeFromAnnotation(Annotation annotation){
-        String annotationname = annotation.annotationType().getName();
+        String annotationname = annotation!=null?annotation.annotationType().getName():null;
         return validationMap.getOrDefault(annotationname, ERROR_CODE_PN_GENERIC_INVALIDPARAMETER);
     }
 
