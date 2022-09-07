@@ -1,7 +1,6 @@
 package it.pagopa.pn.commons.exceptions;
 
 import it.pagopa.pn.commons.exceptions.dto.ProblemError;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.CollectionUtils;
 
@@ -18,9 +17,17 @@ import java.util.Set;
 public class PnValidationException extends PnRuntimeException {
 
 
-
-    @Deprecated
-    public <T> PnValidationException(String validationTargetId, Set<ConstraintViolation<T>> validationErrors) {
+    /**
+     * @deprecated
+     * Costruttore deprecato, inserito per retro compatibilità
+     * Usare il builder o estendere la classe utilizzando i costruttori che prevedono i ProblemError
+     *
+     * @param validationTargetId non usato
+     * @param validationErrors errori di validazione
+     * @param <T> tipo errori validazione
+     */
+    @Deprecated()
+    public <T> PnValidationException(String validationTargetId, Set<? extends ConstraintViolation<?>> validationErrors) {
         this("Some parameters are invalid", new ExceptionHelper(Optional.empty()).generateProblemErrorsFromConstraintViolation(validationErrors), null  );
     }
 
@@ -34,18 +41,18 @@ public class PnValidationException extends PnRuntimeException {
 
     public static class PnValidationExceptionBuilder<T>
     {
-        @Autowired
         private ExceptionHelper exceptionHelper;
 
-        private Set<ConstraintViolation<T>> validationErrors;
+        private Set<ConstraintViolation<? extends Object>> validationErrors;
         private List<ProblemError> problemErrorList;
         private Throwable cause;
         private String message;
 
-        public PnValidationExceptionBuilder() {
+        public PnValidationExceptionBuilder(ExceptionHelper exceptionHelper) {
+            this.exceptionHelper = exceptionHelper;
         }
 
-        public PnValidationExceptionBuilder validationErrors(Set<ConstraintViolation<T>> validationErrors) {
+        public PnValidationExceptionBuilder validationErrors(Set<ConstraintViolation<? extends Object>> validationErrors) {
             this.validationErrors = validationErrors;
             return this;
         }

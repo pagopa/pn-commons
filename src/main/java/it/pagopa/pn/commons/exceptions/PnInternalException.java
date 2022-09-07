@@ -8,11 +8,24 @@ import org.springframework.http.HttpStatus;
  */
 public class PnInternalException extends PnRuntimeException {
 
+    /**
+     * @deprecated
+     * Costruttore deprecato, usare quello che prevede il passaggio anche dell'errorCode
+     *
+     * @param message messaggio diagnostico
+     */
     @Deprecated
     public PnInternalException(String message) {
         this(message, PnExceptionsCodes.ERROR_CODE_PN_GENERIC_ERROR, null);
     }
 
+    /**
+     * @deprecated
+     * Costruttore deprecato, usare quello che prevede il passaggio anche dell'errorCode
+     *
+     * @param message messaggio diagnostico
+     * @param cause eccezione causa
+     */
     @Deprecated
     public PnInternalException(String message, Throwable cause) {
         this(message, PnExceptionsCodes.ERROR_CODE_PN_GENERIC_ERROR, cause);

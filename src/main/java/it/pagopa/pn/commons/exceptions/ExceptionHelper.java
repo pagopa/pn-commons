@@ -35,6 +35,16 @@ public class ExceptionHelper {
         // gestione exception e generazione fault
         Problem res;
 
+        // gestione dedicata delle constraintviolation
+        if (ex instanceof javax.validation.ConstraintViolationException) {
+            javax.validation.ConstraintViolationException cex = (javax.validation.ConstraintViolationException)ex;
+
+            ex = new PnValidationException.PnValidationExceptionBuilder<>(this)
+                    .validationErrors(cex.getConstraintViolations())
+                    .cause(ex)
+                    .message(ex.getMessage())
+                    .build();
+        }
 
         // se l'eccezione non è di tipo pnXXX, ne genero una generica per wrapparla, di fatto la tratto come 500
         if (!(ex instanceof IPnException))
@@ -74,7 +84,7 @@ public class ExceptionHelper {
         return fallback;
     }
 
-    public <T> List<ProblemError> generateProblemErrorsFromConstraintViolation(Set<ConstraintViolation<T>> constraintViolations)
+    public List<ProblemError> generateProblemErrorsFromConstraintViolation(Set<? extends ConstraintViolation<?>> constraintViolations)
     {
         return constraintViolations.stream().map(constraintViolation ->
                 ProblemError.builder()

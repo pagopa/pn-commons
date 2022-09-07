@@ -42,13 +42,14 @@ public class PnErrorWebExceptionHandler implements ErrorWebExceptionHandler {
   @Override
   @NonNull
   public Mono<Void> handle(@NonNull ServerWebExchange serverWebExchange, @NonNull Throwable throwable) {
-
-    Problem problem = exceptionHelper.handleException(throwable);
-
-    DataBufferFactory bufferFactory = serverWebExchange.getResponse().bufferFactory();
-    serverWebExchange.getResponse().setStatusCode(HttpStatus.resolve(problem.getStatus()));
     DataBuffer dataBuffer;
+    DataBufferFactory bufferFactory = serverWebExchange.getResponse().bufferFactory();
+
     try {
+      Problem problem = exceptionHelper.handleException(throwable);
+
+      serverWebExchange.getResponse().setStatusCode(HttpStatus.resolve(problem.getStatus()));
+
       dataBuffer = bufferFactory.wrap(objectMapper.writeValueAsBytes(problem));
     } catch (JsonProcessingException e) {
       log.error("cannot output problem", e);
