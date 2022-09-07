@@ -48,9 +48,9 @@ public class PnValidationExceptionBuilder<T> {
 
     //Return the finally consrcuted PnValidationException object
     public PnValidationException build() {
-        if (CollectionUtils.isEmpty(problemErrorList))
+        if (!CollectionUtils.isEmpty(validationErrors))
             return new PnValidationException(message, exceptionHelper.generateProblemErrorsFromConstraintViolation(this.validationErrors), cause);
-        else if (CollectionUtils.isEmpty(fieldErrors))
+        else if (!CollectionUtils.isEmpty(fieldErrors))
             return new PnValidationException(message, exceptionHelper.generateProblemErrorsFromFieldError(this.fieldErrors), cause);
         else
             return new PnValidationException(message, problemErrorList, cause);
