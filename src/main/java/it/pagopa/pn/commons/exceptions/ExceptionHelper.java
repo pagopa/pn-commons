@@ -2,6 +2,8 @@ package it.pagopa.pn.commons.exceptions;
 
 import it.pagopa.pn.common.rest.error.v1.dto.Problem;
 import it.pagopa.pn.commons.exceptions.dto.ProblemError;
+import it.pagopa.pn.commons.exceptions.mapper.ConstraintViolationToProblemErrorMapper;
+import it.pagopa.pn.commons.exceptions.mapper.FieldErrorToProblemErrorMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.FieldError;
@@ -95,27 +97,32 @@ public class ExceptionHelper {
     public List<ProblemError> generateProblemErrorsFromConstraintViolation(Set<? extends ConstraintViolation<?>> constraintViolations)
     {
         return constraintViolations.stream().map(constraintViolation ->
-                ProblemError.builder()
-                .code(getCodeFromAnnotation(constraintViolation.getConstraintDescriptor() == null?null:constraintViolation.getConstraintDescriptor().getAnnotation()))
-                .detail(constraintViolation.getMessage())
-                .element(constraintViolation.getPropertyPath()==null?null:constraintViolation.getPropertyPath().toString())
-                .build()).collect(Collectors.toList());
+               ConstraintViolationToProblemErrorMapper.toProblemError(constraintViolation, this)).collect(Collectors.toList());
     }
 
 
     public List<ProblemError> generateProblemErrorsFromFieldError(List<FieldError> fieldErrors)
     {
-        return fieldErrors.stream().map(fieldError ->
-                ProblemError.builder()
-                        .code(ERROR_CODE_PN_GENERIC_INVALIDPARAMETER)
-                        .detail(fieldError.getDefaultMessage())
-                        .element(fieldError.getField())
-                        .build()).collect(Collectors.toList());
+        return fieldErrors.stream().map(FieldErrorToProblemErrorMapper::toProblemError).collect(Collectors.toList());
     }
 
-    private String getCodeFromAnnotation(Annotation annotation){
+    public String getCodeFromAnnotation(Annotation annotation){
         String annotationname = annotation!=null?annotation.annotationType().getName():null;
-        return validationMap.getOrDefault(annotationname, ERROR_CODE_PN_GENERIC_INVALIDPARAMETER);
+        if (validationMap.containsKey(annotationname))
+        {
+            return validationMap.get(annotationname);
+        }
+        else if (annotationname == null)
+        {
+            log.warn("Annotation is null");
+            return ERROR_CODE_PN_GENERIC_INVALIDPARAMETER;
+        }
+        else
+        {
+            log.error("Annotation {} not found", annotationname);
+            return ERROR_CODE_PN_GENERIC_INVALIDPARAMETER;
+        }
+
     }
 
 
