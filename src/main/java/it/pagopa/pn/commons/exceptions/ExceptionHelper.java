@@ -7,8 +7,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.FieldError;
 
 import javax.validation.ConstraintViolation;
-import javax.validation.Path;
-import javax.validation.metadata.ConstraintDescriptor;
 import java.lang.annotation.Annotation;
 import java.time.Instant;
 import java.util.*;
@@ -40,7 +38,7 @@ public class ExceptionHelper {
         if (ex instanceof javax.validation.ConstraintViolationException) {
             javax.validation.ConstraintViolationException cex = (javax.validation.ConstraintViolationException)ex;
 
-            ex = new PnValidationException.PnValidationExceptionBuilder<>(this)
+            ex = new PnValidationExceptionBuilder<>(this)
                     .validationErrors(cex.getConstraintViolations())
                     .cause(ex)
                     .message(ex.getMessage())
@@ -49,7 +47,7 @@ public class ExceptionHelper {
         else if (ex instanceof org.springframework.web.bind.support.WebExchangeBindException){
             org.springframework.web.bind.support.WebExchangeBindException cex = (org.springframework.web.bind.support.WebExchangeBindException)ex;
 
-            ex = new PnValidationException.PnValidationExceptionBuilder<>(this)
+            ex = new PnValidationExceptionBuilder<>(this)
                     .fieldErrors(cex.getFieldErrors())
                     .cause(ex)
                     .message(ex.getMessage())
