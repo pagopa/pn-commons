@@ -4,6 +4,7 @@ import it.pagopa.pn.common.rest.error.v1.dto.Problem;
 import it.pagopa.pn.commons.exceptions.dto.ProblemError;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.FieldError;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Path;
@@ -35,12 +36,21 @@ public class ExceptionHelper {
         // gestione exception e generazione fault
         Problem res;
 
-        // gestione dedicata delle constraintviolation
+        // gestione dedicata delle constraintviolation, lanciate da spring direttamente
         if (ex instanceof javax.validation.ConstraintViolationException) {
             javax.validation.ConstraintViolationException cex = (javax.validation.ConstraintViolationException)ex;
 
             ex = new PnValidationException.PnValidationExceptionBuilder<>(this)
                     .validationErrors(cex.getConstraintViolations())
+                    .cause(ex)
+                    .message(ex.getMessage())
+                    .build();
+        }
+        else if (ex instanceof org.springframework.web.bind.support.WebExchangeBindException){
+            org.springframework.web.bind.support.WebExchangeBindException cex = (org.springframework.web.bind.support.WebExchangeBindException)ex;
+
+            ex = new PnValidationException.PnValidationExceptionBuilder<>(this)
+                    .fieldErrors(cex.getFieldErrors())
                     .cause(ex)
                     .message(ex.getMessage())
                     .build();
@@ -92,6 +102,17 @@ public class ExceptionHelper {
                 .detail(constraintViolation.getMessage())
                 .element(constraintViolation.getPropertyPath()==null?null:constraintViolation.getPropertyPath().toString())
                 .build()).collect(Collectors.toList());
+    }
+
+
+    public List<ProblemError> generateProblemErrorsFromFieldError(List<FieldError> fieldErrors)
+    {
+        return fieldErrors.stream().map(fieldError ->
+                ProblemError.builder()
+                        .code(ERROR_CODE_PN_GENERIC_INVALIDPARAMETER)
+                        .detail(fieldError.getDefaultMessage())
+                        .element(fieldError.getField())
+                        .build()).collect(Collectors.toList());
     }
 
     private String getCodeFromAnnotation(Annotation annotation){

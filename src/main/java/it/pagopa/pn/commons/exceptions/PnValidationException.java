@@ -3,6 +3,7 @@ package it.pagopa.pn.commons.exceptions;
 import it.pagopa.pn.commons.exceptions.dto.ProblemError;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.CollectionUtils;
+import org.springframework.validation.FieldError;
 
 import javax.validation.ConstraintViolation;
 import java.util.List;
@@ -44,6 +45,7 @@ public class PnValidationException extends PnRuntimeException {
         private ExceptionHelper exceptionHelper;
 
         private Set<ConstraintViolation<? extends Object>> validationErrors;
+        private List<FieldError> fieldErrors;
         private List<ProblemError> problemErrorList;
         private Throwable cause;
         private String message;
@@ -56,14 +58,21 @@ public class PnValidationException extends PnRuntimeException {
             this.validationErrors = validationErrors;
             return this;
         }
+
+        public PnValidationExceptionBuilder fieldErrors(List<FieldError> fieldErrors) {
+            this.fieldErrors = fieldErrors;
+            return this;
+        }
         public PnValidationExceptionBuilder problemErrorList(List<ProblemError> problemErrorList) {
             this.problemErrorList = problemErrorList;
             return this;
         }
+
         public PnValidationExceptionBuilder cause(Throwable cause) {
             this.cause = cause;
             return this;
         }
+
         public PnValidationExceptionBuilder message(String message) {
             this.message = message;
             return this;
@@ -73,6 +82,8 @@ public class PnValidationException extends PnRuntimeException {
         public PnValidationException build() {
             if (CollectionUtils.isEmpty(problemErrorList))
                 return new PnValidationException(message, exceptionHelper.generateProblemErrorsFromConstraintViolation(this.validationErrors), cause );
+            else if (CollectionUtils.isEmpty(fieldErrors))
+                return new PnValidationException(message, exceptionHelper.generateProblemErrorsFromFieldError(this.fieldErrors), cause );
             else
                 return new PnValidationException(message, problemErrorList, cause );
         }
