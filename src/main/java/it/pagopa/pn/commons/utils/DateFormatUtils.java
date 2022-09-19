@@ -41,8 +41,8 @@ public abstract class DateFormatUtils {
         endDateTime = endDateTime.withNano(nanoOfSecond);
         return endDateTime;
     }
-
-    public static String formatTime(ZonedDateTime datetime) 
+    
+    public static String formatTime(ZonedDateTime datetime)
     {
         DateTimeFormatter formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
         return datetime.format(formatter.withZone(italianZoneId));
@@ -74,7 +74,7 @@ public abstract class DateFormatUtils {
         return endOfDay.toInstant();
     }
 
-    public static ZonedDateTime parseInstantToZonedDateTime(Instant date) 
+    public static ZonedDateTime parseInstantToZonedDateTime(Instant date)
     {
         return date.atZone(italianZoneId);
     }
