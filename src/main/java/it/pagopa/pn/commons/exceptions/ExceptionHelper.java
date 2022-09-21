@@ -21,7 +21,7 @@ import static it.pagopa.pn.commons.exceptions.PnExceptionsCodes.*;
 @Component
 public class ExceptionHelper {
 
-    public static final String MESSAGE_SEE_LOGS_FOR_DETAILS = "See logs for details";
+    public static final String MESSAGE_SEE_LOGS_FOR_DETAILS = "See logs for details in ";
     public static final String MESSAGE_UNEXPECTED_ERROR = "Unexpected error";
     public static final String MESSAGE_HANDLED_ERROR = "Handled error";
     private final Map<String, String> validationMap = new HashMap<>();
@@ -102,15 +102,22 @@ public class ExceptionHelper {
         if (res.getStatus() >= 500)
         {
             res.setTitle(MESSAGE_UNEXPECTED_ERROR);
-            res.setDetail(MESSAGE_SEE_LOGS_FOR_DETAILS);
+            res.setDetail(MESSAGE_SEE_LOGS_FOR_DETAILS + getCurrentApplicationName());
         }
         else
         {
             res.setTitle(MESSAGE_HANDLED_ERROR);
-            res.setDetail(MESSAGE_SEE_LOGS_FOR_DETAILS);
+            res.setDetail(MESSAGE_SEE_LOGS_FOR_DETAILS + getCurrentApplicationName());
         }
 
         return res;
+    }
+
+    private String getCurrentApplicationName(){
+        if (System.getProperties().containsKey("spring.application.name"))
+            return System.getProperty("spring.application.name");
+        else
+            return System.getProperty("sun.java.command");
     }
 
     public String generateFallbackProblem(){

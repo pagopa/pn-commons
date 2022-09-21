@@ -61,7 +61,6 @@ components:
           minItems: 1
           items:
             $ref: '#/components/schemas/ProblemError'
-      additionalProperties: false
       required:
         - detail
         - status
