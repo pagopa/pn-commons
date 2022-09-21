@@ -62,9 +62,7 @@ components:
           items:
             $ref: '#/components/schemas/ProblemError'
       required:
-        - detail
         - status
-        - title
         - errors
     ProblemError:
       properties:
