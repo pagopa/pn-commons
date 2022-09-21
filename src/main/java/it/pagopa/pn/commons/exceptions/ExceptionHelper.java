@@ -5,6 +5,7 @@ import it.pagopa.pn.commons.exceptions.dto.ProblemError;
 import it.pagopa.pn.commons.exceptions.mapper.ConstraintViolationToProblemErrorMapper;
 import it.pagopa.pn.commons.exceptions.mapper.FieldErrorToProblemErrorMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.FieldError;
 
@@ -74,12 +75,27 @@ public class ExceptionHelper {
         }
 
         res = ((IPnException) ex).getProblem();
+
+        // nel caso in cui il traceid non fosse disponibile, magari lo è in questo momento, provo ad aggiungerlo
+        enrichWithTraceIdIfMissing(res);
+
         if (res.getStatus() >= 500)
             log.error("pn-exception " + res.getStatus() + " catched problem={}", res, ex);
         else
             log.warn("pn-exception " + res.getStatus() + " catched problem={}", res, ex);
 
         return offuscateProblem(res);
+    }
+
+    private void enrichWithTraceIdIfMissing(Problem res){
+        if (res.getTraceId() == null)
+        {
+            try {
+                res.setTraceId(MDC.get("trace_id"));
+            } catch (Exception var7) {
+                log.warn("Cannot get traceid", var7);
+            }
+        }
     }
 
     private Problem offuscateProblem(Problem res){

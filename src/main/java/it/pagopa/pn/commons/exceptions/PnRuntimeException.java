@@ -63,11 +63,14 @@ public class PnRuntimeException extends RuntimeException implements IPnException
         {
             problemErrorList.add(it.pagopa.pn.commons.exceptions.dto.ProblemError.builder()
                             .code(ERROR_CODE_PN_GENERIC_ERROR)
+                            .detail("none")
                     .build());
         }
         problem.setErrors(problemErrorList.stream().map(problemError -> {
                     if (problemError.getDetail()!=null)
                         problemError.setDetail(problemError.getDetail().substring(0, Math.min(problemError.getDetail().length(), 1024)));
+                    else
+                        problemError.setDetail("none");
 
                     // mappo nel probleerror generato dallo YAML
                     return it.pagopa.pn.common.rest.error.v1.dto.ProblemError.builder()
