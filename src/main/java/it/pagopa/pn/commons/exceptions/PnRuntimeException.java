@@ -52,6 +52,7 @@ public class PnRuntimeException extends RuntimeException implements IPnException
         if (problemErrorList == null)
             problemErrorList = new ArrayList<>();
 
+        problem.setType("GENERIC_ERROR");
         problem.setTitle(message.substring(0, Math.min(message.length(), 64)));
         problem.setDetail(description.substring(0, Math.min(description.length(), 4096)));
         problem.setStatus(status<100?100:(Math.min(status, 600)));

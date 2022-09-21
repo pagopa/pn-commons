@@ -39,7 +39,7 @@ public class ExceptionHelper {
         // gestione dedicata delle constraintviolation, lanciate da spring direttamente
         if (ex instanceof javax.validation.ConstraintViolationException) {
             javax.validation.ConstraintViolationException cex = (javax.validation.ConstraintViolationException)ex;
-
+            // eccezione di constraint, recupero le info dei campi
             ex = new PnValidationExceptionBuilder<>(this)
                     .validationErrors(cex.getConstraintViolations())
                     .cause(ex)
@@ -48,12 +48,20 @@ public class ExceptionHelper {
         }
         else if (ex instanceof org.springframework.web.bind.support.WebExchangeBindException){
             org.springframework.web.bind.support.WebExchangeBindException cex = (org.springframework.web.bind.support.WebExchangeBindException)ex;
-
+            // eccezione di spring riguardante errori di validazione, recupero le info dei campi
             ex = new PnValidationExceptionBuilder<>(this)
                     .fieldErrors(cex.getFieldErrors())
                     .cause(ex)
                     .message(ex.getMessage())
                     .build();
+        }
+        else if (ex instanceof org.springframework.web.server.ResponseStatusException){
+            org.springframework.web.server.ResponseStatusException cex = (org.springframework.web.server.ResponseStatusException)ex;
+            // eccezione di spring riguardante errori di altra natura
+            ex = new PnRuntimeException(Objects.requireNonNull(cex.getMessage()==null?"Web error":cex.getMessage()),
+                                        Objects.requireNonNull(cex.getReason()==null?"Web error":cex.getReason()),
+                                        cex.getRawStatusCode(),
+                                        ERROR_CODE_PN_WEB_GENERIC_ERROR, null, null, cex);
         }
 
         // se l'eccezione non è di tipo pnXXX, ne genero una generica per wrapparla, di fatto la tratto come 500
@@ -67,6 +75,21 @@ public class ExceptionHelper {
             log.error("pn-exception " + res.getStatus() + " catched problem={}", res, ex);
         else
             log.warn("pn-exception " + res.getStatus() + " catched problem={}", res, ex);
+
+        return offuscateProblem(res);
+    }
+
+    private Problem offuscateProblem(Problem res){
+        if (res.getStatus() >= 500)
+        {
+            res.setTitle("Unexpected error");
+            res.setDetail("See logs for details");
+        }
+        else
+        {
+            res.setTitle("Handled error");
+            res.setDetail("See logs for details");
+        }
 
         return res;
     }
