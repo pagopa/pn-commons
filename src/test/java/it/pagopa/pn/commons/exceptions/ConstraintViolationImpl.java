@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class ConstraintViolationImpl< T > implements ConstraintViolation< T > {
+public class ConstraintViolationImpl< T > implements ConstraintViolationTest {
 
     private final String message;
     private final Path path;
@@ -42,7 +42,7 @@ public class ConstraintViolationImpl< T > implements ConstraintViolation< T > {
     }
 
     @Override
-    public Class<T> getRootBeanClass() {
+    public Class<Object> getRootBeanClass() {
         return null;
     }
 

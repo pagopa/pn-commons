@@ -20,6 +20,9 @@ import static it.pagopa.pn.commons.exceptions.PnExceptionsCodes.*;
 @Component
 public class ExceptionHelper {
 
+    public static final String MESSAGE_SEE_LOGS_FOR_DETAILS = "See logs for details";
+    public static final String MESSAGE_UNEXPECTED_ERROR = "Unexpected error";
+    public static final String MESSAGE_HANDLED_ERROR = "Handled error";
     private final Map<String, String> validationMap = new HashMap<>();
 
     public ExceptionHelper(Optional<IValidationCustomMapper> customValidationMapper){
@@ -82,13 +85,13 @@ public class ExceptionHelper {
     private Problem offuscateProblem(Problem res){
         if (res.getStatus() >= 500)
         {
-            res.setTitle("Unexpected error");
-            res.setDetail("See logs for details");
+            res.setTitle(MESSAGE_UNEXPECTED_ERROR);
+            res.setDetail(MESSAGE_SEE_LOGS_FOR_DETAILS);
         }
         else
         {
-            res.setTitle("Handled error");
-            res.setDetail("See logs for details");
+            res.setTitle(MESSAGE_HANDLED_ERROR);
+            res.setDetail(MESSAGE_SEE_LOGS_FOR_DETAILS);
         }
 
         return res;
