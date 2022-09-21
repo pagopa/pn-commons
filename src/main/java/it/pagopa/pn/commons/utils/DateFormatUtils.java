@@ -2,16 +2,14 @@ package it.pagopa.pn.commons.utils;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 
 public abstract class DateFormatUtils {
     private DateFormatUtils() {}
-    
-    public static final ZoneId italianZoneId =  ZoneId.of("Europe/Rome");
+
+    public static final ZoneId utcZoneId = ZoneId.of("UTC");
+    public static final ZoneId italianZoneId = ZoneId.of("Europe/Rome");
 
     @NotNull
     public static String formatInstantToString(Instant dateToFormat, String pattern) {
@@ -34,6 +32,16 @@ public abstract class DateFormatUtils {
         return LocalDate.ofInstant(instant, italianZoneId).format(formatter);
     }
 
+    @NotNull
+    public static ZonedDateTime setSpecificTimeToDate(ZonedDateTime dateTime, int hour, int minute, int second, int nanoOfSecond) {
+        ZonedDateTime endDateTime = dateTime;
+        endDateTime = endDateTime.withHour(hour);
+        endDateTime = endDateTime.withMinute(minute);
+        endDateTime = endDateTime.withSecond(second);
+        endDateTime = endDateTime.withNano(nanoOfSecond);
+        return endDateTime;
+    }
+    
     public static String formatTime(ZonedDateTime datetime)
     {
         DateTimeFormatter formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
@@ -58,6 +66,12 @@ public abstract class DateFormatUtils {
     {
         DateTimeFormatter formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
         return formatter.parse(date, ZonedDateTime::from);
+    }
+
+    public static Instant getEndOfTheDay() {
+        ZonedDateTime todayUtc = LocalDateTime.now().atZone(utcZoneId);
+        ZonedDateTime endOfDay = todayUtc.with(LocalTime.MAX);
+        return endOfDay.toInstant();
     }
 
     public static ZonedDateTime parseInstantToZonedDateTime(Instant date)
