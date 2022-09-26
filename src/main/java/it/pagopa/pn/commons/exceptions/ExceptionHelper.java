@@ -6,6 +6,7 @@ import it.pagopa.pn.commons.exceptions.mapper.ConstraintViolationToProblemErrorM
 import it.pagopa.pn.commons.exceptions.mapper.FieldErrorToProblemErrorMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.FieldError;
 
@@ -25,6 +26,9 @@ public class ExceptionHelper {
     public static final String MESSAGE_UNEXPECTED_ERROR = "Unexpected error";
     public static final String MESSAGE_HANDLED_ERROR = "Handled error";
     private final Map<String, String> validationMap = new HashMap<>();
+
+    @Value("${spring.application.name:}")
+    private String applicationName;
 
     public ExceptionHelper(Optional<IValidationCustomMapper> customValidationMapper){
 
@@ -96,28 +100,30 @@ public class ExceptionHelper {
                 log.warn("Cannot get traceid", var7);
             }
         }
+        // se è ancora nullo, ci metto un uuid
+        if (res.getTraceId() == null)
+        {
+            res.setTraceId("FALLBACK-UUID:" + UUID.randomUUID().toString());
+        }
     }
 
     private Problem offuscateProblem(Problem res){
         if (res.getStatus() >= 500)
         {
             res.setTitle(MESSAGE_UNEXPECTED_ERROR);
-            res.setDetail(MESSAGE_SEE_LOGS_FOR_DETAILS + getCurrentApplicationName());
         }
         else
         {
             res.setTitle(MESSAGE_HANDLED_ERROR);
-            res.setDetail(MESSAGE_SEE_LOGS_FOR_DETAILS + getCurrentApplicationName());
         }
+
+        res.setDetail(MESSAGE_SEE_LOGS_FOR_DETAILS + getCurrentApplicationName());
 
         return res;
     }
 
     private String getCurrentApplicationName(){
-        if (System.getProperties().containsKey("spring.application.name"))
-            return System.getProperty("spring.application.name");
-        else
-            return System.getProperty("sun.java.command");
+        return applicationName;
     }
 
     public String generateFallbackProblem(){
