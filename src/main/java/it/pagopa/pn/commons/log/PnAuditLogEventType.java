@@ -4,8 +4,8 @@ package it.pagopa.pn.commons.log;
  * See documentations <a href="https://pagopa.atlassian.net/wiki/spaces/PN/pages/498466884/Audit+Logs">Audit Logs</a>
  */
 public enum PnAuditLogEventType {
-    AUD_ACC_LOGIN(PnAuditLogMarker.AUDIT5Y),
-    AUD_ACC_LOGOUT(PnAuditLogMarker.AUDIT5Y),
+    AUD_ACC_LOGIN(PnAuditLogMarker.AUDIT10Y),
+    AUD_ACC_LOGOUT(PnAuditLogMarker.AUDIT10Y),
     AUD_NT_PRELOAD(PnAuditLogMarker.AUDIT10Y),
     AUD_NT_LOAD(PnAuditLogMarker.AUDIT10Y), //Load is direct on S3 bucket, cannot be cached by PN code.
     AUD_NT_INSERT(PnAuditLogMarker.AUDIT10Y),
