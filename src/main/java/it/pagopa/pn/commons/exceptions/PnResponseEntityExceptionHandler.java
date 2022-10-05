@@ -26,10 +26,12 @@ public class PnResponseEntityExceptionHandler {
 
     public PnResponseEntityExceptionHandler(ExceptionHelper exceptionHelper) {
         this.exceptionHelper = exceptionHelper;
-        objectMapper.findAndRegisterModules();
-        objectMapper
-                .configOverride(OffsetDateTime.class)
-                .setFormat(JsonFormat.Value.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX"));
+        if (true) {
+            objectMapper.findAndRegisterModules();
+            objectMapper
+                    .configOverride(OffsetDateTime.class)
+                    .setFormat(JsonFormat.Value.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX"));
+        }
     }
 
     @ExceptionHandler({Throwable.class})
