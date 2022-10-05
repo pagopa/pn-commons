@@ -5,6 +5,8 @@ import it.pagopa.pn.commons.exceptions.dto.ProblemError;
 import it.pagopa.pn.commons.exceptions.mapper.ConstraintViolationToProblemErrorMapper;
 import it.pagopa.pn.commons.exceptions.mapper.FieldErrorToProblemErrorMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.FieldError;
 
@@ -20,7 +22,13 @@ import static it.pagopa.pn.commons.exceptions.PnExceptionsCodes.*;
 @Component
 public class ExceptionHelper {
 
+    public static final String MESSAGE_SEE_LOGS_FOR_DETAILS = "See logs for details in ";
+    public static final String MESSAGE_UNEXPECTED_ERROR = "Unexpected error";
+    public static final String MESSAGE_HANDLED_ERROR = "Handled error";
     private final Map<String, String> validationMap = new HashMap<>();
+
+    @Value("${spring.application.name:}")
+    private String applicationName;
 
     public ExceptionHelper(Optional<IValidationCustomMapper> customValidationMapper){
 
@@ -39,7 +47,7 @@ public class ExceptionHelper {
         // gestione dedicata delle constraintviolation, lanciate da spring direttamente
         if (ex instanceof javax.validation.ConstraintViolationException) {
             javax.validation.ConstraintViolationException cex = (javax.validation.ConstraintViolationException)ex;
-
+            // eccezione di constraint, recupero le info dei campi
             ex = new PnValidationExceptionBuilder<>(this)
                     .validationErrors(cex.getConstraintViolations())
                     .cause(ex)
@@ -48,12 +56,20 @@ public class ExceptionHelper {
         }
         else if (ex instanceof org.springframework.web.bind.support.WebExchangeBindException){
             org.springframework.web.bind.support.WebExchangeBindException cex = (org.springframework.web.bind.support.WebExchangeBindException)ex;
-
+            // eccezione di spring riguardante errori di validazione, recupero le info dei campi
             ex = new PnValidationExceptionBuilder<>(this)
                     .fieldErrors(cex.getFieldErrors())
                     .cause(ex)
                     .message(ex.getMessage())
                     .build();
+        }
+        else if (ex instanceof org.springframework.web.server.ResponseStatusException){
+            org.springframework.web.server.ResponseStatusException cex = (org.springframework.web.server.ResponseStatusException)ex;
+            // eccezione di spring riguardante errori di altra natura
+            ex = new PnRuntimeException(Objects.requireNonNull(cex.getMessage()==null?"Web error":cex.getMessage()),
+                                        Objects.requireNonNull(cex.getReason()==null?"Web error":cex.getReason()),
+                                        cex.getRawStatusCode(),
+                                        ERROR_CODE_PN_WEB_GENERIC_ERROR, null, null, cex);
         }
 
         // se l'eccezione non è di tipo pnXXX, ne genero una generica per wrapparla, di fatto la tratto come 500
@@ -63,12 +79,51 @@ public class ExceptionHelper {
         }
 
         res = ((IPnException) ex).getProblem();
+
+        // nel caso in cui il traceid non fosse disponibile, magari lo è in questo momento, provo ad aggiungerlo
+        enrichWithTraceIdIfMissing(res);
+
         if (res.getStatus() >= 500)
             log.error("pn-exception " + res.getStatus() + " catched problem={}", res, ex);
         else
             log.warn("pn-exception " + res.getStatus() + " catched problem={}", res, ex);
 
+        return offuscateProblem(res);
+    }
+
+    private void enrichWithTraceIdIfMissing(Problem res){
+        if (res.getTraceId() == null)
+        {
+            try {
+                res.setTraceId(MDC.get("trace_id"));
+            } catch (Exception var7) {
+                log.warn("Cannot get traceid", var7);
+            }
+        }
+        // se è ancora nullo, ci metto un uuid
+        if (res.getTraceId() == null)
+        {
+            res.setTraceId("FALLBACK-UUID:" + UUID.randomUUID().toString());
+        }
+    }
+
+    private Problem offuscateProblem(Problem res){
+        if (res.getStatus() >= 500)
+        {
+            res.setTitle(MESSAGE_UNEXPECTED_ERROR);
+        }
+        else
+        {
+            res.setTitle(MESSAGE_HANDLED_ERROR);
+        }
+
+        res.setDetail(MESSAGE_SEE_LOGS_FOR_DETAILS + getCurrentApplicationName());
+
         return res;
+    }
+
+    private String getCurrentApplicationName(){
+        return applicationName;
     }
 
     public String generateFallbackProblem(){
