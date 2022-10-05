@@ -13,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class RestTemplateFactory {
@@ -20,6 +21,7 @@ public class RestTemplateFactory {
     @Bean
     @Qualifier("withTracing")
     public RestTemplate restTemplateWithTracing(){
+        LinkedList list = new LinkedList();
         RestTemplate template = new RestTemplate();
         enrichWithTracing(template);
         template.setErrorHandler(new RestTemplateResponseErrorHandler());
