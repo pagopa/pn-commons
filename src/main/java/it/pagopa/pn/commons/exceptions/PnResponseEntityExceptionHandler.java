@@ -27,7 +27,7 @@ public class PnResponseEntityExceptionHandler {
     public PnResponseEntityExceptionHandler(ExceptionHelper exceptionHelper) {
         this.exceptionHelper = exceptionHelper;
         int b = 1;
-        if (2==2) {
+        if (3==3) {
             objectMapper.findAndRegisterModules();
             objectMapper
                     .configOverride(OffsetDateTime.class)
