@@ -26,7 +26,7 @@ public class PnResponseEntityExceptionHandler {
 
     public PnResponseEntityExceptionHandler(ExceptionHelper exceptionHelper) {
         this.exceptionHelper = exceptionHelper;
-        int a = 1;
+        int a = 2;
         if (1==1) {
             objectMapper.findAndRegisterModules();
             objectMapper
