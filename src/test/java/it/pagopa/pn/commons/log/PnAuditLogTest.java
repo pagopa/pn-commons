@@ -73,7 +73,7 @@ class PnAuditLogTest {
         List<ILoggingEvent> logsList = listAppender.list;
 
         final ILoggingEvent loggingEvent3 = logsList.get(0);
-        assertEquals("AUDIT5Y", loggingEvent3.getMarker().getName());
+        assertEquals("AUDIT10Y", loggingEvent3.getMarker().getName());
         assertEquals("INFO", loggingEvent3.getLevel().toString());
         assertEquals("AUD_ACC_LOGIN", loggingEvent3.getMDCPropertyMap().get(AUDIT_TYPE));
         assertTrue(loggingEvent3.getFormattedMessage().startsWith("[AUD_ACC_LOGIN] BEFORE"));
@@ -81,7 +81,7 @@ class PnAuditLogTest {
         assertEquals("CUSTOM_VALUE",logEvent.getMdc().get("CUSTOM_MDC"));
 
         final ILoggingEvent loggingEvent4 = logsList.get(1);
-        assertEquals("AUDIT5Y", loggingEvent4.getMarker().getName());
+        assertEquals("AUDIT10Y", loggingEvent4.getMarker().getName());
         assertEquals("INFO", loggingEvent4.getLevel().toString());
         assertEquals("AUD_ACC_LOGIN", loggingEvent4.getMDCPropertyMap().get(AUDIT_TYPE));
         assertTrue(loggingEvent4.getFormattedMessage().startsWith("[AUD_ACC_LOGIN] SUCCESS"));
