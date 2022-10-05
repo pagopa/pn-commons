@@ -1,5 +1,6 @@
 package it.pagopa.pn.commons.pnclients;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,11 +17,13 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+@Slf4j
 public class RestTemplateFactory {
 
     @Bean
     @Qualifier("withTracing")
     public RestTemplate restTemplateWithTracing(){
+        log.info("prova");
         LinkedList list = new LinkedList();
         RestTemplate template = new RestTemplate();
         enrichWithTracing(template);
