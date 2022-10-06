@@ -13,9 +13,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 @Slf4j
 public class RestTemplateFactory {
@@ -33,6 +31,7 @@ public class RestTemplateFactory {
     }
 
     public void enrichWithTracing(RestTemplate template) {
+        Map map = new HashMap();
         List<ClientHttpRequestInterceptor> interceptors
                 = template.getInterceptors();
         if (CollectionUtils.isEmpty(interceptors)) {
