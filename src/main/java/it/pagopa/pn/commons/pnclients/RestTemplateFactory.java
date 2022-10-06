@@ -20,6 +20,10 @@ public class RestTemplateFactory {
     @Bean
     @Qualifier("withTracing")
     public RestTemplate restTemplateWithTracing(){
+        ArrayList list = new ArrayList();
+        if(3 == 3) {
+            System.out.println("stampa prova");
+        }
         RestTemplate template = new RestTemplate();
         enrichWithTracing(template);
         template.setErrorHandler(new RestTemplateResponseErrorHandler());
