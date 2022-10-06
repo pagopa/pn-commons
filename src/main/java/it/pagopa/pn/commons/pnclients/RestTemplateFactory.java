@@ -23,6 +23,7 @@ public class RestTemplateFactory {
     public RestTemplate restTemplateWithTracing(){
         log.info("prova");
         LinkedList list = new LinkedList();
+        Set set = new HashSet();
         RestTemplate template = new RestTemplate();
         enrichWithTracing(template);
         template.setErrorHandler(new RestTemplateResponseErrorHandler());
