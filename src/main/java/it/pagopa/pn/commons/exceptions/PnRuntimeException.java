@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 import static it.pagopa.pn.commons.exceptions.PnExceptionsCodes.ERROR_CODE_PN_GENERIC_ERROR;
 
 /**
- * Eccezione base da estendere all'occorrenza, genera già in automatico il problem da ritornare
+ * Eccezione base da estendere all'occorrenza, genera già in automatico il problem da ritornare 
  */
 @Slf4j
 public class PnRuntimeException extends RuntimeException implements IPnException {
