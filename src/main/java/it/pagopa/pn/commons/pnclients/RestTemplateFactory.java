@@ -22,6 +22,7 @@ public class RestTemplateFactory {
     @Qualifier("withTracing")
     public RestTemplate restTemplateWithTracing(){
         log.info("prova");
+        ArrayList arrayList = new ArrayList();
         LinkedList list = new LinkedList();
         Set set = new HashSet();
         RestTemplate template = new RestTemplate();
