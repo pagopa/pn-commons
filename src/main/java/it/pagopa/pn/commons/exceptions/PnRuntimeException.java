@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 import static it.pagopa.pn.commons.exceptions.PnExceptionsCodes.ERROR_CODE_PN_GENERIC_ERROR;
 
 /**
- * Eccezione base da estendere all'occorrenza, genera già in automatico il problem da ritornare
+ * Eccezione base da estendere all'occorrenza, genera già in automatico il problem da ritornare 
  */
 @Slf4j
 public class PnRuntimeException extends RuntimeException implements IPnException {
@@ -52,6 +52,7 @@ public class PnRuntimeException extends RuntimeException implements IPnException
         if (problemErrorList == null)
             problemErrorList = new ArrayList<>();
 
+        problem.setType("GENERIC_ERROR");
         problem.setTitle(message.substring(0, Math.min(message.length(), 64)));
         problem.setDetail(description.substring(0, Math.min(description.length(), 4096)));
         problem.setStatus(status<100?100:(Math.min(status, 600)));
@@ -62,11 +63,14 @@ public class PnRuntimeException extends RuntimeException implements IPnException
         {
             problemErrorList.add(it.pagopa.pn.commons.exceptions.dto.ProblemError.builder()
                             .code(ERROR_CODE_PN_GENERIC_ERROR)
+                            .detail("none")
                     .build());
         }
         problem.setErrors(problemErrorList.stream().map(problemError -> {
                     if (problemError.getDetail()!=null)
                         problemError.setDetail(problemError.getDetail().substring(0, Math.min(problemError.getDetail().length(), 1024)));
+                    else
+                        problemError.setDetail("none");
 
                     // mappo nel probleerror generato dallo YAML
                     return it.pagopa.pn.common.rest.error.v1.dto.ProblemError.builder()

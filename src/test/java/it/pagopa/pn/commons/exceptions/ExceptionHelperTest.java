@@ -5,10 +5,21 @@ import it.pagopa.pn.commons.exceptions.dto.ProblemError;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.PropertyEditorRegistry;
+import org.springframework.core.Conventions;
+import org.springframework.core.MethodParameter;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.*;
+import org.springframework.web.bind.support.WebExchangeBindException;
+import org.springframework.web.bind.support.WebExchangeDataBinder;
+import org.springframework.web.server.MethodNotAllowedException;
 
 import javax.validation.*;
+import javax.validation.Validator;
 import javax.validation.constraints.Max;
+import java.beans.PropertyEditor;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -34,7 +45,7 @@ class ExceptionHelperTest {
 
         //Then
         assertNotNull(res);
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), res.getTitle());
+        assertEquals(ExceptionHelper.MESSAGE_UNEXPECTED_ERROR, res.getTitle());
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), res.getStatus());
         assertNotNull(res.getTimestamp());
         assertNotNull(res.getErrors());
@@ -50,7 +61,7 @@ class ExceptionHelperTest {
 
         //Then
         assertNotNull(res);
-        assertEquals("some message", res.getTitle());
+        assertEquals(ExceptionHelper.MESSAGE_HANDLED_ERROR, res.getTitle());
         assertEquals(404, res.getStatus());
         assertNotNull(res.getTimestamp());
         assertNotNull(res.getErrors());
@@ -66,7 +77,7 @@ class ExceptionHelperTest {
 
         //Then
         assertNotNull(res);
-        assertEquals("some message", res.getTitle());
+        assertEquals(ExceptionHelper.MESSAGE_HANDLED_ERROR, res.getTitle());
         assertEquals(404, res.getStatus());
         assertNotNull(res.getTimestamp());
         assertNotNull(res.getErrors());
@@ -92,7 +103,7 @@ class ExceptionHelperTest {
 
         //Then
         assertNotNull(res);
-        assertEquals(HttpStatus.BAD_REQUEST.getReasonPhrase(), res.getTitle());
+        assertEquals(ExceptionHelper.MESSAGE_HANDLED_ERROR, res.getTitle());
         assertEquals(HttpStatus.BAD_REQUEST.value(), res.getStatus());
         assertNotNull(res.getTimestamp());
         assertNotNull(res.getErrors());
@@ -104,6 +115,86 @@ class ExceptionHelperTest {
         assertEquals(List.of("innerobjects[1].notnullvalue", "notnullvalue"), res.getErrors().stream().map(it.pagopa.pn.common.rest.error.v1.dto.ProblemError::getElement).sorted().collect(Collectors.toList()));
 
     }
+
+    @Test
+    void handleConstraintViolationException() {
+
+        //When
+        Problem res = exceptionHelper.handleException(new ConstraintViolationException("invalid error",
+                Set.of(generateConstraintViolation("too big", "name", Max.class))));
+
+        //Then
+        assertNotNull(res);
+        assertEquals(ExceptionHelper.MESSAGE_HANDLED_ERROR, res.getTitle());
+        assertEquals(400, res.getStatus());
+        assertNotNull(res.getTimestamp());
+        assertNotNull(res.getErrors());
+        assertEquals( PnExceptionsCodes.ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_MAX, res.getErrors().get(0).getCode());
+    }
+
+
+    @Test
+    public void handleConstraintWebExchangeBindException() throws NoSuchMethodException {
+
+        //When
+        BindingResult bindingResult = new MapBindingResult(new HashMap<>(), "objectName");
+        bindingResult.addError(new FieldError("objectName", "field1", "message"));
+        bindingResult.addError(new FieldError("objectName", "field2", "message"));
+        Method method = this.getClass().getMethod("handleConstraintWebExchangeBindException", (Class<?>[]) null);
+        MethodParameter parameter = new MethodParameter(method, -1);
+        WebExchangeBindException exception =
+                new WebExchangeBindException(parameter, bindingResult);
+
+        Problem res = exceptionHelper.handleException(exception);
+
+        //Then
+        assertNotNull(res);
+        assertEquals(ExceptionHelper.MESSAGE_HANDLED_ERROR, res.getTitle());
+        assertEquals(400, res.getStatus());
+        assertNotNull(res.getTimestamp());
+        assertNotNull(res.getErrors());
+        assertEquals( PnExceptionsCodes.ERROR_CODE_PN_GENERIC_INVALIDPARAMETER, res.getErrors().get(0).getCode());
+    }
+
+
+
+    @Test
+    public void handleMethodNotAllowedException()  {
+
+        //When
+             MethodNotAllowedException exception =
+                new MethodNotAllowedException(HttpMethod.GET, List.of(HttpMethod.POST));
+
+        Problem res = exceptionHelper.handleException(exception);
+
+        //Then
+        assertNotNull(res);
+        assertEquals(ExceptionHelper.MESSAGE_HANDLED_ERROR, res.getTitle());
+        assertEquals(405, res.getStatus());
+        assertNotNull(res.getTimestamp());
+        assertNotNull(res.getErrors());
+        assertEquals( PnExceptionsCodes.ERROR_CODE_PN_WEB_GENERIC_ERROR, res.getErrors().get(0).getCode());
+    }
+
+
+    @Test
+    public void handleNullPointerEx()   {
+
+        //When
+        NullPointerException exception =
+                new NullPointerException();
+
+        Problem res = exceptionHelper.handleException(exception);
+
+        //Then
+        assertNotNull(res);
+        assertEquals(ExceptionHelper.MESSAGE_UNEXPECTED_ERROR, res.getTitle());
+        assertEquals(500, res.getStatus());
+        assertNotNull(res.getTimestamp());
+        assertNotNull(res.getErrors());
+        assertEquals( PnExceptionsCodes.ERROR_CODE_PN_GENERIC_ERROR, res.getErrors().get(0).getCode());
+    }
+
 
     @Test
     void generateProblemErrorsFromConstraintViolationRealValidation() {
@@ -131,7 +222,11 @@ class ExceptionHelperTest {
         public TestValidation[] innerobjects;
     }
 
-    private ConstraintViolation generateConstraintViolation(String message, String element, Class annotationClass)
+    interface UniqueConstraintViolation extends ConstraintViolation<Object> {
+
+    }
+
+    private ConstraintViolationTest generateConstraintViolation(String message, String element, Class annotationClass)
     {
         return  new ConstraintViolationImpl(message, annotationClass, new Path() {
             @NotNull
