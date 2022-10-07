@@ -22,6 +22,7 @@ public class RestTemplateFactory {
         ArrayList list = new ArrayList();
         Map map = new HashMap();
         Set set = new HashSet();
+        LinkedList list1 = new LinkedList();
         if(3 == 3) {
             System.out.println("stampa prova");
         }
