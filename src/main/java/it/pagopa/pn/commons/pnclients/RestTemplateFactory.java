@@ -13,7 +13,9 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class RestTemplateFactory {
 
@@ -21,6 +23,7 @@ public class RestTemplateFactory {
     @Qualifier("withTracing")
     public RestTemplate restTemplateWithTracing(){
         ArrayList list = new ArrayList();
+        Map map = new HashMap();
         if(3 == 3) {
             System.out.println("stampa prova");
         }
