@@ -12,10 +12,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class RestTemplateFactory {
 
@@ -24,6 +21,7 @@ public class RestTemplateFactory {
     public RestTemplate restTemplateWithTracing(){
         ArrayList list = new ArrayList();
         Map map = new HashMap();
+        Set set = new HashSet();
         if(3 == 3) {
             System.out.println("stampa prova");
         }
