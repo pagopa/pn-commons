@@ -34,6 +34,7 @@ public class RestTemplateFactory {
     }
 
     public void enrichWithTracing(RestTemplate template) {
+        LinkedHashSet set = new LinkedHashSet();
         List<ClientHttpRequestInterceptor> interceptors
                 = template.getInterceptors();
         if (CollectionUtils.isEmpty(interceptors)) {
