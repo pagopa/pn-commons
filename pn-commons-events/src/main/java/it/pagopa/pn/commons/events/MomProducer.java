@@ -1,4 +1,4 @@
-package it.pagopa.pn.commons.abstractions;
+package it.pagopa.pn.commons.events;
 
 import it.pagopa.pn.api.dto.events.GenericEvent;
 

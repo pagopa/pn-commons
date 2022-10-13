@@ -1,4 +1,4 @@
-package it.pagopa.pn.commons.abstractions;
+package it.pagopa.pn.commons.events;
 
 import java.time.Duration;
 import java.util.List;

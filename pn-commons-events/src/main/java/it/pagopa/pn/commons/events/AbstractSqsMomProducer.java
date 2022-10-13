@@ -1,10 +1,9 @@
-package it.pagopa.pn.commons.abstractions.impl;
+package it.pagopa.pn.commons.events;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import it.pagopa.pn.api.dto.events.GenericEvent;
-import it.pagopa.pn.commons.abstractions.MomProducer;
 import it.pagopa.pn.commons.exceptions.PnInternalException;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awssdk.services.sqs.SqsClient;
