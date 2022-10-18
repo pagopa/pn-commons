@@ -1,9 +1,6 @@
 package it.pagopa.pn.commons.abstractions;
 
-import it.pagopa.pn.api.dto.notification.NotificationAttachment;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
 
 import java.io.InputStream;
 import java.util.List;
@@ -26,8 +23,6 @@ public interface FileStorage {
     FileData getFileVersion(String key, String versionId);
 
     List<FileData> getDocumentsListing(String prefix);
-
-    ResponseEntity<Resource> loadAttachment(NotificationAttachment.Ref attachmentRef);
 
     HttpHeaders headers();
 }
