@@ -7,6 +7,8 @@ import software.amazon.awssdk.enhanced.dynamodb.Key;
 import java.util.Optional;
 
 public abstract class AbstractDynamoKeyValueStore <T> implements KeyValueStore<Key,T> {
+    public static final String ATTRIBUTE_NOT_EXISTS = "attribute_not_exists";
+
     protected final DynamoDbTable<T> table;
 
     protected AbstractDynamoKeyValueStore(DynamoDbTable<T> table) {
