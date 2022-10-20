@@ -2,10 +2,10 @@ package it.pagopa.pn.commons.abstractions;
 
 import java.util.Optional;
 
-public interface ParameterConsumer <T> {
+public interface ParameterConsumer {
 
-     String getParameter(String parameterName);
+     <T> Optional<T> getParameterValue( String parameterName, Class<T> clazz );
 
-     Optional<T> getParameter(String fieldName, Class<T> clazz);
+     //<T> Optional<T> getParameter(String fieldName, Class<T> clazz);
 
 }
