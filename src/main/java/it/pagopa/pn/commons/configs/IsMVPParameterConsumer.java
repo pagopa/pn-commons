@@ -10,7 +10,7 @@ import java.util.Optional;
 public class IsMVPParameterConsumer {
     private final AbstractCachedSsmParameterConsumer abstractCachedSsmParameterConsumer;
 
-    private static final String PARAMETER_STORE_MAP_PA_NAME = "testMapPAMVP";
+    private static final String PARAMETER_STORE_MAP_PA_NAME = "MapPaMVP";
 
     public IsMVPParameterConsumer(AbstractCachedSsmParameterConsumer abstractCachedSsmParameterConsumer) {
         this.abstractCachedSsmParameterConsumer = abstractCachedSsmParameterConsumer;
