@@ -1,5 +1,6 @@
-package it.pagopa.pn.commons.abstractions.impl;
+package it.pagopa.pn.commons.configs;
 
+import it.pagopa.pn.commons.abstractions.impl.AbstractCachedSsmParameterConsumer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
