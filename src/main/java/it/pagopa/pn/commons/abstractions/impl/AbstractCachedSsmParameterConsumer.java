@@ -6,7 +6,6 @@ import it.pagopa.pn.commons.abstractions.ParameterConsumer;
 import it.pagopa.pn.commons.exceptions.PnInternalException;
 import lombok.NonNull;
 import lombok.Value;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import software.amazon.awssdk.services.ssm.SsmClient;
 import software.amazon.awssdk.services.ssm.model.GetParameterRequest;
@@ -17,6 +16,8 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static it.pagopa.pn.commons.exceptions.PnExceptionsCodes.ERROR_CODE_PN_GENERIC_ERROR;
 
 public class AbstractCachedSsmParameterConsumer implements ParameterConsumer {
 
@@ -29,7 +30,7 @@ public class AbstractCachedSsmParameterConsumer implements ParameterConsumer {
 
     private final ConcurrentHashMap<String, ExpiringValue> valueCache = new ConcurrentHashMap<>();
     public <T> Optional<T> getParameterValue( String parameterName, Class<T> clazz ) {
-        Optional<T> optValue = (Optional<T>) valueCache.computeIfAbsent( parameterName, (K) -> new ExpiringValue())
+        Optional<T> optValue = (Optional<T>) valueCache.computeIfAbsent( parameterName, key -> new ExpiringValue())
                 .getValueCheckTimestamp();
         if ( optValue == null ) {
             optValue = getParameter( parameterName, clazz );
@@ -57,7 +58,7 @@ public class AbstractCachedSsmParameterConsumer implements ParameterConsumer {
             try {
                 result = Optional.of( objectMapper.readValue( json, clazz ) );
             } catch (JsonProcessingException e) {
-                throw new PnInternalException( "message", "errorCode", e );
+                throw new PnInternalException( "Unable to deserialize object", ERROR_CODE_PN_GENERIC_ERROR, e );
             }
         }
         return result;
