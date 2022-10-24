@@ -13,6 +13,8 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.sqs.SqsClient;
+import software.amazon.awssdk.services.ssm.SsmClient;
+
 
 import java.net.URI;
 
@@ -54,6 +56,9 @@ public class AwsServicesClientsConfig {
     public SqsClient sqsClient() {
         return configureBuilder( SqsClient.builder() );
     }
+
+    @Bean
+    public SsmClient ssmClient() { return configureBuilder( SsmClient.builder() ); }
 
 
     private <C> C configureBuilder(AwsClientBuilder<?, C> builder) {
