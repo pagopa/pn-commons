@@ -4,10 +4,15 @@ import it.pagopa.pn.commons.abstractions.impl.AbstractCachedSsmParameterConsumer
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Optional;
 
 public class IsMVPParameterConsumer {
+
+    @Value("${pn.commons.features.is-mvp-default-value}")
+    private Boolean isMVPDefaultValue;
+
     private final AbstractCachedSsmParameterConsumer abstractCachedSsmParameterConsumer;
 
     private static final String PARAMETER_STORE_MAP_PA_NAME = "MapPaMVP";
@@ -27,7 +32,7 @@ public class IsMVPParameterConsumer {
                 }
             }
         }
-        return false;
+        return isMVPDefaultValue;
     }
 
     @Data
