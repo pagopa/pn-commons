@@ -6,10 +6,12 @@ import it.pagopa.pn.commons.abstractions.ParameterConsumer;
 import it.pagopa.pn.commons.exceptions.PnInternalException;
 import lombok.NonNull;
 import lombok.Value;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 import software.amazon.awssdk.services.ssm.SsmClient;
 import software.amazon.awssdk.services.ssm.model.GetParameterRequest;
 import software.amazon.awssdk.services.ssm.model.GetParameterResponse;
+import software.amazon.awssdk.services.ssm.model.SsmException;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -19,6 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static it.pagopa.pn.commons.exceptions.PnExceptionsCodes.ERROR_CODE_PN_GENERIC_ERROR;
 
+@Slf4j
 public class AbstractCachedSsmParameterConsumer implements ParameterConsumer {
 
     private final SsmClient ssmClient;
@@ -44,9 +47,13 @@ public class AbstractCachedSsmParameterConsumer implements ParameterConsumer {
         GetParameterRequest parameterRequest = GetParameterRequest.builder()
                 .name(parameterName)
                 .build();
-
-        GetParameterResponse parameterResponse = ssmClient.getParameter(parameterRequest);
-        return parameterResponse.parameter().value();
+        try {
+            GetParameterResponse parameterResponse = ssmClient.getParameter(parameterRequest);
+            return parameterResponse.parameter().value();
+        } catch ( SsmException ex) {
+            log.info( "Ssm Client exception for parameterName={}", parameterName, ex );
+            return null;
+        }
     }
 
     @NonNull
