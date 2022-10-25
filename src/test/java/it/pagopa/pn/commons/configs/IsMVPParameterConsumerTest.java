@@ -2,29 +2,33 @@ package it.pagopa.pn.commons.configs;
 
 import it.pagopa.pn.commons.abstractions.impl.AbstractCachedSsmParameterConsumer;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Optional;
 
+@ExtendWith(SpringExtension.class)
+@TestPropertySource(properties = { "pn.commons.features.is-mvp-default-value=true",
+        "pn.env.runtime=DEVELOPMENT"})
+@SpringBootTest
 class IsMVPParameterConsumerTest {
 
     private static final String PA_TAX_ID_MVP = "01199250158";
     private static final String PA_TAX_ID_NO_MVP = "02438750586";
+    private static final Boolean DEFAULT_VALUE_PA_IS_MVP = true;
 
-    @Mock
+    @MockBean
     private AbstractCachedSsmParameterConsumer abstractCachedSsmParameterConsumer;
 
-    private IsMVPParameterConsumer isMVPParameterConsumer;
-
-    @BeforeEach
-    void setup() {
-        this.isMVPParameterConsumer = new IsMVPParameterConsumer( abstractCachedSsmParameterConsumer );
-    }
+    @Autowired
+    private IsMVPParameterConsumerTestActivator isMVPParameterConsumer;
 
     @ExtendWith(MockitoExtension.class)
     @Test
@@ -40,8 +44,8 @@ class IsMVPParameterConsumerTest {
         Assertions.assertTrue( resultTrue );
         Boolean resultFalse = isMVPParameterConsumer.isMvp( PA_TAX_ID_NO_MVP );
         Assertions.assertFalse( resultFalse );
-        Boolean resultNotFound = isMVPParameterConsumer.isMvp( "" );
-        Assertions.assertFalse( resultNotFound );
+        Boolean resultDefault = isMVPParameterConsumer.isMvp( "" );
+        Assertions.assertEquals( DEFAULT_VALUE_PA_IS_MVP, resultDefault );
     }
 
 }

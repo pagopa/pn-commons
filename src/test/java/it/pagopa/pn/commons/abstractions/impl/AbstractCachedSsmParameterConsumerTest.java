@@ -12,6 +12,7 @@ import software.amazon.awssdk.services.ssm.SsmClient;
 import software.amazon.awssdk.services.ssm.model.GetParameterRequest;
 import software.amazon.awssdk.services.ssm.model.GetParameterResponse;
 import software.amazon.awssdk.services.ssm.model.Parameter;
+import software.amazon.awssdk.services.ssm.model.SsmException;
 
 import java.util.Optional;
 
@@ -61,6 +62,16 @@ class AbstractCachedSsmParameterConsumerTest {
         Executable todo = () -> consumer.getParameterValue( "parameterName", String.class );
 
         assertThrows(PnInternalException.class, todo);
+    }
+
+    @ExtendWith(MockitoExtension.class)
+    @Test
+    void getParameterValueSuccessDefault() {
+
+        Mockito.when( ssmClient.getParameter( Mockito.any(GetParameterRequest.class) ) ).thenThrow( SsmException.class );
+        Optional<String> result = consumer.getParameterValue( "parameterName", String.class );
+
+        assertEquals( Optional.empty(), result );
     }
 
 }
