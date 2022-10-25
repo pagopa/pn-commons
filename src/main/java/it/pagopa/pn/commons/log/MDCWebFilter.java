@@ -23,10 +23,13 @@ import java.util.function.Consumer;
 public class MDCWebFilter implements WebFilter {
 
     public static final String MDC_TRACE_ID_KEY = "trace_id";
+    public static final String MDC_JTI_ID_KEY = "jti_id";
 
     @Value("${pn.log.trace-id-header}")
     private String traceIdHeader;
 
+    @Value("${pn.log.jti-id-header}")
+    private String jtiIdHeader;
 
     private String MDC_CONTEXT_REACTOR_KEY = MDCWebFilter.class.getName();
 
@@ -50,13 +53,24 @@ public class MDCWebFilter implements WebFilter {
             if (traceIdHeaders != null) {
                 MDC.put(MDC_TRACE_ID_KEY, traceIdHeaders.get(0));
             }
+            List<String> jtiIdHeaders = serverWebExchange.getRequest().getHeaders().get(jtiIdHeader);
+            if (jtiIdHeaders != null) {
+                MDC.put(MDC_JTI_ID_KEY, jtiIdHeaders.get(0));
+            }
         };
 
-        Consumer mdcCleaner = ignored -> MDC.remove(MDC_TRACE_ID_KEY);
+        Consumer mdcCleaner = ignored -> {
+            MDC.remove(MDC_TRACE_ID_KEY);
+            MDC.remove(MDC_JTI_ID_KEY);
+        };
 
         return webFilterChain.filter(serverWebExchange)
                 .doFirst(mdcSetter)
                 .contextWrite(ctx -> {
+                    List<String> jtiIdHeaders = serverWebExchange.getRequest().getHeaders().get(jtiIdHeader);
+                    if (jtiIdHeaders != null) {
+                        return ctx.put(MDC_JTI_ID_KEY, jtiIdHeaders.get(0));
+                    }
                     List<String> traceIdHeaders = serverWebExchange.getRequest().getHeaders().get(traceIdHeader);
                     if (traceIdHeaders != null) {
                         return ctx.put(MDC_TRACE_ID_KEY, traceIdHeaders.get(0));

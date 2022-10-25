@@ -1,10 +1,17 @@
 package it.pagopa.pn.commons.log;
 
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import static it.pagopa.pn.commons.log.MDCWebFilter.MDC_JTI_ID_KEY;
+import static it.pagopa.pn.commons.log.MDCWebFilter.MDC_TRACE_ID_KEY;
+
+@Slf4j
 @Component
 public class PnAuditLogBuilder {
     private PnAuditLogEventType type;
@@ -17,6 +24,13 @@ public class PnAuditLogBuilder {
         this.msg = msg;
         this.arguments = arguments;
         this.mdcMap = new HashMap<>();
+        try {
+            String jti = MDC.get(MDC_JTI_ID_KEY);
+            if (StringUtils.hasText(jti))
+                this.mdcMap.put("cx_jti", jti);
+        } catch (Exception ex) {
+            log.warn("Cannot get jtiid", ex);
+        }
         return this;
     }
 
