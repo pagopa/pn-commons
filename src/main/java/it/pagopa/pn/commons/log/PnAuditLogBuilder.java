@@ -24,13 +24,6 @@ public class PnAuditLogBuilder {
         this.msg = msg;
         this.arguments = arguments;
         this.mdcMap = new HashMap<>();
-        try {
-            String jti = MDC.get(MDC_JTI_ID_KEY);
-            if (StringUtils.hasText(jti))
-                this.mdcMap.put("cx_jti", jti);
-        } catch (Exception ex) {
-            log.warn("Cannot get jtiid", ex);
-        }
         return this;
     }
 
