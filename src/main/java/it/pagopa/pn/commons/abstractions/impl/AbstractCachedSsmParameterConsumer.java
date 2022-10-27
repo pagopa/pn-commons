@@ -33,13 +33,13 @@ public class AbstractCachedSsmParameterConsumer implements ParameterConsumer {
 
     private final ConcurrentHashMap<String, ExpiringValue> valueCache = new ConcurrentHashMap<>();
     public <T> Optional<T> getParameterValue( String parameterName, Class<T> clazz ) {
-        Optional<T> optValue = (Optional<T>) valueCache.computeIfAbsent( parameterName, key -> new ExpiringValue())
+        Object optValue = valueCache.computeIfAbsent( parameterName, key -> new ExpiringValue())
                 .getValueCheckTimestamp();
         if ( optValue == null ) {
             optValue = getParameter( parameterName, clazz );
             valueCache.put( parameterName, new ExpiringValue(optValue, cacheExpiration));
         }
-        return optValue;
+        return (Optional<T>) optValue;
     }
 
 
