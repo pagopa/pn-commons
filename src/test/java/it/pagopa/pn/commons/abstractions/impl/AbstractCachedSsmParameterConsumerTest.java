@@ -17,6 +17,7 @@ import software.amazon.awssdk.services.ssm.model.SsmException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.times;
 
 class AbstractCachedSsmParameterConsumerTest {
 
@@ -45,6 +46,31 @@ class AbstractCachedSsmParameterConsumerTest {
         Optional<String> result = consumer.getParameterValue( "parameterName", String.class );
 
         assertNotNull( result );
+    }
+
+    @ExtendWith(MockitoExtension.class)
+    @Test
+    void getParameterValueSuccessWithCache() {
+
+        GetParameterResponse response = GetParameterResponse.builder()
+                .parameter( Parameter.builder()
+                        .name( "parameterName" )
+                        .value( "\"parameterValue\"" )
+                        .build() )
+                .build();
+
+        Mockito.when( ssmClient.getParameter( Mockito.any(GetParameterRequest.class) ) ).thenReturn( response );
+        Optional<String> result = consumer.getParameterValue( "parameterName", String.class );
+
+        Optional<String> result1 = consumer.getParameterValue( "parameterName", String.class );
+
+        Mockito.verify(ssmClient, times(1)).getParameter(Mockito.any(GetParameterRequest.class));
+
+        assertNotNull( result );
+        assertNotNull( result1 );
+        assertTrue( result.isPresent() );
+        assertTrue( result1.isPresent() );
+        assertEquals(result.get(), result1.get());
     }
 
     @ExtendWith(MockitoExtension.class)

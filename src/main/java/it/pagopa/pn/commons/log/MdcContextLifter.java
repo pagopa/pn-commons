@@ -54,7 +54,7 @@ class MdcContextLifter<T> implements CoreSubscriber<T> {
         if(mdcTraceidVal != null && mdcJtiVal != null ) {
 
             try(MDC.MDCCloseable ignored = MDC.putCloseable(MDCWebFilter.MDC_TRACE_ID_KEY, mdcTraceidVal.toString());
-                MDC.MDCCloseable ignored1 = MDC.putCloseable(MDCWebFilter.MDC_JTI_KEY, mdcTraceidVal.toString())) {
+                MDC.MDCCloseable ignored1 = MDC.putCloseable(MDCWebFilter.MDC_JTI_KEY, mdcJtiVal.toString())) {
                 task.run();
             }
         } else if (mdcTraceidVal != null) {
