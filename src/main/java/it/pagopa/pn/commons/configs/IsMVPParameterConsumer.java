@@ -1,6 +1,6 @@
 package it.pagopa.pn.commons.configs;
 
-import it.pagopa.pn.commons.abstractions.impl.AbstractCachedSsmParameterConsumer;
+import it.pagopa.pn.commons.abstractions.ParameterConsumer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,12 +13,12 @@ public class IsMVPParameterConsumer {
     @Value("${pn.commons.features.is-mvp-default-value}")
     private Boolean isMVPDefaultValue;
 
-    private final AbstractCachedSsmParameterConsumer abstractCachedSsmParameterConsumer;
+    private final ParameterConsumer abstractCachedSsmParameterConsumer;
 
     private static final String PARAMETER_STORE_MAP_PA_NAME = "MapPaMVP";
 
-    public IsMVPParameterConsumer(AbstractCachedSsmParameterConsumer abstractCachedSsmParameterConsumer) {
-        this.abstractCachedSsmParameterConsumer = abstractCachedSsmParameterConsumer;
+    public IsMVPParameterConsumer(ParameterConsumer parameterConsumer) {
+        this.abstractCachedSsmParameterConsumer = parameterConsumer;
     }
 
     public Boolean isMvp( String paTaxId ) {
