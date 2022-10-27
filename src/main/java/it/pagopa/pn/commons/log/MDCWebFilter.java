@@ -58,7 +58,7 @@ public class MDCWebFilter implements WebFilter {
             }
             else
             {
-                log.warn("trace id header not found, generating internal trace_id" + notFoundGeneratedTraceId);
+                log.debug("trace id header not found, generating internal trace_id={}", notFoundGeneratedTraceId);
                 MDC.put(MDC_TRACE_ID_KEY, notFoundGeneratedTraceId);
             }
             List<String> jtiIdHeaders = serverWebExchange.getRequest().getHeaders().get(jtiHeader);
