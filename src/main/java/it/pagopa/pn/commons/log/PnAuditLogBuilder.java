@@ -1,15 +1,10 @@
 package it.pagopa.pn.commons.log;
 
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import static it.pagopa.pn.commons.log.MDCWebFilter.MDC_JTI_ID_KEY;
-import static it.pagopa.pn.commons.log.MDCWebFilter.MDC_TRACE_ID_KEY;
 
 @Slf4j
 @Component

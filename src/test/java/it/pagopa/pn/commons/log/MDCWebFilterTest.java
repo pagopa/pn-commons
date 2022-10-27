@@ -24,17 +24,18 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
 @ExtendWith(SpringExtension.class)
-@TestPropertySource(properties = { "pn.log.trace-id-header=X-Amzn-Trace-Id" })
+@TestPropertySource(properties = { "pn.log.trace-id-header=X-Amzn-Trace-Id", "pn.log.jti-header=x-pagopa-pn-jti" })
 class MDCWebFilterTest {
 
     public static final String MY_HEADER = "Root=1-61b1d38b-752391d8200695e11e2e5bac;";
+    public static final String MY_HEADER_JTI = "1234567890";
 
     @TestConfiguration
     static class SpringTestConfiguration {
         @Bean
         public MDCWebFilter mdcTraceIdWebFilter(){
             return new MDCWebFilter();
-        };
+        }
     }
 
 
@@ -48,12 +49,47 @@ class MDCWebFilterTest {
                 .header("X-Amzn-Trace-Id", MY_HEADER).build();
         ServerWebExchange exchange = MockServerWebExchange.from(request);
 
-        WebHandler webHandler = new WebHandler() {
-            @Override
-            public Mono<Void> handle(ServerWebExchange serverWebExchange) {
-                Assertions.assertEquals(MY_HEADER, MDC.get(MDCWebFilter.MDC_TRACE_ID_KEY));
-                return Mono.empty();
-            }
+        WebHandler webHandler = serverWebExchange -> {
+            Assertions.assertEquals(MY_HEADER, MDC.get(MDCWebFilter.MDC_TRACE_ID_KEY));
+            return Mono.empty();
+        };
+        WebFilterChain filterChain = new DefaultWebFilterChain(webHandler, Collections.emptyList());
+
+        mdcTraceIdWebFilter.filter(exchange, filterChain).block();
+
+    }
+
+    @Test
+    void filterWithTraceAndJti() {
+
+        MockServerHttpRequest request = MockServerHttpRequest.get("http://localhost")
+                .header("X-Amzn-Trace-Id", MY_HEADER)
+                .header("x-pagopa-pn-jti", MY_HEADER_JTI).build();
+        ServerWebExchange exchange = MockServerWebExchange.from(request);
+
+        WebHandler webHandler = serverWebExchange -> {
+            Assertions.assertEquals(MY_HEADER, MDC.get(MDCWebFilter.MDC_TRACE_ID_KEY));
+            Assertions.assertEquals(MY_HEADER_JTI, MDC.get(MDCWebFilter.MDC_JTI_KEY));
+            return Mono.empty();
+        };
+        WebFilterChain filterChain = new DefaultWebFilterChain(webHandler, Collections.emptyList());
+
+        mdcTraceIdWebFilter.filter(exchange, filterChain).block();
+
+    }
+
+
+    @Test
+    void filterWithJti() {
+
+        MockServerHttpRequest request = MockServerHttpRequest.get("http://localhost")
+                .header("x-pagopa-pn-jti", MY_HEADER_JTI).build();
+        ServerWebExchange exchange = MockServerWebExchange.from(request);
+
+        WebHandler webHandler = serverWebExchange -> {
+            Assertions.assertNotNull(MDC.get(MDCWebFilter.MDC_TRACE_ID_KEY));
+            Assertions.assertEquals(MY_HEADER_JTI, MDC.get(MDCWebFilter.MDC_JTI_KEY));
+            return Mono.empty();
         };
         WebFilterChain filterChain = new DefaultWebFilterChain(webHandler, Collections.emptyList());
 

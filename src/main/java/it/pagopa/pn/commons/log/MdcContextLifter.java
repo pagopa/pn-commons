@@ -48,13 +48,13 @@ class MdcContextLifter<T> implements CoreSubscriber<T> {
      */
     private void injectMdc(Runnable task) {
         final Object mdcTraceidVal = coreSubscriber.currentContext().getOrDefault(MDCWebFilter.MDC_TRACE_ID_KEY, null);
-        final Object mdcJtiVal = coreSubscriber.currentContext().getOrDefault(MDCWebFilter.MDC_JTI_ID_KEY, null);
+        final Object mdcJtiVal = coreSubscriber.currentContext().getOrDefault(MDCWebFilter.MDC_JTI_KEY, null);
         // NB: MDC supporta il value null, a patto che chi lo usa lo supporti a sua volta.
         // si sceglie comunque di inserire i valori solo se presenti gestendo i vari casi
         if(mdcTraceidVal != null && mdcJtiVal != null ) {
 
             try(MDC.MDCCloseable ignored = MDC.putCloseable(MDCWebFilter.MDC_TRACE_ID_KEY, mdcTraceidVal.toString());
-                MDC.MDCCloseable ignored1 = MDC.putCloseable(MDCWebFilter.MDC_JTI_ID_KEY, mdcTraceidVal.toString())) {
+                MDC.MDCCloseable ignored1 = MDC.putCloseable(MDCWebFilter.MDC_JTI_KEY, mdcTraceidVal.toString())) {
                 task.run();
             }
         } else if (mdcTraceidVal != null) {
@@ -62,7 +62,7 @@ class MdcContextLifter<T> implements CoreSubscriber<T> {
                 task.run();
             }
         } else if (mdcJtiVal != null) {
-            try(MDC.MDCCloseable ignored = MDC.putCloseable(MDCWebFilter.MDC_JTI_ID_KEY, mdcJtiVal.toString())) {
+            try(MDC.MDCCloseable ignored = MDC.putCloseable(MDCWebFilter.MDC_JTI_KEY, mdcJtiVal.toString())) {
                 task.run();
             }
         } else {
