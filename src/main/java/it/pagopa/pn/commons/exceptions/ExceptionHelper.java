@@ -17,6 +17,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static it.pagopa.pn.commons.exceptions.PnExceptionsCodes.*;
+import static it.pagopa.pn.commons.log.MDCWebFilter.MDC_TRACE_ID_KEY;
 
 @Slf4j
 @Component
@@ -95,7 +96,7 @@ public class ExceptionHelper {
         if (res.getTraceId() == null)
         {
             try {
-                res.setTraceId(MDC.get("trace_id"));
+                res.setTraceId(MDC.get(MDC_TRACE_ID_KEY));
             } catch (Exception var7) {
                 log.warn("Cannot get traceid", var7);
             }

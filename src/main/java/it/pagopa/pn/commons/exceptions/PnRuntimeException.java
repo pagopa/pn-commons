@@ -14,14 +14,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static it.pagopa.pn.commons.exceptions.PnExceptionsCodes.ERROR_CODE_PN_GENERIC_ERROR;
+import static it.pagopa.pn.commons.log.MDCWebFilter.MDC_TRACE_ID_KEY;
 
 /**
  * Eccezione base da estendere all'occorrenza, genera già in automatico il problem da ritornare 
  */
 @Slf4j
 public class PnRuntimeException extends RuntimeException implements IPnException {
-
-    private static final String MDC_TRACE_ID_KEY = "trace_id";
 
     private final Problem problem;
 
