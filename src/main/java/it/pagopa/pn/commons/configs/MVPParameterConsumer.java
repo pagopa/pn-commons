@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import java.util.Optional;
 
 @Slf4j
-public class IsMVPParameterConsumer {
+public class MVPParameterConsumer {
 
     @Value("${pn.commons.features.is-mvp-default-value}")
     private Boolean isMVPDefaultValue;
@@ -19,7 +19,7 @@ public class IsMVPParameterConsumer {
 
     private static final String PARAMETER_STORE_MAP_PA_NAME = "MapPaMVP";
 
-    public IsMVPParameterConsumer(ParameterConsumer parameterConsumer) {
+    public MVPParameterConsumer(ParameterConsumer parameterConsumer) {
         this.parameterConsumer = parameterConsumer;
     }
 
