@@ -36,6 +36,7 @@ public class AbstractCachedSsmParameterConsumer implements ParameterConsumer {
         Object optValue = valueCache.computeIfAbsent( parameterName, key -> new ExpiringValue())
                 .getValueCheckTimestamp();
         if ( optValue == null ) {
+            log.debug("Value for {} not in cache",parameterName);
             optValue = getParameter( parameterName, clazz );
             valueCache.put( parameterName, new ExpiringValue(optValue, cacheExpiration));
         }

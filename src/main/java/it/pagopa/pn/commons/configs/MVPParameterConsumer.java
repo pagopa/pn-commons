@@ -1,37 +1,45 @@
 package it.pagopa.pn.commons.configs;
 
-import it.pagopa.pn.commons.abstractions.impl.AbstractCachedSsmParameterConsumer;
+import it.pagopa.pn.commons.abstractions.ParameterConsumer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Optional;
 
-public class IsMVPParameterConsumer {
+@Slf4j
+public class MVPParameterConsumer {
 
     @Value("${pn.commons.features.is-mvp-default-value}")
     private Boolean isMVPDefaultValue;
 
-    private final AbstractCachedSsmParameterConsumer abstractCachedSsmParameterConsumer;
+    private final ParameterConsumer parameterConsumer;
 
     private static final String PARAMETER_STORE_MAP_PA_NAME = "MapPaMVP";
 
-    public IsMVPParameterConsumer(AbstractCachedSsmParameterConsumer abstractCachedSsmParameterConsumer) {
-        this.abstractCachedSsmParameterConsumer = abstractCachedSsmParameterConsumer;
+    public MVPParameterConsumer(ParameterConsumer parameterConsumer) {
+        this.parameterConsumer = parameterConsumer;
     }
 
     public Boolean isMvp( String paTaxId ) {
-        Optional<PaTaxIdIsMVP[]> optionalPaTaxIdIsMVPList = abstractCachedSsmParameterConsumer.getParameterValue(
+        log.debug("Start isMvp for paTaxId={}", paTaxId);
+        
+        Optional<PaTaxIdIsMVP[]> optionalPaTaxIdIsMVPList = parameterConsumer.getParameterValue(
                 PARAMETER_STORE_MAP_PA_NAME, PaTaxIdIsMVP[].class );
         if (optionalPaTaxIdIsMVPList.isPresent() ) {
             PaTaxIdIsMVP[] paTaxIdIsMVPS = optionalPaTaxIdIsMVPList.get();
             for (PaTaxIdIsMVP paTaxIdIsMVP : paTaxIdIsMVPS) {
                 if (paTaxIdIsMVP.paTaxId.equals(paTaxId)) {
-                    return paTaxIdIsMVP.isMVP;
+                    Boolean isMVP = paTaxIdIsMVP.isMVP;
+                    log.debug("paTaxId={} isMVP={}", paTaxId, isMVP);
+                    return isMVP;
                 }
             }
         }
+
+        log.debug("paTaxId={} configuration not found, isMVPDefaultValue={}", paTaxId, isMVPDefaultValue);
         return isMVPDefaultValue;
     }
 

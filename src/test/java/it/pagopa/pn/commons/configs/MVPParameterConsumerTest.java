@@ -18,7 +18,7 @@ import java.util.Optional;
 @TestPropertySource(properties = { "pn.commons.features.is-mvp-default-value=true",
         "pn.env.runtime=DEVELOPMENT"})
 @SpringBootTest
-class IsMVPParameterConsumerTest {
+class MVPParameterConsumerTest {
 
     private static final String PA_TAX_ID_MVP = "01199250158";
     private static final String PA_TAX_ID_NO_MVP = "02438750586";
@@ -28,15 +28,15 @@ class IsMVPParameterConsumerTest {
     private AbstractCachedSsmParameterConsumer abstractCachedSsmParameterConsumer;
 
     @Autowired
-    private IsMVPParameterConsumerTestActivator isMVPParameterConsumer;
+    private MVPParameterConsumerTestActivator isMVPParameterConsumer;
 
     @ExtendWith(MockitoExtension.class)
     @Test
     void getPaIsMVPConfig() {
 
-        IsMVPParameterConsumer.PaTaxIdIsMVP[] paTaxIdIsMVPs = new IsMVPParameterConsumer.PaTaxIdIsMVP[2];
-        paTaxIdIsMVPs[0] = new IsMVPParameterConsumer.PaTaxIdIsMVP(PA_TAX_ID_MVP, true );
-        paTaxIdIsMVPs[1] = new IsMVPParameterConsumer.PaTaxIdIsMVP( PA_TAX_ID_NO_MVP, false );
+        MVPParameterConsumer.PaTaxIdIsMVP[] paTaxIdIsMVPs = new MVPParameterConsumer.PaTaxIdIsMVP[2];
+        paTaxIdIsMVPs[0] = new MVPParameterConsumer.PaTaxIdIsMVP(PA_TAX_ID_MVP, true );
+        paTaxIdIsMVPs[1] = new MVPParameterConsumer.PaTaxIdIsMVP( PA_TAX_ID_NO_MVP, false );
 
         Mockito.when( abstractCachedSsmParameterConsumer.getParameterValue( Mockito.anyString(), Mockito.any() ) ).thenReturn(Optional.of(paTaxIdIsMVPs));
 
