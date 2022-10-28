@@ -24,7 +24,7 @@ public class IsMVPParameterConsumer {
     }
 
     public Boolean isMvp( String paTaxId ) {
-        log.info("Start isMvp for paTaxId={}", paTaxId);
+        log.debug("Start isMvp for paTaxId={}", paTaxId);
         
         Optional<PaTaxIdIsMVP[]> optionalPaTaxIdIsMVPList = parameterConsumer.getParameterValue(
                 PARAMETER_STORE_MAP_PA_NAME, PaTaxIdIsMVP[].class );
@@ -33,13 +33,13 @@ public class IsMVPParameterConsumer {
             for (PaTaxIdIsMVP paTaxIdIsMVP : paTaxIdIsMVPS) {
                 if (paTaxIdIsMVP.paTaxId.equals(paTaxId)) {
                     Boolean isMVP = paTaxIdIsMVP.isMVP;
-                    log.info("paTaxId={} isMVP={}", paTaxId, isMVP);
+                    log.debug("paTaxId={} isMVP={}", paTaxId, isMVP);
                     return isMVP;
                 }
             }
         }
 
-        log.info("paTaxId={} configuration not found, isMVPDefaultValue={}", paTaxId, isMVPDefaultValue);
+        log.debug("paTaxId={} configuration not found, isMVPDefaultValue={}", paTaxId, isMVPDefaultValue);
         return isMVPDefaultValue;
     }
 
