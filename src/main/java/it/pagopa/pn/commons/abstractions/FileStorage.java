@@ -1,5 +1,7 @@
 package it.pagopa.pn.commons.abstractions;
 
+import org.springframework.http.HttpHeaders;
+
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
@@ -21,4 +23,6 @@ public interface FileStorage {
     FileData getFileVersion(String key, String versionId);
 
     List<FileData> getDocumentsListing(String prefix);
+
+    HttpHeaders headers();
 }
