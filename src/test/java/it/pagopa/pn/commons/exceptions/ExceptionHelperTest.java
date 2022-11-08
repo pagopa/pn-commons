@@ -5,20 +5,17 @@ import it.pagopa.pn.commons.exceptions.dto.ProblemError;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.PropertyEditorRegistry;
-import org.springframework.core.Conventions;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.*;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.MapBindingResult;
 import org.springframework.web.bind.support.WebExchangeBindException;
-import org.springframework.web.bind.support.WebExchangeDataBinder;
 import org.springframework.web.server.MethodNotAllowedException;
 
 import javax.validation.*;
-import javax.validation.Validator;
 import javax.validation.constraints.Max;
-import java.beans.PropertyEditor;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -57,7 +54,7 @@ class ExceptionHelperTest {
     void handlePnRuntimeException() {
 
         //When
-        Problem res = exceptionHelper.handleException(new PnRuntimeException("some message", "some desc", 404, "NOT_FOUND", null,null));
+        Problem res = exceptionHelper.handleException(new PnRuntimeException("some message", "some desc", 404, "NOT_FOUND", null,null, null));
 
         //Then
         assertNotNull(res);
@@ -73,11 +70,10 @@ class ExceptionHelperTest {
     void handlePnRuntimeException1() {
 
         //When
-        Problem res = exceptionHelper.handleException(new PnRuntimeException("some message", "some desc", 404, new ArrayList<ProblemError>(), null));
+        Problem res = exceptionHelper.handleException(new PnRuntimeException("some message", "some desc", 404, new ArrayList<>(),  null));
 
         //Then
         assertNotNull(res);
-        assertEquals(ExceptionHelper.MESSAGE_HANDLED_ERROR, res.getTitle());
         assertEquals(404, res.getStatus());
         assertNotNull(res.getTimestamp());
         assertNotNull(res.getErrors());
@@ -133,7 +129,10 @@ class ExceptionHelperTest {
     }
 
 
+    // il modifier public è stato messo per essere usato dal method, per generare l'eccezione
+    // la segnalazione di sonar va quindi ignorata
     @Test
+    @java.lang.SuppressWarnings("java:S5786")
     public void handleConstraintWebExchangeBindException() throws NoSuchMethodException {
 
         //When
@@ -159,7 +158,7 @@ class ExceptionHelperTest {
 
 
     @Test
-    public void handleMethodNotAllowedException()  {
+    void handleMethodNotAllowedException()  {
 
         //When
              MethodNotAllowedException exception =
@@ -178,7 +177,7 @@ class ExceptionHelperTest {
 
 
     @Test
-    public void handleNullPointerEx()   {
+    void handleNullPointerEx()   {
 
         //When
         NullPointerException exception =

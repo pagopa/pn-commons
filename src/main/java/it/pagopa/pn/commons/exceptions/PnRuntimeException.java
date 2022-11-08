@@ -5,7 +5,10 @@ import it.pagopa.pn.common.rest.error.v1.dto.Problem;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.MDC;
+import org.springframework.core.NestedRuntimeException;
 import org.springframework.http.HttpStatus;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.time.Instant;
 import java.time.ZoneOffset;
@@ -20,7 +23,7 @@ import static it.pagopa.pn.commons.log.MDCWebFilter.MDC_TRACE_ID_KEY;
  * Eccezione base da estendere all'occorrenza, genera già in automatico il problem da ritornare 
  */
 @Slf4j
-public class PnRuntimeException extends RuntimeException implements IPnException {
+public class PnRuntimeException extends NestedRuntimeException implements IPnException {
 
     private final Problem problem;
 
@@ -44,11 +47,11 @@ public class PnRuntimeException extends RuntimeException implements IPnException
         super(message, cause);
         problem = new Problem();
 
-        if (message == null)
+        if (!StringUtils.hasText(message))
             message = HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase();
-        if (description == null)
+        if (!StringUtils.hasText(description))
             description = HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase();
-        if (problemErrorList == null)
+        if (CollectionUtils.isEmpty(problemErrorList))
             problemErrorList = new ArrayList<>();
 
         problem.setType("GENERIC_ERROR");

@@ -7,6 +7,8 @@ import static it.pagopa.pn.commons.exceptions.PnExceptionsCodes.ERROR_CODE_PN_GE
 
 public class FieldErrorToProblemErrorMapper {
 
+    private FieldErrorToProblemErrorMapper(){}
+
     public static ProblemError toProblemError(FieldError fieldError)
     {
         return  ProblemError.builder()
