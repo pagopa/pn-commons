@@ -7,6 +7,8 @@ import javax.validation.ConstraintViolation;
 
 public class ConstraintViolationToProblemErrorMapper {
 
+    private ConstraintViolationToProblemErrorMapper(){}
+
     public static ProblemError toProblemError(ConstraintViolation<?> constraintViolation, ExceptionHelper exceptionHelper)
     {
         return ProblemError.builder()

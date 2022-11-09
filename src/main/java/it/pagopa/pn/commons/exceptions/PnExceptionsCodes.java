@@ -2,11 +2,13 @@ package it.pagopa.pn.commons.exceptions;
 
 public class PnExceptionsCodes {
 
+    protected PnExceptionsCodes(){}
     /**
      * codice di errore generico, quando non si sa cosa mettere. Dovrebbe essere usato il meno possibile
     */
     public static final String ERROR_CODE_PN_GENERIC_ERROR = "PN_GENERIC_ERROR";
     public static final String ERROR_CODE_PN_WEB_GENERIC_ERROR = "PN_WEB_GENERIC_ERROR";
+    public static final String ERROR_CODE_PN_HTTPRESPONSE_GENERIC_ERROR = "PN_HTTPRESPONSE_GENERIC_ERROR";
 
     // codici legati alla validazione
     public static final String ERROR_CODE_PN_GENERIC_INVALIDPARAMETER = "PN_GENERIC_INVALIDPARAMETER";

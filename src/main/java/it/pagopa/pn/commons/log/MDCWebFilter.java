@@ -11,6 +11,7 @@ import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Hooks;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Operators;
+import reactor.core.publisher.SignalType;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -67,7 +68,7 @@ public class MDCWebFilter implements WebFilter {
             }
         };
 
-        Consumer mdcCleaner = ignored -> {
+        Consumer<SignalType> mdcCleaner = ignored -> {
             MDC.remove(MDC_TRACE_ID_KEY);
             MDC.remove(MDC_JTI_KEY);
         };

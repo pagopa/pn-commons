@@ -2,8 +2,6 @@ package it.pagopa.pn.commons.exceptions;
 
 import it.pagopa.pn.commons.exceptions.dto.ProblemError;
 import org.springframework.http.HttpStatus;
-import org.springframework.util.CollectionUtils;
-import org.springframework.validation.FieldError;
 
 import javax.validation.ConstraintViolation;
 import java.util.List;
@@ -27,7 +25,7 @@ public class PnValidationException extends PnRuntimeException {
      * @param validationErrors errori di validazione
      * @param <T> tipo errori validazione
      */
-    @Deprecated()
+    @Deprecated(since = "0.0.2")
     public <T> PnValidationException(String validationTargetId, Set<? extends ConstraintViolation<?>> validationErrors) {
         this("Some parameters are invalid", new ExceptionHelper(Optional.empty()).generateProblemErrorsFromConstraintViolation(validationErrors), null  );
     }
