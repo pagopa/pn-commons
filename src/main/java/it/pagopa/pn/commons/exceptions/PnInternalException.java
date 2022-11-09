@@ -14,7 +14,7 @@ public class PnInternalException extends PnRuntimeException {
      *
      * @param message messaggio diagnostico
      */
-    @Deprecated
+    @Deprecated(since = "0.0.2-Snapshot")
     public PnInternalException(String message) {
         this(message, PnExceptionsCodes.ERROR_CODE_PN_GENERIC_ERROR, null);
     }
@@ -26,7 +26,7 @@ public class PnInternalException extends PnRuntimeException {
      * @param message messaggio diagnostico
      * @param cause eccezione causa
      */
-    @Deprecated
+    @Deprecated(since = "0.0.2-Snapshot")
     public PnInternalException(String message, Throwable cause) {
         this(message, PnExceptionsCodes.ERROR_CODE_PN_GENERIC_ERROR, cause);
     }

@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 public class PnValidationExceptionBuilder<T> {
-    private ExceptionHelper exceptionHelper;
+    private final ExceptionHelper exceptionHelper;
 
     private Set<ConstraintViolation<? extends Object>> validationErrors;
     private List<FieldError> fieldErrors;
@@ -21,27 +21,27 @@ public class PnValidationExceptionBuilder<T> {
         this.exceptionHelper = exceptionHelper;
     }
 
-    public PnValidationExceptionBuilder validationErrors(Set<ConstraintViolation<? extends Object>> validationErrors) {
+    public PnValidationExceptionBuilder<T> validationErrors(Set<ConstraintViolation<? extends Object>> validationErrors) {
         this.validationErrors = validationErrors;
         return this;
     }
 
-    public PnValidationExceptionBuilder fieldErrors(List<FieldError> fieldErrors) {
+    public PnValidationExceptionBuilder<T> fieldErrors(List<FieldError> fieldErrors) {
         this.fieldErrors = fieldErrors;
         return this;
     }
 
-    public PnValidationExceptionBuilder problemErrorList(List<ProblemError> problemErrorList) {
+    public PnValidationExceptionBuilder<T> problemErrorList(List<ProblemError> problemErrorList) {
         this.problemErrorList = problemErrorList;
         return this;
     }
 
-    public PnValidationExceptionBuilder cause(Throwable cause) {
+    public PnValidationExceptionBuilder<T> cause(Throwable cause) {
         this.cause = cause;
         return this;
     }
 
-    public PnValidationExceptionBuilder message(String message) {
+    public PnValidationExceptionBuilder<T> message(String message) {
         this.message = message;
         return this;
     }

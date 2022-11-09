@@ -1,6 +1,7 @@
 package it.pagopa.pn.commons.configs.aws;
 
 import it.pagopa.pn.commons.configs.RuntimeMode;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -20,12 +21,14 @@ import java.net.URI;
 
 @Configuration
 @ConditionalOnProperty( name = "pn.middleware.init.aws", havingValue = "true")
+@Slf4j
 public class AwsServicesClientsConfig {
 
     private final AwsConfigs props;
 
     public AwsServicesClientsConfig(AwsConfigs props, RuntimeMode runtimeMode) {
         this.props = props;
+        log.info("AWS RuntimeMode is={}", runtimeMode);
     }
 
     @Bean
