@@ -2,7 +2,7 @@ package it.pagopa.pn.commons.exceptions;
 
 public class PnExceptionsCodes {
 
-    private PnExceptionsCodes(){}
+    protected PnExceptionsCodes(){}
     /**
      * codice di errore generico, quando non si sa cosa mettere. Dovrebbe essere usato il meno possibile
     */
