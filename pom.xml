@@ -6,15 +6,19 @@
 	<parent>
 		<groupId>it.pagopa.pn</groupId>
 		<artifactId>pn-parent</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
-		<relativePath/>
+		<version>1.0.0</version>
+		<relativePath>../pn-parent</relativePath>
 	</parent>
 
 	<artifactId>pn-commons</artifactId>
 	<version>0.0.2-SNAPSHOT</version>
 	<name>pn-commons</name>
 	<description>Pn Common Utilities</description>
-
+	<scm>
+		<connection>${git.conn}</connection>
+		<developerConnection>${git.devConn}</developerConnection>
+		<url>${git.url}</url>
+	</scm>
 	<dependencies>
 
 		<dependency>
