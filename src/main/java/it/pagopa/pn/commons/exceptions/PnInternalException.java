@@ -40,6 +40,6 @@ public class PnInternalException extends PnRuntimeException {
     }
     
     public PnInternalException(String message, int httpStatus, String errorCode) {
-      super(HttpStatus.valueOf(httpStatus).getReasonPhrase(), message, httpStatus, errorCode, null, null, null);
+        super(HttpStatus.valueOf(httpStatus).getReasonPhrase(), message, httpStatus, errorCode, null, null, null);
     }
 }
