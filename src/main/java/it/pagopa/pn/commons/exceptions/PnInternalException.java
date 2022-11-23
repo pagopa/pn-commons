@@ -38,4 +38,8 @@ public class PnInternalException extends PnRuntimeException {
     public PnInternalException(String message, String errorCode, Throwable cause) {
         super(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), message, HttpStatus.INTERNAL_SERVER_ERROR.value(), errorCode, null, null, cause);
     }
+    
+    public PnInternalException(String message, int httpStatus, String errorCode) {
+      super(HttpStatus.valueOf(httpStatus).getReasonPhrase(), message, httpStatus, errorCode, null, null, null);
+    }
 }
