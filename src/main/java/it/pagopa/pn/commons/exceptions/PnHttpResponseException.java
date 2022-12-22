@@ -9,7 +9,7 @@ public class PnHttpResponseException extends PnInternalException{
     private final int statusCode;
     
     public PnHttpResponseException(String message, int statusCode) {
-        super(message, ERROR_CODE_PN_HTTPRESPONSE_GENERIC_ERROR);
+        super(message, statusCode, ERROR_CODE_PN_HTTPRESPONSE_GENERIC_ERROR);
         this.statusCode = statusCode;
     }
 }
