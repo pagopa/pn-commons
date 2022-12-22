@@ -60,7 +60,7 @@ public enum PnAuditLogEventType {
     AUD_AK_ROTATE(PnAuditLogMarker.AUDIT10Y),
     AUD_AK_BLOCK(PnAuditLogMarker.AUDIT10Y),
     AUD_AK_REACTIVATE(PnAuditLogMarker.AUDIT10Y),
-    AUD_AK_DELETE(PnAuditLogMarker.AUDIT10Y)
+    AUD_AK_DELETE(PnAuditLogMarker.AUDIT10Y),
     AUD_FD_RESOLVE_LOGIC(PnAuditLogMarker.AUDIT10Y),
     AUD_FD_RESOLVE_SERVICE(PnAuditLogMarker.AUDIT10Y),
     AUD_FD_SEND(PnAuditLogMarker.AUDIT10Y),
