@@ -100,6 +100,96 @@ class MDCWebFilterTest {
     }
 
     @Test
+    void filterWithUid() {
+
+        MockServerHttpRequest request = MockServerHttpRequest.get("http://localhost")
+                .header("x-pagopa-pn-uid", "uid-value")
+                .build();
+        ServerWebExchange exchange = MockServerWebExchange.from(request);
+
+        WebHandler webHandler = serverWebExchange -> {
+            Assertions.assertEquals("uid-value", MDC.get(MDCWebFilter.MDC_PN_UID_KEY));
+            return Mono.empty();
+        };
+        WebFilterChain filterChain = new DefaultWebFilterChain(webHandler, Collections.emptyList());
+
+        mdcTraceIdWebFilter.filter(exchange, filterChain).block();
+
+    }
+
+    @Test
+    void filterWithCxId() {
+
+        MockServerHttpRequest request = MockServerHttpRequest.get("http://localhost")
+                .header("x-pagopa-cx-id", "cx-id-value")
+                .build();
+        ServerWebExchange exchange = MockServerWebExchange.from(request);
+
+        WebHandler webHandler = serverWebExchange -> {
+            Assertions.assertEquals("cx-id-value", MDC.get(MDCWebFilter.MDC_CX_ID_KEY));
+            return Mono.empty();
+        };
+        WebFilterChain filterChain = new DefaultWebFilterChain(webHandler, Collections.emptyList());
+
+        mdcTraceIdWebFilter.filter(exchange, filterChain).block();
+
+    }
+
+    @Test
+    void filterWithCxType() {
+
+        MockServerHttpRequest request = MockServerHttpRequest.get("http://localhost")
+                .header("x-pagopa-pn-cx-type", "PF")
+                .build();
+        ServerWebExchange exchange = MockServerWebExchange.from(request);
+
+        WebHandler webHandler = serverWebExchange -> {
+            Assertions.assertEquals("PF", MDC.get(MDCWebFilter.MDC_PN_CX_TYPE_KEY));
+            return Mono.empty();
+        };
+        WebFilterChain filterChain = new DefaultWebFilterChain(webHandler, Collections.emptyList());
+
+        mdcTraceIdWebFilter.filter(exchange, filterChain).block();
+
+    }
+
+    @Test
+    void filterWithCxGroups() {
+
+        MockServerHttpRequest request = MockServerHttpRequest.get("http://localhost")
+                .header("x-pagopa-pn-cx-groups", "cx-groups-value")
+                .build();
+        ServerWebExchange exchange = MockServerWebExchange.from(request);
+
+        WebHandler webHandler = serverWebExchange -> {
+            Assertions.assertEquals("cx-groups-value", MDC.get(MDCWebFilter.MDC_PN_CX_GROUPS_KEY));
+            return Mono.empty();
+        };
+        WebFilterChain filterChain = new DefaultWebFilterChain(webHandler, Collections.emptyList());
+
+        mdcTraceIdWebFilter.filter(exchange, filterChain).block();
+
+    }
+
+    @Test
+    void filterWithCxRole() {
+
+        MockServerHttpRequest request = MockServerHttpRequest.get("http://localhost")
+                .header("x-pagopa-pn-cx-role", "role-value")
+                .build();
+        ServerWebExchange exchange = MockServerWebExchange.from(request);
+
+        WebHandler webHandler = serverWebExchange -> {
+            Assertions.assertEquals("role-value", MDC.get(MDCWebFilter.MDC_PN_CX_ROLE_KEY));
+            return Mono.empty();
+        };
+        WebFilterChain filterChain = new DefaultWebFilterChain(webHandler, Collections.emptyList());
+
+        mdcTraceIdWebFilter.filter(exchange, filterChain).block();
+
+    }
+
+    @Test
     void filterWithAllHeaders() {
 
         MockServerHttpRequest request = MockServerHttpRequest.get("http://localhost")

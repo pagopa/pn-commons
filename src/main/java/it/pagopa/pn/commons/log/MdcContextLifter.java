@@ -69,7 +69,7 @@ class MdcContextLifter<T> implements CoreSubscriber<T> {
             ) {
                 task.run();
             }
-        } else if (mdcTraceidVal != null) {
+        } else if (mdcTraceidVal != null) { //TODO chiarire questa serie di if, poiché sembra che mdcTraceidVal non sia mai null
             try(MDC.MDCCloseable ignored = MDC.putCloseable(MDCWebFilter.MDC_TRACE_ID_KEY, mdcTraceidVal.toString())) {
                 task.run();
             }

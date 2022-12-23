@@ -115,7 +115,7 @@ public class MDCWebFilter implements WebFilter {
         List<String> traceIdHeaders = requestHeaders.get(traceIdHeader);
         List<String> traceIdHeaderValues = traceIdHeaders != null ? traceIdHeaders : notFoundGeneratedTraceId;
 
-        ctx = addToWebFluxContext(ctx, traceIdHeaderValues, MDC_PN_CX_ROLE_KEY);
+        ctx = addToWebFluxContext(ctx, traceIdHeaderValues, MDC_TRACE_ID_KEY);
         ctx = addToWebFluxContext(ctx, requestHeaders.get(jtiHeader), MDC_JTI_KEY);
         ctx = addToWebFluxContext(ctx, requestHeaders.get(pnUidHeader), MDC_PN_UID_KEY);
         ctx = addToWebFluxContext(ctx, requestHeaders.get(cxIdHeader), MDC_CX_ID_KEY);
