@@ -24,7 +24,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
 @ExtendWith(SpringExtension.class)
-@TestPropertySource(properties = { "pn.log.trace-id-header=X-Amzn-Trace-Id", "pn.log.jti-header=x-pagopa-pn-jti" })
+@TestPropertySource(properties = { "pn.log.trace-id-header=X-Amzn-Trace-Id", "pn.log.jti-header=x-pagopa-pn-jti",
+        "pn.log.pn-uid-header=x-pagopa-pn-uid", "pn.log.cx-id-header=x-pagopa-cx-id", "pn.log.pn-cx-type-header=x-pagopa-pn-cx-type",
+        "pn.log.pn-cx-groups-header=x-pagopa-pn-cx-groups", "pn.log.pn-cx-role-header=x-pagopa-pn-cx-role" })
 class MDCWebFilterTest {
 
     public static final String MY_HEADER = "Root=1-61b1d38b-752391d8200695e11e2e5bac;";
@@ -89,6 +91,36 @@ class MDCWebFilterTest {
         WebHandler webHandler = serverWebExchange -> {
             Assertions.assertNotNull(MDC.get(MDCWebFilter.MDC_TRACE_ID_KEY));
             Assertions.assertEquals(MY_HEADER_JTI, MDC.get(MDCWebFilter.MDC_JTI_KEY));
+            return Mono.empty();
+        };
+        WebFilterChain filterChain = new DefaultWebFilterChain(webHandler, Collections.emptyList());
+
+        mdcTraceIdWebFilter.filter(exchange, filterChain).block();
+
+    }
+
+    @Test
+    void filterWithAllHeaders() {
+
+        MockServerHttpRequest request = MockServerHttpRequest.get("http://localhost")
+                .header("X-Amzn-Trace-Id", MY_HEADER)
+                .header("x-pagopa-pn-jti", MY_HEADER_JTI)
+                .header("x-pagopa-pn-uid", "uid-value")
+                .header("x-pagopa-cx-id", "cx-id-value")
+                .header("x-pagopa-pn-cx-type", "PF")
+                .header("x-pagopa-pn-cx-groups", "cx-groups-value")
+                .header("x-pagopa-pn-cx-role", "role-value")
+                .build();
+        ServerWebExchange exchange = MockServerWebExchange.from(request);
+
+        WebHandler webHandler = serverWebExchange -> {
+            Assertions.assertEquals(MY_HEADER, MDC.get(MDCWebFilter.MDC_TRACE_ID_KEY));
+            Assertions.assertEquals(MY_HEADER_JTI, MDC.get(MDCWebFilter.MDC_JTI_KEY));
+            Assertions.assertEquals("uid-value", MDC.get(MDCWebFilter.MDC_PN_UID_KEY));
+            Assertions.assertEquals("cx-id-value", MDC.get(MDCWebFilter.MDC_CX_ID_KEY));
+            Assertions.assertEquals("PF", MDC.get(MDCWebFilter.MDC_PN_CX_TYPE_KEY));
+            Assertions.assertEquals("cx-groups-value", MDC.get(MDCWebFilter.MDC_PN_CX_GROUPS_KEY));
+            Assertions.assertEquals("role-value", MDC.get(MDCWebFilter.MDC_PN_CX_ROLE_KEY));
             return Mono.empty();
         };
         WebFilterChain filterChain = new DefaultWebFilterChain(webHandler, Collections.emptyList());

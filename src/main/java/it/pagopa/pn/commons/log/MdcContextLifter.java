@@ -53,17 +53,19 @@ class MdcContextLifter<T> implements CoreSubscriber<T> {
         final Object mdcCxIdVal = coreSubscriber.currentContext().getOrDefault(MDCWebFilter.MDC_CX_ID_KEY, null);
         final Object mdcPnCxTypeVal = coreSubscriber.currentContext().getOrDefault(MDCWebFilter.MDC_PN_CX_TYPE_KEY, null);
         final Object mdcPnCxGroupsVal = coreSubscriber.currentContext().getOrDefault(MDCWebFilter.MDC_PN_CX_GROUPS_KEY, null);
+        final Object mdcPnCxRoleVal = coreSubscriber.currentContext().getOrDefault(MDCWebFilter.MDC_PN_CX_ROLE_KEY, null);
         // NB: MDC supporta il value null, a patto che chi lo usa lo supporti a sua volta.
         // si sceglie comunque di inserire i valori solo se presenti gestendo i vari casi
         if(mdcTraceidVal != null && mdcJtiVal != null && mdcPnUidVal != null && mdcCxIdVal != null && mdcPnCxTypeVal != null
-        && mdcPnCxGroupsVal != null) {
+        && mdcPnCxGroupsVal != null && mdcPnCxRoleVal != null) {
 
             try(MDC.MDCCloseable ignored = MDC.putCloseable(MDCWebFilter.MDC_TRACE_ID_KEY, mdcTraceidVal.toString());
                 MDC.MDCCloseable ignored1 = MDC.putCloseable(MDCWebFilter.MDC_JTI_KEY, mdcJtiVal.toString());
                 MDC.MDCCloseable ignored2 = MDC.putCloseable(MDCWebFilter.MDC_PN_UID_KEY, mdcPnUidVal.toString());
                 MDC.MDCCloseable ignored3 = MDC.putCloseable(MDCWebFilter.MDC_CX_ID_KEY, mdcCxIdVal.toString());
                 MDC.MDCCloseable ignored4 = MDC.putCloseable(MDCWebFilter.MDC_PN_CX_TYPE_KEY, mdcPnCxTypeVal.toString());
-                MDC.MDCCloseable ignored5 = MDC.putCloseable(MDCWebFilter.MDC_PN_CX_GROUPS_KEY, mdcPnCxGroupsVal.toString())
+                MDC.MDCCloseable ignored5 = MDC.putCloseable(MDCWebFilter.MDC_PN_CX_GROUPS_KEY, mdcPnCxGroupsVal.toString());
+                MDC.MDCCloseable ignored6 = MDC.putCloseable(MDCWebFilter.MDC_PN_CX_ROLE_KEY, mdcPnCxRoleVal.toString())
             ) {
                 task.run();
             }
@@ -89,6 +91,10 @@ class MdcContextLifter<T> implements CoreSubscriber<T> {
             }
         } else if (mdcPnCxGroupsVal != null) {
             try(MDC.MDCCloseable ignored = MDC.putCloseable(MDCWebFilter.MDC_PN_CX_GROUPS_KEY, mdcPnCxGroupsVal.toString())) {
+                task.run();
+            }
+        } else if (mdcPnCxRoleVal != null) {
+            try(MDC.MDCCloseable ignored = MDC.putCloseable(MDCWebFilter.MDC_PN_CX_ROLE_KEY, mdcPnCxRoleVal.toString())) {
                 task.run();
             }
         }

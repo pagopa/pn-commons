@@ -33,6 +33,7 @@ public class MDCWebFilter implements WebFilter {
     public static final String MDC_CX_ID_KEY = "cx-id";
     public static final String MDC_PN_CX_TYPE_KEY = "pn-cx-type";
     public static final String MDC_PN_CX_GROUPS_KEY = "pn-cx-groups";
+    public static final String MDC_PN_CX_ROLE_KEY = "pn-cx-role";
 
     @Value("${pn.log.trace-id-header}")
     private String traceIdHeader;
@@ -51,6 +52,9 @@ public class MDCWebFilter implements WebFilter {
 
     @Value("${pn.log.pn-cx-groups-header}")
     private String pnCxGroupsHeader;
+
+    @Value("${pn.log.pn-cx-role-header}")
+    private String pnCxRoleHeader;
 
     private static final String MDC_CONTEXT_REACTOR_KEY = MDCWebFilter.class.getName();
 
@@ -103,6 +107,10 @@ public class MDCWebFilter implements WebFilter {
             if(pnCxGroupsHeaders != null) {
                 MDC.put(MDC_PN_CX_GROUPS_KEY, pnCxGroupsHeaders.get(0));
             }
+            List<String> pnCxRoleHeaders = requestHeaders.get(pnCxRoleHeader);
+            if(pnCxRoleHeaders != null) {
+                MDC.put(MDC_PN_CX_ROLE_KEY, pnCxRoleHeaders.get(0));
+            }
         };
 
         Consumer<SignalType> mdcCleaner = ignored -> {
@@ -112,6 +120,7 @@ public class MDCWebFilter implements WebFilter {
             MDC.remove(MDC_CX_ID_KEY);
             MDC.remove(MDC_PN_CX_TYPE_KEY);
             MDC.remove(MDC_PN_CX_GROUPS_KEY);
+            MDC.remove(MDC_PN_CX_ROLE_KEY);
         };
 
         return webFilterChain.filter(serverWebExchange)
@@ -137,6 +146,10 @@ public class MDCWebFilter implements WebFilter {
                     List<String> pnCxGroupsHeaders = requestHeaders.get(pnCxGroupsHeader);
                     if(pnCxGroupsHeaders != null) {
                         ctx = ctx.put(MDC_PN_CX_GROUPS_KEY, pnCxGroupsHeaders.get(0));
+                    }
+                    List<String> pnCxRoleHeaders = requestHeaders.get(pnCxRoleHeader);
+                    if(pnCxRoleHeaders != null) {
+                        ctx = ctx.put(MDC_PN_CX_ROLE_KEY, pnCxRoleHeaders.get(0));
                     }
                     List<String> traceIdHeaders = requestHeaders.get(traceIdHeader);
                     if (traceIdHeaders != null) {
