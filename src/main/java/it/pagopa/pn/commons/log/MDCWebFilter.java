@@ -13,6 +13,7 @@ import reactor.core.publisher.Hooks;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Operators;
 import reactor.core.publisher.SignalType;
+import reactor.util.context.Context;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -72,45 +73,20 @@ public class MDCWebFilter implements WebFilter {
 
     @Override
     public @NotNull Mono<Void> filter(@NotNull ServerWebExchange serverWebExchange, WebFilterChain webFilterChain) {
-        final String notFoundGeneratedTraceId = "trace_id:" + UUID.randomUUID();
+        final List<String> notFoundGeneratedTraceId = List.of("trace_id:" + UUID.randomUUID());
+        HttpHeaders requestHeaders = serverWebExchange.getRequest().getHeaders();
+
         Runnable mdcSetter = () -> {
-            HttpHeaders requestHeaders = serverWebExchange.getRequest().getHeaders();
             List<String> traceIdHeaders = requestHeaders.get(traceIdHeader);
+            List<String> traceIdHeaderValues = traceIdHeaders != null ? traceIdHeaders : notFoundGeneratedTraceId;
 
-            if (traceIdHeaders != null) {
-                MDC.put(MDC_TRACE_ID_KEY, traceIdHeaders.get(0));
-            }
-            else
-            {
-
-                log.debug("trace id header not found, generating internal trace_id={}", notFoundGeneratedTraceId);
-                MDC.put(MDC_TRACE_ID_KEY, notFoundGeneratedTraceId);
-            }
-
-            List<String> jtiIdHeaders = requestHeaders.get(jtiHeader);
-            if (jtiIdHeaders != null) {
-                MDC.put(MDC_JTI_KEY, jtiIdHeaders.get(0));
-            }
-            List<String> uidHeaders = requestHeaders.get(pnUidHeader);
-            if(uidHeaders != null) {
-                MDC.put(MDC_PN_UID_KEY, uidHeaders.get(0));
-            }
-            List<String> cxIdHeaders = requestHeaders.get(cxIdHeader);
-            if(cxIdHeaders != null) {
-                MDC.put(MDC_CX_ID_KEY, cxIdHeaders.get(0));
-            }
-            List<String> pnCxTypeHeaders = requestHeaders.get(pnCxTypeHeader);
-            if(pnCxTypeHeaders != null) {
-                MDC.put(MDC_PN_CX_TYPE_KEY, pnCxTypeHeaders.get(0));
-            }
-            List<String> pnCxGroupsHeaders = requestHeaders.get(pnCxGroupsHeader);
-            if(pnCxGroupsHeaders != null) {
-                MDC.put(MDC_PN_CX_GROUPS_KEY, pnCxGroupsHeaders.get(0));
-            }
-            List<String> pnCxRoleHeaders = requestHeaders.get(pnCxRoleHeader);
-            if(pnCxRoleHeaders != null) {
-                MDC.put(MDC_PN_CX_ROLE_KEY, pnCxRoleHeaders.get(0));
-            }
+            addToMDC(traceIdHeaderValues, MDC_TRACE_ID_KEY);
+            addToMDC(requestHeaders.get(jtiHeader), MDC_JTI_KEY);
+            addToMDC(requestHeaders.get(pnUidHeader), MDC_PN_UID_KEY);
+            addToMDC(requestHeaders.get(cxIdHeader), MDC_CX_ID_KEY);
+            addToMDC(requestHeaders.get(pnCxTypeHeader), MDC_PN_CX_TYPE_KEY);
+            addToMDC(requestHeaders.get(pnCxGroupsHeader), MDC_PN_CX_GROUPS_KEY);
+            addToMDC(requestHeaders.get(pnCxRoleHeader), MDC_PN_CX_ROLE_KEY);
         };
 
         Consumer<SignalType> mdcCleaner = ignored -> {
@@ -125,39 +101,35 @@ public class MDCWebFilter implements WebFilter {
 
         return webFilterChain.filter(serverWebExchange)
                 .doFirst(mdcSetter)
-                .contextWrite(ctx -> {
-                    HttpHeaders requestHeaders = serverWebExchange.getRequest().getHeaders();
-                    List<String> jtiIdHeaders = requestHeaders.get(jtiHeader);
-                    if (jtiIdHeaders != null) {
-                        ctx = ctx.put(MDC_JTI_KEY, jtiIdHeaders.get(0));
-                    }
-                    List<String> uidHeaders = requestHeaders.get(pnUidHeader);
-                    if(uidHeaders != null) {
-                        ctx = ctx.put(MDC_PN_UID_KEY, uidHeaders.get(0));
-                    }
-                    List<String> cxIdHeaders = requestHeaders.get(cxIdHeader);
-                    if(cxIdHeaders != null) {
-                        ctx = ctx.put(MDC_CX_ID_KEY, cxIdHeaders.get(0));
-                    }
-                    List<String> pnCxTypeHeaders = requestHeaders.get(pnCxTypeHeader);
-                    if(pnCxTypeHeaders != null) {
-                        ctx = ctx.put(MDC_PN_CX_TYPE_KEY, pnCxTypeHeaders.get(0));
-                    }
-                    List<String> pnCxGroupsHeaders = requestHeaders.get(pnCxGroupsHeader);
-                    if(pnCxGroupsHeaders != null) {
-                        ctx = ctx.put(MDC_PN_CX_GROUPS_KEY, pnCxGroupsHeaders.get(0));
-                    }
-                    List<String> pnCxRoleHeaders = requestHeaders.get(pnCxRoleHeader);
-                    if(pnCxRoleHeaders != null) {
-                        ctx = ctx.put(MDC_PN_CX_ROLE_KEY, pnCxRoleHeaders.get(0));
-                    }
-                    List<String> traceIdHeaders = requestHeaders.get(traceIdHeader);
-                    if (traceIdHeaders != null) {
-                        return ctx.put(MDC_TRACE_ID_KEY, traceIdHeaders.get(0));
-                    }
-                    else
-                        return ctx.put(MDC_TRACE_ID_KEY, notFoundGeneratedTraceId);
-                }).doFinally(mdcCleaner)
-                ;
+                .contextWrite(ctx -> enrichContext(ctx, requestHeaders, notFoundGeneratedTraceId))
+                .doFinally(mdcCleaner);
     }
+
+    private void addToMDC(List<String> headerValues, String mdcKey) {
+        if (headerValues != null) {
+            MDC.put(mdcKey, headerValues.get(0));
+        }
+    }
+
+    private Context enrichContext(Context ctx, HttpHeaders requestHeaders, List<String> notFoundGeneratedTraceId) {
+        List<String> traceIdHeaders = requestHeaders.get(traceIdHeader);
+        List<String> traceIdHeaderValues = traceIdHeaders != null ? traceIdHeaders : notFoundGeneratedTraceId;
+
+        ctx = addToWebFluxContext(ctx, traceIdHeaderValues, MDC_PN_CX_ROLE_KEY);
+        ctx = addToWebFluxContext(ctx, requestHeaders.get(jtiHeader), MDC_JTI_KEY);
+        ctx = addToWebFluxContext(ctx, requestHeaders.get(pnUidHeader), MDC_PN_UID_KEY);
+        ctx = addToWebFluxContext(ctx, requestHeaders.get(cxIdHeader), MDC_CX_ID_KEY);
+        ctx = addToWebFluxContext(ctx, requestHeaders.get(pnCxTypeHeader), MDC_PN_CX_TYPE_KEY);
+        ctx = addToWebFluxContext(ctx, requestHeaders.get(pnCxGroupsHeader), MDC_PN_CX_GROUPS_KEY);
+        ctx = addToWebFluxContext(ctx, requestHeaders.get(pnCxRoleHeader), MDC_PN_CX_ROLE_KEY);
+        return ctx;
+    }
+
+    private Context addToWebFluxContext(Context ctx, List<String> headerValues, String mdcKey) {
+        if (headerValues != null) {
+            ctx = ctx.put(mdcKey, headerValues.get(0));
+        }
+        return ctx;
+    }
+
 }
