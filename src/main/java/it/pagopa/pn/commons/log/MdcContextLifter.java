@@ -1,6 +1,5 @@
 package it.pagopa.pn.commons.log;
 
-import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.reactivestreams.Subscription;
 import org.slf4j.MDC;
@@ -10,7 +9,6 @@ import reactor.util.context.Context;
 /**
  * Helper that copies the state of Reactor [Context] to MDC on the #onNext function.
  */
-@Slf4j
 class MdcContextLifter<T> implements CoreSubscriber<T> {
 
     CoreSubscriber<T> coreSubscriber;
@@ -58,45 +56,50 @@ class MdcContextLifter<T> implements CoreSubscriber<T> {
         final Object mdcPnCxRoleVal = coreSubscriber.currentContext().getOrDefault(MDCWebFilter.MDC_PN_CX_ROLE_KEY, null);
         // NB: MDC supporta il value null, a patto che chi lo usa lo supporti a sua volta.
         // si sceglie comunque di inserire i valori solo se presenti gestendo i vari casi
-       if (mdcTraceidVal != null) {
-            try(MDC.MDCCloseable ignored = MDC.putCloseable(MDCWebFilter.MDC_TRACE_ID_KEY, mdcTraceidVal.toString())) {
-                logMDC(MDCWebFilter.MDC_TRACE_ID_KEY, mdcTraceidVal);
-            }
-        }
-       if (mdcJtiVal != null) {
-            try(MDC.MDCCloseable ignored = MDC.putCloseable(MDCWebFilter.MDC_JTI_KEY, mdcJtiVal.toString())) {
-                logMDC(MDCWebFilter.MDC_JTI_KEY, mdcJtiVal);
-            }
-        }
-       if (mdcPnUidVal != null) {
-            try(MDC.MDCCloseable ignored = MDC.putCloseable(MDCWebFilter.MDC_PN_UID_KEY, mdcPnUidVal.toString())) {
-                logMDC(MDCWebFilter.MDC_PN_UID_KEY, mdcPnUidVal);
-            }
-        }
-       if (mdcCxIdVal != null) {
-            try(MDC.MDCCloseable ignored = MDC.putCloseable(MDCWebFilter.MDC_CX_ID_KEY, mdcCxIdVal.toString())) {
-                logMDC(MDCWebFilter.MDC_CX_ID_KEY, mdcCxIdVal);
-            }
-        }
-       if (mdcPnCxTypeVal != null) {
-            try(MDC.MDCCloseable ignored = MDC.putCloseable(MDCWebFilter.MDC_PN_CX_TYPE_KEY, mdcPnCxTypeVal.toString())) {
-                logMDC(MDCWebFilter.MDC_PN_CX_TYPE_KEY, mdcPnCxTypeVal);
-            }
-        }
-       if (mdcPnCxGroupsVal != null) {
-            try(MDC.MDCCloseable ignored = MDC.putCloseable(MDCWebFilter.MDC_PN_CX_GROUPS_KEY, mdcPnCxGroupsVal.toString())) {
-                logMDC(MDCWebFilter.MDC_PN_CX_GROUPS_KEY, mdcPnCxGroupsVal);
-            }
-        }
-       if (mdcPnCxRoleVal != null) {
-            try(MDC.MDCCloseable ignored = MDC.putCloseable(MDCWebFilter.MDC_PN_CX_ROLE_KEY, mdcPnCxRoleVal.toString())) {
-                logMDC(MDCWebFilter.MDC_PN_CX_ROLE_KEY, mdcPnCxRoleVal);
-            }
-        }
-       task.run();
-    }
+        if(mdcTraceidVal != null && mdcJtiVal != null && mdcPnUidVal != null && mdcCxIdVal != null && mdcPnCxTypeVal != null
+                && mdcPnCxGroupsVal != null && mdcPnCxRoleVal != null) {
 
-    private void logMDC(String mdcKey, Object mdcValue) {
-        log.trace("Put in MDC: key: {}, value: {}", mdcKey, mdcValue);
+            try(MDC.MDCCloseable ignored = MDC.putCloseable(MDCWebFilter.MDC_TRACE_ID_KEY, mdcTraceidVal.toString());
+                MDC.MDCCloseable ignored1 = MDC.putCloseable(MDCWebFilter.MDC_JTI_KEY, mdcJtiVal.toString());
+                MDC.MDCCloseable ignored2 = MDC.putCloseable(MDCWebFilter.MDC_PN_UID_KEY, mdcPnUidVal.toString());
+                MDC.MDCCloseable ignored3 = MDC.putCloseable(MDCWebFilter.MDC_CX_ID_KEY, mdcCxIdVal.toString());
+                MDC.MDCCloseable ignored4 = MDC.putCloseable(MDCWebFilter.MDC_PN_CX_TYPE_KEY, mdcPnCxTypeVal.toString());
+                MDC.MDCCloseable ignored5 = MDC.putCloseable(MDCWebFilter.MDC_PN_CX_GROUPS_KEY, mdcPnCxGroupsVal.toString());
+                MDC.MDCCloseable ignored6 = MDC.putCloseable(MDCWebFilter.MDC_PN_CX_ROLE_KEY, mdcPnCxRoleVal.toString())
+            ) {
+                task.run();
+            }
+        } else if (mdcTraceidVal != null) {
+            try(MDC.MDCCloseable ignored = MDC.putCloseable(MDCWebFilter.MDC_TRACE_ID_KEY, mdcTraceidVal.toString())) {
+                task.run();
+            }
+        } else if (mdcJtiVal != null) {
+            try(MDC.MDCCloseable ignored = MDC.putCloseable(MDCWebFilter.MDC_JTI_KEY, mdcJtiVal.toString())) {
+                task.run();
+            }
+        } else if (mdcPnUidVal != null) {
+            try(MDC.MDCCloseable ignored = MDC.putCloseable(MDCWebFilter.MDC_PN_UID_KEY, mdcPnUidVal.toString())) {
+                task.run();
+            }
+        } else if (mdcCxIdVal != null) {
+            try(MDC.MDCCloseable ignored = MDC.putCloseable(MDCWebFilter.MDC_CX_ID_KEY, mdcCxIdVal.toString())) {
+                task.run();
+            }
+        } else if (mdcPnCxTypeVal != null) {
+            try(MDC.MDCCloseable ignored = MDC.putCloseable(MDCWebFilter.MDC_PN_CX_TYPE_KEY, mdcPnCxTypeVal.toString())) {
+                task.run();
+            }
+        } else if (mdcPnCxGroupsVal != null) {
+            try(MDC.MDCCloseable ignored = MDC.putCloseable(MDCWebFilter.MDC_PN_CX_GROUPS_KEY, mdcPnCxGroupsVal.toString())) {
+                task.run();
+            }
+        } else if (mdcPnCxRoleVal != null) {
+            try(MDC.MDCCloseable ignored = MDC.putCloseable(MDCWebFilter.MDC_PN_CX_ROLE_KEY, mdcPnCxRoleVal.toString())) {
+                task.run();
+            }
+        }
+        else {
+            task.run();
+        }
     }
 }
