@@ -14,7 +14,6 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static it.pagopa.pn.commons.exceptions.PnExceptionsCodes.ERROR_CODE_PN_GENERIC_ERROR;
 import static it.pagopa.pn.commons.log.MDCWebFilter.MDC_TRACE_ID_KEY;
@@ -80,7 +79,7 @@ public class PnRuntimeException extends NestedRuntimeException implements IPnExc
                             .detail(problemError.getDetail())
                             .element(problemError.getElement())
                             .build();
-                }).collect(Collectors.toList()));
+                }).toList());
 
         try {
             problem.setTraceId(MDC.get(MDC_TRACE_ID_KEY));
