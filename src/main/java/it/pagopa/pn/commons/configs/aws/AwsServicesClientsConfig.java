@@ -1,11 +1,15 @@
 package it.pagopa.pn.commons.configs.aws;
 
+import com.amazonaws.services.sqs.AmazonSQSAsync;
+import com.amazonaws.services.sqs.AmazonSQSAsyncClientBuilder;
 import it.pagopa.pn.commons.configs.RuntimeMode;
+import it.pagopa.pn.commons.utils.CustomAWSRequestHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.awscore.client.builder.AwsClientBuilder;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedAsyncClient;
@@ -62,6 +66,25 @@ public class AwsServicesClientsConfig {
 
     @Bean
     public SsmClient ssmClient() { return configureBuilder( SsmClient.builder() ); }
+
+    /* viene sovrascritta la configurazione di default di spring-cloud-aws (che crea AmazonSQSBufferedAsyncClient)
+       per 2 motivi:
+       - AmazonSQSBufferedAsyncClient non supporta le code fifo
+       - aggiungendo la configurazione custom, possiamo agganciarci un RequestHandler
+    */
+    @Bean
+    @Lazy
+    public AmazonSQSAsync amazonSQS() {
+        if (org.springframework.util.StringUtils.hasText(props.getEndpointUrl()))
+            return AmazonSQSAsyncClientBuilder.standard()
+                    .withRequestHandlers(new CustomAWSRequestHandler())
+                    .withEndpointConfiguration(new com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration(props.getEndpointUrl(), props.getRegionCode()))
+                    .build();
+        else
+            return AmazonSQSAsyncClientBuilder.standard()
+                    .withRegion(props.getRegionCode())
+                    .build();
+    }
 
 
     private <C> C configureBuilder(AwsClientBuilder<?, C> builder) {
