@@ -11,7 +11,7 @@ public enum PnAuditLogEventType {
     AUD_NT_INSERT(PnAuditLogMarker.AUDIT10Y),
     AUD_NT_CHECK(PnAuditLogMarker.AUDIT10Y),
     AUD_NT_VALID(PnAuditLogMarker.AUDIT10Y),
-    AUD_NT_ARR(PnAuditLogMarker.AUDIT10Y),
+    AUD_NT_AAR(PnAuditLogMarker.AUDIT10Y),
     AUD_NT_TIMELINE(PnAuditLogMarker.AUDIT10Y),
     AUD_NT_STATUS(PnAuditLogMarker.AUDIT10Y),
     AUD_NT_NEWLEGAL(PnAuditLogMarker.AUDIT10Y),
