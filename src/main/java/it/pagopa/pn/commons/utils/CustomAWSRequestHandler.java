@@ -23,6 +23,6 @@ public class CustomAWSRequestHandler extends RequestHandler2 {
 
     @Override
     public void afterError(Request<?> request, Response<?> response, Exception e) {
-        log.error("Exception for: " + request.getOriginalRequestObject().toString(), e);
+        log.error("Exception for: " + request.getOriginalRequestObject(), e);
     }
 }
