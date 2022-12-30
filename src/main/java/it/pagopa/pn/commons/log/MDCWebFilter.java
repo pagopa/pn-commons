@@ -31,10 +31,10 @@ public class MDCWebFilter implements WebFilter {
     public static final String MDC_TRACE_ID_KEY = "trace_id";
     public static final String MDC_JTI_KEY = "jti";
     public static final String MDC_PN_UID_KEY = "uid";
-    public static final String MDC_CX_ID_KEY = "cx-id";
-    public static final String MDC_PN_CX_TYPE_KEY = "cx-type";
-    public static final String MDC_PN_CX_GROUPS_KEY = "cx-groups";
-    public static final String MDC_PN_CX_ROLE_KEY = "cx-role";
+    public static final String MDC_CX_ID_KEY = "cx_id";
+    public static final String MDC_PN_CX_TYPE_KEY = "cx_type";
+    public static final String MDC_PN_CX_GROUPS_KEY = "cx_groups";
+    public static final String MDC_PN_CX_ROLE_KEY = "cx_role";
 
     @Value("${pn.log.trace-id-header}")
     private String traceIdHeader;

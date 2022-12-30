@@ -31,22 +31,6 @@ public class PnAuditLogBuilder {
         return this;
     }
 
-    //TODO eliminare i metodi uid, cxId e cxType una volta che i microservizi non li utilizzeranno più (poiché inclusi in MDC)
-    public PnAuditLogBuilder uid(String uid) {
-        mdcMap.put("uid", uid);
-        return this;
-    }
-
-    public PnAuditLogBuilder cxId(String cxId) {
-        mdcMap.put("cx_id", cxId);
-        return this;
-    }
-
-    public PnAuditLogBuilder cxType(String cxType) {
-        mdcMap.put("cx_type", cxType);
-        return this;
-    }
-
     public PnAuditLogBuilder mdcEntry(String key, String value) {
         this.mdcMap.put(key, value);
         return this;
