@@ -4,8 +4,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.NullSource;
-import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -80,6 +78,34 @@ class LogUtilsTest {
         //Then
         Assertions.assertNotEquals( str, result);
         assertEquals("u^^^^ualche stringa lunga", result);
+    }
+
+    @Test
+    void getMessageWithSafeUrl() {
+        //Given
+        String fileName = "filename.pdf";
+        String url = "https://fakeurlfordownload?token=faketoken";
+
+        //When
+        String messageResult = LogUtils.createAuditLogMessageForDownloadDocument( fileName, url, null );
+
+        //Then
+        Assertions.assertNotNull( messageResult );
+        Assertions.assertEquals( "filename=filename.pdf, url=https://fakeurlfordownload", messageResult );
+    }
+
+    @Test
+    void getMessageWithRetryAfter() {
+        //Given
+        String fileName = "filename.pdf";
+        String retryAfter = "3600";
+
+        //When
+        String messageResult = LogUtils.createAuditLogMessageForDownloadDocument( fileName, null, retryAfter );
+
+        //Then
+        Assertions.assertNotNull( messageResult );
+        Assertions.assertEquals( "filename=filename.pdf, retryAfter=3600", messageResult );
     }
 
 }

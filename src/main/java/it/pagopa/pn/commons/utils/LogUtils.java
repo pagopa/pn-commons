@@ -1,6 +1,10 @@
 package it.pagopa.pn.commons.utils;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
+
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 @Slf4j
 public class LogUtils {
@@ -83,5 +87,17 @@ public class LogUtils {
         return strText.substring(0, start)
                 + sbMaskString
                 + strText.substring(start + maskLength);
+    }
+
+    public static String createAuditLogMessageForDownloadDocument(@NotNull String filename, @Nullable String url, @Nullable String retryAfter) {
+        String message = String.format("filename=%s, ", filename);
+        String safeUrl = StringUtils.hasText( url )? url.split("\\?")[0] : null;
+        if (StringUtils.hasText( safeUrl ) ) {
+            message += String.format("url=%s", safeUrl);
+        }
+        if ( StringUtils.hasText( retryAfter ) ) {
+            message += String.format("retryAfter=%s", retryAfter);
+        }
+        return message;
     }
 }
