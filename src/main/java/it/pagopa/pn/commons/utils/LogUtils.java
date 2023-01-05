@@ -90,13 +90,13 @@ public class LogUtils {
     }
 
     public static String createAuditLogMessageForDownloadDocument(@NotNull String filename, @Nullable String url, @Nullable String retryAfter) {
-        String message = String.format("filename=%s, ", filename);
+        String message = String.format("filename=%s", filename);
         String safeUrl = StringUtils.hasText( url )? url.split("\\?")[0] : null;
         if (StringUtils.hasText( safeUrl ) ) {
-            message += String.format("url=%s", safeUrl);
+            message += String.format(", url=%s", safeUrl);
         }
         if ( StringUtils.hasText( retryAfter ) ) {
-            message += String.format("retryAfter=%s", retryAfter);
+            message += String.format(", retryAfter=%s", retryAfter);
         }
         return message;
     }
