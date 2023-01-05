@@ -1,13 +1,11 @@
 package it.pagopa.pn.commons.log;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
-@Component
 public class PnAuditLogBuilder {
     private PnAuditLogEventType type;
     private String msg;
