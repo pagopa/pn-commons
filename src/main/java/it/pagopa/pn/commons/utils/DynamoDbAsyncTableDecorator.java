@@ -144,4 +144,26 @@ public class DynamoDbAsyncTableDecorator<T> implements DynamoDbAsyncTable<T> {
         return this.dynamoDbAsyncTable.deleteItem(keyItem)
                 .thenApply(t -> MDCUtils.enrichWithMDC(t, copyOfContextMap));
     }
+
+    @Override
+    public CompletableFuture<T> updateItem(T item) {
+        Map<String, String> copyOfContextMap = MDCUtils.retrieveMDCContextMap();
+        return this.dynamoDbAsyncTable.updateItem(item)
+                .thenApply(t -> MDCUtils.enrichWithMDC(t, copyOfContextMap));
+    }
+
+    @Override
+    public CompletableFuture<T> updateItem(Consumer<UpdateItemEnhancedRequest.Builder<T>> requestConsumer) {
+        Map<String, String> copyOfContextMap = MDCUtils.retrieveMDCContextMap();
+        return this.dynamoDbAsyncTable.updateItem(requestConsumer)
+                .thenApply(t -> MDCUtils.enrichWithMDC(t, copyOfContextMap));
+    }
+
+    @Override
+    public CompletableFuture<T> updateItem(UpdateItemEnhancedRequest<T> request) {
+        Map<String, String> copyOfContextMap = MDCUtils.retrieveMDCContextMap();
+        return this.dynamoDbAsyncTable.updateItem(request)
+                .thenApply(t -> MDCUtils.enrichWithMDC(t, copyOfContextMap));
+    }
+
 }
