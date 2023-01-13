@@ -1,6 +1,8 @@
 package it.pagopa.pn.commons.configs.aws;
 
 import it.pagopa.pn.commons.configs.RuntimeMode;
+import it.pagopa.pn.commons.utils.DynamoDbAsyncClientDecorator;
+import it.pagopa.pn.commons.utils.DynamoDbEnhancedAsyncClientDecorator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -31,16 +33,26 @@ public class AwsServicesClientsConfig {
         log.info("AWS RuntimeMode is={}", runtimeMode);
     }
 
-    @Bean
+//    @Bean
     public DynamoDbAsyncClient dynamoDbAsyncClient() {
         return this.configureBuilder( DynamoDbAsyncClient.builder() );
     }
 
-    @Bean
+//    @Bean
     public DynamoDbEnhancedAsyncClient dynamoDbEnhancedAsyncClient( DynamoDbAsyncClient baseAsyncClient) {
         return DynamoDbEnhancedAsyncClient.builder()
                 .dynamoDbClient( baseAsyncClient )
                 .build();
+    }
+
+    @Bean
+    public DynamoDbAsyncClient dynamoDbAsyncClientWithMDC() {
+        return new DynamoDbAsyncClientDecorator(this.dynamoDbAsyncClient());
+    }
+
+    @Bean
+    public DynamoDbEnhancedAsyncClient dynamoDbEnhancedAsyncClientWithMDC(DynamoDbAsyncClient delegate) {
+        return new DynamoDbEnhancedAsyncClientDecorator(this.dynamoDbEnhancedAsyncClient(delegate));
     }
 
     @Bean
