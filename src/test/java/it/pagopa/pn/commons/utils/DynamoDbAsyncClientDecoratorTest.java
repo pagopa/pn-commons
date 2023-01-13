@@ -141,4 +141,20 @@ class DynamoDbAsyncClientDecoratorTest {
         assertThat(dynamoDbAsyncClientDecorator.deleteItem(consumer).get()).isEqualTo(expectedValue);
     }
 
+    @Test
+    void updateItemTest() throws ExecutionException, InterruptedException {
+        UpdateItemRequest request = UpdateItemRequest.builder().build();
+        UpdateItemResponse expectedValue = UpdateItemResponse.builder().consumedCapacity(ConsumedCapacity.builder().tableName("TABLE").build()).build();
+        Mockito.when(delegate.updateItem(request)).thenReturn(CompletableFuture.completedFuture(expectedValue));
+        assertThat(dynamoDbAsyncClientDecorator.updateItem(request).get()).isEqualTo(expectedValue);
+    }
+
+    @Test
+    void updateItemConsumerTest() throws ExecutionException, InterruptedException {
+        Consumer<UpdateItemRequest.Builder> consumer = SdkBuilder::build;
+        UpdateItemResponse expectedValue = UpdateItemResponse.builder().consumedCapacity(ConsumedCapacity.builder().tableName("TABLE").build()).build();
+        Mockito.when(delegate.updateItem(consumer)).thenReturn(CompletableFuture.completedFuture(expectedValue));
+        assertThat(dynamoDbAsyncClientDecorator.updateItem(consumer).get()).isEqualTo(expectedValue);
+    }
+
 }

@@ -168,4 +168,29 @@ class DynamoDbAsyncTableDecoratorTest {
         Mockito.when(delegate.deleteItem(request)).thenReturn(CompletableFuture.completedFuture(expectedValue));
         assertThat(dynamoDbAsyncTableDecorator.deleteItem(request).get()).isEqualTo(expectedValue);
     }
+
+    @Test
+    void updateItemTest() throws ExecutionException, InterruptedException {
+        String request = "REQUEST";
+        String expectedValue = "RESPONSE";
+        Mockito.when(delegate.updateItem(request)).thenReturn(CompletableFuture.completedFuture(expectedValue));
+        assertThat(dynamoDbAsyncTableDecorator.updateItem(request).get()).isEqualTo(expectedValue);
+    }
+
+    @Test
+    void updateItemConsumerTest() throws ExecutionException, InterruptedException {
+        Consumer<UpdateItemEnhancedRequest.Builder<String>> consumer = UpdateItemEnhancedRequest.Builder::build;
+        String expectedValue = "RESPONSE";
+        Mockito.when(delegate.updateItem(consumer)).thenReturn(CompletableFuture.completedFuture(expectedValue));
+        assertThat(dynamoDbAsyncTableDecorator.updateItem(consumer).get()).isEqualTo(expectedValue);
+    }
+
+    @Test
+    void updateItemEnhancedRequestTest() throws ExecutionException, InterruptedException {
+        UpdateItemEnhancedRequest<String> request = UpdateItemEnhancedRequest.builder(String.class).build();
+        String expectedValue = "RESPONSE";
+        Mockito.when(delegate.updateItem(request)).thenReturn(CompletableFuture.completedFuture(expectedValue));
+        assertThat(dynamoDbAsyncTableDecorator.updateItem(request).get()).isEqualTo(expectedValue);
+    }
+
 }
