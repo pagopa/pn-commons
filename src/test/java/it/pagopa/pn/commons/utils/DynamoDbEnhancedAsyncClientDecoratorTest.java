@@ -7,6 +7,8 @@ import org.mockito.Mockito;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbAsyncTable;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedAsyncClient;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
+import software.amazon.awssdk.enhanced.dynamodb.model.BatchGetItemEnhancedRequest;
+import software.amazon.awssdk.enhanced.dynamodb.model.BatchGetResultPagePublisher;
 import software.amazon.awssdk.enhanced.dynamodb.model.TransactWriteItemsEnhancedRequest;
 
 import java.util.concurrent.CompletableFuture;
@@ -46,5 +48,14 @@ class DynamoDbEnhancedAsyncClientDecoratorTest {
         Consumer<TransactWriteItemsEnhancedRequest.Builder> consumer = TransactWriteItemsEnhancedRequest.Builder::build;
         Mockito.when(delegate.transactWriteItems(consumer)).thenReturn(CompletableFuture.completedFuture(null));
         Assertions.assertDoesNotThrow(() -> dynamoDbEnhancedAsyncClientDecorator.transactWriteItems(consumer));
+    }
+
+    @Test
+    void batchGetItemTest() {
+        BatchGetItemEnhancedRequest request = BatchGetItemEnhancedRequest.builder().build();
+        Mockito.when(delegate.batchGetItem(request)).thenReturn(BatchGetResultPagePublisher.create(subscriber -> {
+
+        }));
+        Assertions.assertDoesNotThrow(() -> dynamoDbEnhancedAsyncClientDecorator.batchGetItem(request));
     }
 }
