@@ -69,7 +69,12 @@ public enum PnAuditLogEventType {
     AUD_FD_RESOLVE_LOGIC(PnAuditLogMarker.AUDIT10Y),
     AUD_FD_RESOLVE_SERVICE(PnAuditLogMarker.AUDIT10Y),
     AUD_FD_SEND(PnAuditLogMarker.AUDIT10Y),
-    AUD_FD_RECEIVE(PnAuditLogMarker.AUDIT10Y);
+    AUD_FD_RECEIVE(PnAuditLogMarker.AUDIT10Y),
+    AUD_PD_PREPARE(PnAuditLogMarker.AUDIT10Y),
+    AUD_PD_PREPARE_RECEIVE(PnAuditLogMarker.AUDIT10Y),
+    AUD_PD_EXECUTE(PnAuditLogMarker.AUDIT10Y),
+    AUD_PD_EXECUTE_RECEIVE(PnAuditLogMarker.AUDIT10Y);
+
     
     final org.slf4j.Marker marker;
 
