@@ -15,6 +15,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
+import reactor.netty.resources.ConnectionProvider;
 import reactor.util.retry.Retry;
 
 import java.net.ConnectException;
@@ -33,9 +34,12 @@ public abstract class CommonBaseClient {
 
     private int connectionTimeoutMillis;
 
-
+    public WebClient initWebClient(WebClient.Builder builder) {
+        return enrichBuilder(builder).build();
+    }
     protected WebClient.Builder enrichBuilder(WebClient.Builder builder){
-        return enrichBuilderWithTraceId(builder);
+        WebClient.Builder builderEnriched = enrichBuilderWithTraceId(builder);
+        return enrichWithDefaultProps(builderEnriched);
     }
 
     private WebClient.Builder enrichBuilderWithTraceId(WebClient.Builder builder){
@@ -75,15 +79,21 @@ public abstract class CommonBaseClient {
         }
     }
 
-    public WebClient initWebClient(WebClient.Builder builder){
+    public WebClient.Builder enrichWithDefaultProps(WebClient.Builder builder){
 
-        HttpClient httpClient = HttpClient.create().option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectionTimeoutMillis)
+        ConnectionProvider provider = ConnectionProvider.builder("fixed")
+                .maxConnections(500)
+                .maxIdleTime(Duration.ofSeconds(20))
+                .maxLifeTime(Duration.ofSeconds(60))
+                .pendingAcquireTimeout(Duration.ofSeconds(60))
+                .evictInBackground(Duration.ofSeconds(120)).build();
+
+        HttpClient httpClient = HttpClient.create(provider).option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectionTimeoutMillis)
                 .doOnConnected(connection -> connection.addHandlerLast(new ReadTimeoutHandler(10000, TimeUnit.MILLISECONDS)));
 
-        return this.enrichBuilder(builder)
+        return builder
                 .filter(buildRetryExchangeFilterFunction())
-                .clientConnector(new ReactorClientHttpConnector(httpClient))
-                .build();
+                .clientConnector(new ReactorClientHttpConnector(httpClient));
     }
 
     private ExchangeFilterFunction buildRetryExchangeFilterFunction() {
