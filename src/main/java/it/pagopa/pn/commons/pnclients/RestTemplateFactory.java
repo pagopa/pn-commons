@@ -19,6 +19,7 @@ public class RestTemplateFactory {
     @Qualifier("withTracing")
     public RestTemplate restTemplateWithTracing(@Value("${pn.commons.retry.max-attempts}") int retryMaxAttempts,
                                                 @Value("${pn.commons.connection-timeout-millis}") int connectionTimeout) {
+        //RetryTemplate nel parametro retryMaxAttempts vuole le invocazioni totali (compresa la prima che non è fallita)
         RestTemplate template = new RestTemplateDecorator(retryMaxAttempts + 1);
         configureRestTemplate(connectionTimeout, template);
         return template;
