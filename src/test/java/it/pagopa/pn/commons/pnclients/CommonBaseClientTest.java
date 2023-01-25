@@ -21,6 +21,9 @@ class CommonBaseClientTest {
     @BeforeEach
     public void init(){
         commonBaseClient = new CommonBaseClient(){};
+        commonBaseClient.setTraceIdHeader("trace");
+        commonBaseClient.setConnectionTimeoutMillis(10000);
+        commonBaseClient.setRetryMaxAttempts(3);
     }
 
 
@@ -61,7 +64,6 @@ class CommonBaseClientTest {
 
         HttpUrl url = mockWebServer.url("/test");
 
-        commonBaseClient.setRetryMaxAttempts(3);
         WebClient webClient = commonBaseClient.initWebClient(WebClient.builder());
         Mono<String> responseMono = webClient.post()
                 .uri(url.uri())
@@ -91,7 +93,6 @@ class CommonBaseClientTest {
 
         HttpUrl url = mockWebServer.url("/test");
 
-        commonBaseClient.setRetryMaxAttempts(3);
         WebClient webClient = commonBaseClient.initWebClient(WebClient.builder());
         Mono<String> responseMono = webClient.post()
                 .uri(url.uri())
@@ -120,7 +121,6 @@ class CommonBaseClientTest {
 
         HttpUrl url = mockWebServer.url("/test");
 
-        commonBaseClient.setRetryMaxAttempts(3);
         WebClient webClient = commonBaseClient.initWebClient(WebClient.builder());
         Mono<String> responseMono = webClient.post()
                 .uri(url.uri())
@@ -152,7 +152,6 @@ class CommonBaseClientTest {
 
         HttpUrl url = mockWebServer.url("/test");
 
-        commonBaseClient.setRetryMaxAttempts(3);
         WebClient webClient = commonBaseClient.initWebClient(WebClient.builder());
         Mono<String> responseMono = webClient.post()
                 .uri(url.uri())
@@ -181,7 +180,6 @@ class CommonBaseClientTest {
 
         HttpUrl url = mockWebServer.url("/test");
 
-        commonBaseClient.setRetryMaxAttempts(3);
         WebClient webClient = commonBaseClient.initWebClient(WebClient.builder());
         Mono<String> responseMono = webClient.post()
                 .uri(url.uri())
