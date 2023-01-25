@@ -18,21 +18,43 @@ import reactor.netty.http.client.HttpClient;
 import reactor.netty.resources.ConnectionProvider;
 import reactor.util.retry.Retry;
 
+import javax.net.ssl.SSLHandshakeException;
 import java.net.ConnectException;
+import java.net.UnknownHostException;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Classe utilizzare per creare un @{@link WebClient}
+ * I client potranno estendere la classe per arricchirla (tramite @{@link WebClient.Builder}.
+ * Esempio di estensione semplice (in questo caso il client può utilizzare il metodo super.initWebClient):
+ * <p>
+ * public class SimpleClient extends CommonBaseClient {
+ *     public void init(){
+ *         ApiClient newApiClient = new ApiClient(super.initWebClient(ApiClient.buildWebClientBuilder()));
+ *         newApiClient.setBasePath(pnMandateConfig.getClientDatavaultBasepath());
+ *     }
+ * <p>
+ * Esempio di estensione sovrascrivendo il metodo initWebClient, per aggiungere altri parametri:
+ * <p>
+ * protected WebClient initWebClient(WebClient.Builder builder, String apiKey){
+ * <p>
+ *         return super.enrichBuilder(builder)
+ *                 .defaultHeader(HEADER_API_KEY, apiKey)
+ *                 .build();
+ *     }
+ */
 @Slf4j
 public abstract class CommonBaseClient {
-
-    protected CommonBaseClient(){
-    }
 
     private String traceIdHeader;
 
     private int retryMaxAttempts;
 
     private int connectionTimeoutMillis;
+
+    protected CommonBaseClient() {}
+
 
     public WebClient initWebClient(WebClient.Builder builder) {
         return enrichBuilder(builder).build();
@@ -79,34 +101,48 @@ public abstract class CommonBaseClient {
         }
     }
 
-    public WebClient.Builder enrichWithDefaultProps(WebClient.Builder builder){
-
-        ConnectionProvider provider = ConnectionProvider.builder("fixed")
-                .maxConnections(500)
-                .maxIdleTime(Duration.ofSeconds(20))
-                .maxLifeTime(Duration.ofSeconds(60))
-                .pendingAcquireTimeout(Duration.ofSeconds(60))
-                .evictInBackground(Duration.ofSeconds(120)).build();
-
-        HttpClient httpClient = HttpClient.create(provider).option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectionTimeoutMillis)
-                .doOnConnected(connection -> connection.addHandlerLast(new ReadTimeoutHandler(10000, TimeUnit.MILLISECONDS)));
+    protected WebClient.Builder enrichWithDefaultProps(WebClient.Builder builder){
+        HttpClient httpClient = buildHttpClient();
 
         return builder
                 .filter(buildRetryExchangeFilterFunction())
                 .clientConnector(new ReactorClientHttpConnector(httpClient));
     }
 
-    private ExchangeFilterFunction buildRetryExchangeFilterFunction() {
+    protected HttpClient buildHttpClient() {
+        ConnectionProvider provider = ConnectionProvider.builder("fixed")
+        .maxConnections(500)
+        .maxIdleTime(Duration.ofSeconds(20))
+        .maxLifeTime(Duration.ofSeconds(60))
+        .pendingAcquireTimeout(Duration.ofSeconds(60))
+        .evictInBackground(Duration.ofSeconds(120)).build();
+
+        return HttpClient.create(provider)
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectionTimeoutMillis)
+                .doOnConnected(connection -> connection.addHandlerLast(new ReadTimeoutHandler(10000, TimeUnit.MILLISECONDS)));
+    }
+
+    protected ExchangeFilterFunction buildRetryExchangeFilterFunction() {
         return (request, next) -> next.exchange(request)
                 .flatMap(clientResponse -> Mono.just(clientResponse)
                 .filter(response -> clientResponse.statusCode().isError())
                 .flatMap(response -> clientResponse.createException())
                 .flatMap(Mono::error)
                 .thenReturn(clientResponse))
-                .retryWhen( Retry.backoff(retryMaxAttempts, Duration.ofMillis(25))
-                        .filter(throwable -> throwable instanceof TimeoutException ||
-                                throwable instanceof ConnectException ||
-                                throwable instanceof WebClientResponseException.TooManyRequests));
+                .retryWhen( Retry.backoff(retryMaxAttempts, Duration.ofMillis(25)).jitter(0.75)
+                        .filter(this::isRetryableException));
+    }
+
+    private boolean isRetryableException(Throwable throwable) {
+        return throwable instanceof TimeoutException ||
+                throwable instanceof ConnectException ||
+                throwable instanceof SSLHandshakeException ||
+                throwable instanceof UnknownHostException ||
+                throwable instanceof WebClientResponseException.TooManyRequests ||
+                throwable instanceof WebClientResponseException.GatewayTimeout ||
+                throwable instanceof WebClientResponseException.BadGateway ||
+                throwable instanceof WebClientResponseException.ServiceUnavailable
+                ;
     }
 
     @Autowired

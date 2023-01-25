@@ -29,7 +29,14 @@ public class RestTemplateResponseErrorHandler
 
     @Override
     public void handleError(@NotNull ClientHttpResponse response) throws IOException {
-        String body = getBody(response);
+        String body = null;
+
+        try {
+            body = getBody(response);
+        }
+        catch (IOException e) {
+            log.trace("Empty body");
+        }
         
         String errorMsg = String.format(
                 "Error with statusCode=%s and body=%s",
@@ -45,8 +52,14 @@ public class RestTemplateResponseErrorHandler
     public void handleError(@NotNull URI url, @NotNull HttpMethod method, @NotNull ClientHttpResponse response)
             throws IOException {
 
-        String body = getBody(response);
-        
+        String body = null;
+        try {
+            body = getBody(response);
+        }
+        catch (IOException e) {
+            log.trace("Empty body");
+        }
+
         String errorMsg = String.format(
                 "Error in call url=%s method=%s statusCode=%s and body=%s",
                 url, 

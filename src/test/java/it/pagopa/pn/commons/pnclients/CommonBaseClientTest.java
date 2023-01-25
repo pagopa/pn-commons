@@ -46,13 +46,13 @@ class CommonBaseClientTest {
     }
 
     @Test
-    void testRetryTreeTimes() throws IOException
+    void testRetryWithTreeFails() throws IOException
     {
         MockWebServer mockWebServer = new MockWebServer();
 
         String expectedResponse = "expect that it works";
         mockWebServer.enqueue(new MockResponse().setResponseCode(429));
-        mockWebServer.enqueue(new MockResponse().setResponseCode(429));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(502));
         mockWebServer.enqueue(new MockResponse().setResponseCode(429));
         mockWebServer.enqueue(new MockResponse().setResponseCode(200)
                 .setBody(expectedResponse));
@@ -77,13 +77,13 @@ class CommonBaseClientTest {
     }
 
     @Test
-    void testRetryTwice() throws IOException
+    void testRetryWithTwoFails() throws IOException
     {
         MockWebServer mockWebServer = new MockWebServer();
 
         String expectedResponse = "expect that it works";
         mockWebServer.enqueue(new MockResponse().setResponseCode(429));
-        mockWebServer.enqueue(new MockResponse().setResponseCode(429));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(502));
         mockWebServer.enqueue(new MockResponse().setResponseCode(200)
                 .setBody(expectedResponse));
 
@@ -107,7 +107,7 @@ class CommonBaseClientTest {
     }
 
     @Test
-    void testRetryOnce() throws IOException
+    void testRetryWithOneFail() throws IOException
     {
         MockWebServer mockWebServer = new MockWebServer();
 
@@ -142,9 +142,38 @@ class CommonBaseClientTest {
 
         String expectedResponse = "expect that it works";
         mockWebServer.enqueue(new MockResponse().setResponseCode(429));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(502));
         mockWebServer.enqueue(new MockResponse().setResponseCode(429));
         mockWebServer.enqueue(new MockResponse().setResponseCode(429));
-        mockWebServer.enqueue(new MockResponse().setResponseCode(429));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(200)
+                .setBody(expectedResponse));
+
+        mockWebServer.start();
+
+        HttpUrl url = mockWebServer.url("/test");
+
+        commonBaseClient.setRetryMaxAttempts(3);
+        WebClient webClient = commonBaseClient.initWebClient(WebClient.builder());
+        Mono<String> responseMono = webClient.post()
+                .uri(url.uri())
+                .body(BodyInserters.fromObject("myRequest"))
+                .retrieve()
+                .bodyToMono(String.class);
+
+        StepVerifier.create(responseMono)
+                .expectError()
+                .verify();
+
+        mockWebServer.shutdown();
+    }
+
+    @Test
+    void testExceptionNotRetryable() throws IOException
+    {
+        MockWebServer mockWebServer = new MockWebServer();
+
+        String expectedResponse = "expect that it works";
+        mockWebServer.enqueue(new MockResponse().setResponseCode(500));
         mockWebServer.enqueue(new MockResponse().setResponseCode(200)
                 .setBody(expectedResponse));
 

@@ -5,9 +5,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpRequest;
-import org.springframework.http.client.ClientHttpRequestExecution;
-import org.springframework.http.client.ClientHttpRequestInterceptor;
-import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.http.client.*;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
@@ -19,12 +17,20 @@ public class RestTemplateFactory {
 
     @Bean
     @Qualifier("withTracing")
-    public RestTemplate restTemplateWithTracing(){
-        RestTemplate template = new RestTemplate();
+    public RestTemplate restTemplateWithTracing(@Value("${pn.commons.retry.max-attempts}") int retryMaxAttempts,
+                                                @Value("${pn.commons.connection-timeout-millis}") int connectionTimeout) {
+        RestTemplate template = new RestTemplateDecorator(retryMaxAttempts + 1);
+        configureRestTemplate(connectionTimeout, template);
+        return template;
+    }
+
+    protected void configureRestTemplate(int connectionTimeout, RestTemplate template) {
+        SimpleClientHttpRequestFactory clientHttpRequestFactory = new SimpleClientHttpRequestFactory();
+        clientHttpRequestFactory.setConnectTimeout(connectionTimeout);
+        clientHttpRequestFactory.setReadTimeout(connectionTimeout);
+        template.setRequestFactory(clientHttpRequestFactory);
         enrichWithTracing(template);
         template.setErrorHandler(new RestTemplateResponseErrorHandler());
-        
-        return template;
     }
 
     public void enrichWithTracing(RestTemplate template) {
