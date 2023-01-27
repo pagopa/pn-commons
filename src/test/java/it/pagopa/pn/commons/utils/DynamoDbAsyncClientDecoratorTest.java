@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
 import software.amazon.awssdk.services.dynamodb.model.*;
+import software.amazon.awssdk.services.dynamodb.paginators.BatchGetItemPublisher;
 import software.amazon.awssdk.services.dynamodb.paginators.QueryPublisher;
 import software.amazon.awssdk.utils.builder.SdkBuilder;
 
@@ -155,6 +156,14 @@ class DynamoDbAsyncClientDecoratorTest {
         UpdateItemResponse expectedValue = UpdateItemResponse.builder().consumedCapacity(ConsumedCapacity.builder().tableName("TABLE").build()).build();
         Mockito.when(delegate.updateItem(consumer)).thenReturn(CompletableFuture.completedFuture(expectedValue));
         assertThat(dynamoDbAsyncClientDecorator.updateItem(consumer).get()).isEqualTo(expectedValue);
+    }
+
+    @Test
+    void batchGetItemPaginator() {
+        BatchGetItemRequest request = BatchGetItemRequest.builder().build();
+        BatchGetItemPublisher publisher = new BatchGetItemPublisher(null, null);
+        Mockito.when(delegate.batchGetItemPaginator(request)).thenReturn(publisher);
+        assertThat(dynamoDbAsyncClientDecorator.batchGetItemPaginator(request)).isEqualTo(publisher);
     }
 
 }

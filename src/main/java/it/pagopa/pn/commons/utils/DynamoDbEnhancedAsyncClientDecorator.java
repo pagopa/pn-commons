@@ -1,9 +1,13 @@
 package it.pagopa.pn.commons.utils;
 
 import lombok.EqualsAndHashCode;
+import reactor.core.publisher.Mono;
+import software.amazon.awssdk.core.async.SdkPublisher;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbAsyncTable;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedAsyncClient;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
+import software.amazon.awssdk.enhanced.dynamodb.model.BatchGetItemEnhancedRequest;
+import software.amazon.awssdk.enhanced.dynamodb.model.BatchGetResultPagePublisher;
 import software.amazon.awssdk.enhanced.dynamodb.model.TransactWriteItemsEnhancedRequest;
 
 import java.util.Map;
@@ -36,5 +40,13 @@ public class DynamoDbEnhancedAsyncClientDecorator implements DynamoDbEnhancedAsy
         Map<String, String> copyOfContextMap = MDCUtils.retrieveMDCContextMap();
         return this.dynamoDbEnhancedAsyncClient.transactWriteItems(request)
                 .thenApply(queryResponse -> MDCUtils.enrichWithMDC(queryResponse, copyOfContextMap));
+    }
+
+    @Override
+    public BatchGetResultPagePublisher batchGetItem(BatchGetItemEnhancedRequest request) {
+        Map<String, String> copyOfContextMap = MDCUtils.retrieveMDCContextMap();
+        return BatchGetResultPagePublisher.create(SdkPublisher.adapt(
+                Mono.from(this.dynamoDbEnhancedAsyncClient.batchGetItem(request))
+                        .doOnNext(response -> MDCUtils.enrichWithMDC(response, copyOfContextMap))));
     }
 }

@@ -2,6 +2,7 @@ package it.pagopa.pn.commons.utils;
 
 import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
 import software.amazon.awssdk.services.dynamodb.model.*;
+import software.amazon.awssdk.services.dynamodb.paginators.BatchGetItemPublisher;
 import software.amazon.awssdk.services.dynamodb.paginators.QueryPublisher;
 
 import java.util.Map;
@@ -77,6 +78,12 @@ public class DynamoDbAsyncClientDecorator implements DynamoDbAsyncClient {
         Map<String, String> copyOfContextMap = MDCUtils.retrieveMDCContextMap();
         return this.dynamoDbAsyncClient.transactWriteItems(transactWriteItemsRequest)
                 .thenApply(transactWriteItemsResponse -> MDCUtils.enrichWithMDC(transactWriteItemsResponse, copyOfContextMap));
+    }
+
+    @Override
+    public BatchGetItemPublisher batchGetItemPaginator(BatchGetItemRequest batchGetItemRequest) {
+        // richiamato internamente da DynamoDbEnhancedAsyncClient.batchGetItem()
+        return this.dynamoDbAsyncClient.batchGetItemPaginator(batchGetItemRequest);
     }
 
     @Override
