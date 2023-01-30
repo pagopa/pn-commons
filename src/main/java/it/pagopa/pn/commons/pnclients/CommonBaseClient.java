@@ -119,7 +119,7 @@ public abstract class CommonBaseClient {
 
         return HttpClient.create(provider)
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectionTimeoutMillis)
-                .doOnConnected(connection -> connection.addHandlerLast(new ReadTimeoutHandler(10000, TimeUnit.MILLISECONDS)));
+                .doOnConnected(connection -> connection.addHandlerLast(new ReadTimeoutHandler(connectionTimeoutMillis, TimeUnit.MILLISECONDS)));
     }
 
     protected ExchangeFilterFunction buildRetryExchangeFilterFunction() {

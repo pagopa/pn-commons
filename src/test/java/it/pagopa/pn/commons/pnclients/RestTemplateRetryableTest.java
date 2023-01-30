@@ -13,13 +13,13 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class RestTemplateDecoratorTest {
+class RestTemplateRetryableTest {
 
-    private RestTemplateDecorator restTemplateDecorator;
+    private RestTemplateRetryable restTemplateRetryable;
 
     @BeforeEach
     public void init() {
-        restTemplateDecorator = new RestTemplateDecorator(3);
+        restTemplateRetryable = new RestTemplateRetryable(3);
     }
 
     @Test
@@ -31,7 +31,7 @@ class RestTemplateDecoratorTest {
         mockWebServer.start();
         HttpUrl url = mockWebServer.url("/test");
         URI uri = url.uri();
-        String response = restTemplateDecorator.getForObject(uri, String.class);
+        String response = restTemplateRetryable.getForObject(uri, String.class);
         assertThat(response).isEqualTo(expectedResponse);
         mockWebServer.shutdown();
     }
@@ -45,7 +45,7 @@ class RestTemplateDecoratorTest {
         mockWebServer.start();
         HttpUrl url = mockWebServer.url("/test?param=1");
         URI uri = url.uri();
-        String response = restTemplateDecorator.getForObject(uri.toString(), String.class, "param", 1);
+        String response = restTemplateRetryable.getForObject(uri.toString(), String.class, "param", 1);
         assertThat(response).isEqualTo(expectedResponse);
         mockWebServer.shutdown();
     }
@@ -59,7 +59,7 @@ class RestTemplateDecoratorTest {
         mockWebServer.start();
         HttpUrl url = mockWebServer.url("/test?param=1");
         URI uri = url.uri();
-        String response = restTemplateDecorator.getForObject(uri.toString(), String.class, Map.of("param", 1));
+        String response = restTemplateRetryable.getForObject(uri.toString(), String.class, Map.of("param", 1));
         assertThat(response).isEqualTo(expectedResponse);
         mockWebServer.shutdown();
     }
@@ -73,7 +73,7 @@ class RestTemplateDecoratorTest {
         mockWebServer.start();
         HttpUrl url = mockWebServer.url("/test");
         URI uri = url.uri();
-        ResponseEntity<String> response = restTemplateDecorator.getForEntity(uri, String.class);
+        ResponseEntity<String> response = restTemplateRetryable.getForEntity(uri, String.class);
         assertThat(response.getStatusCodeValue()).isEqualTo(200);
         assertThat(response.getBody()).isEqualTo(expectedResponse);
         mockWebServer.shutdown();
@@ -88,7 +88,7 @@ class RestTemplateDecoratorTest {
         mockWebServer.start();
         HttpUrl url = mockWebServer.url("/test?param=1");
         URI uri = url.uri();
-        ResponseEntity<String> response = restTemplateDecorator.getForEntity(uri.toString(), String.class, "param", 1);
+        ResponseEntity<String> response = restTemplateRetryable.getForEntity(uri.toString(), String.class, "param", 1);
         assertThat(response.getStatusCodeValue()).isEqualTo(200);
         assertThat(response.getBody()).isEqualTo(expectedResponse);
         mockWebServer.shutdown();
@@ -103,7 +103,7 @@ class RestTemplateDecoratorTest {
         mockWebServer.start();
         HttpUrl url = mockWebServer.url("/test?param=1");
         URI uri = url.uri();
-        ResponseEntity<String> response = restTemplateDecorator.getForEntity(uri.toString(), String.class, Map.of("param", 1));
+        ResponseEntity<String> response = restTemplateRetryable.getForEntity(uri.toString(), String.class, Map.of("param", 1));
         assertThat(response.getStatusCodeValue()).isEqualTo(200);
         assertThat(response.getBody()).isEqualTo(expectedResponse);
         mockWebServer.shutdown();
@@ -118,7 +118,7 @@ class RestTemplateDecoratorTest {
         mockWebServer.start();
         HttpUrl url = mockWebServer.url("/test");
         URI uri = url.uri();
-        String response = restTemplateDecorator.postForObject(uri, "Body", String.class);
+        String response = restTemplateRetryable.postForObject(uri, "Body", String.class);
         assertThat(response).isEqualTo(expectedResponse);
         mockWebServer.shutdown();
     }
@@ -132,7 +132,7 @@ class RestTemplateDecoratorTest {
         mockWebServer.start();
         HttpUrl url = mockWebServer.url("/test?param=1");
         URI uri = url.uri();
-        String response = restTemplateDecorator.postForObject(uri.toString(), "Body", String.class, "param", 1);
+        String response = restTemplateRetryable.postForObject(uri.toString(), "Body", String.class, "param", 1);
         assertThat(response).isEqualTo(expectedResponse);
         mockWebServer.shutdown();
     }
@@ -146,7 +146,7 @@ class RestTemplateDecoratorTest {
         mockWebServer.start();
         HttpUrl url = mockWebServer.url("/test?param=1");
         URI uri = url.uri();
-        String response = restTemplateDecorator.postForObject(uri.toString(), "Body", String.class, Map.of("param", 1));
+        String response = restTemplateRetryable.postForObject(uri.toString(), "Body", String.class, Map.of("param", 1));
         assertThat(response).isEqualTo(expectedResponse);
         mockWebServer.shutdown();
     }
@@ -160,7 +160,7 @@ class RestTemplateDecoratorTest {
         mockWebServer.start();
         HttpUrl url = mockWebServer.url("/test");
         URI uri = url.uri();
-        ResponseEntity<String> response = restTemplateDecorator.postForEntity(uri, "Body", String.class);
+        ResponseEntity<String> response = restTemplateRetryable.postForEntity(uri, "Body", String.class);
         assertThat(response.getStatusCodeValue()).isEqualTo(200);
         assertThat(response.getBody()).isEqualTo(expectedResponse);
         mockWebServer.shutdown();
@@ -175,7 +175,7 @@ class RestTemplateDecoratorTest {
         mockWebServer.start();
         HttpUrl url = mockWebServer.url("/test?param=1");
         URI uri = url.uri();
-        ResponseEntity<String> response = restTemplateDecorator.postForEntity(uri.toString(), "Body", String.class, "param", 1);
+        ResponseEntity<String> response = restTemplateRetryable.postForEntity(uri.toString(), "Body", String.class, "param", 1);
         assertThat(response.getStatusCodeValue()).isEqualTo(200);
         assertThat(response.getBody()).isEqualTo(expectedResponse);
         mockWebServer.shutdown();
@@ -190,7 +190,7 @@ class RestTemplateDecoratorTest {
         mockWebServer.start();
         HttpUrl url = mockWebServer.url("/test?param=1");
         URI uri = url.uri();
-        ResponseEntity<String> response = restTemplateDecorator.postForEntity(uri.toString(), "Body", String.class, Map.of("param", 1));
+        ResponseEntity<String> response = restTemplateRetryable.postForEntity(uri.toString(), "Body", String.class, Map.of("param", 1));
         assertThat(response.getStatusCodeValue()).isEqualTo(200);
         assertThat(response.getBody()).isEqualTo(expectedResponse);
         mockWebServer.shutdown();
