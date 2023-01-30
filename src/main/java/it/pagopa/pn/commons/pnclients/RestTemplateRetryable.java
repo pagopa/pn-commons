@@ -21,11 +21,11 @@ import java.net.URI;
 import java.net.UnknownHostException;
 import java.util.Map;
 
-public class RestTemplateDecorator extends RestTemplate {
+public class RestTemplateRetryable extends RestTemplate {
 
     private final RetryTemplate retryTemplate;
 
-    public RestTemplateDecorator(int retryMaxAttempts) {
+    public RestTemplateRetryable(int retryMaxAttempts) {
         this.retryTemplate = createRetryTemplate(retryMaxAttempts);
     }
 
