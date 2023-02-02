@@ -8,18 +8,31 @@ public class ValidateUtils {
     private ValidateUtils() {
     }
 
-    public static boolean validate(String taxId){
+    /**
+     * Valida un taxId come PF (ovvero deve essere un CF 16 cifre)
+     * o come PG (che può essere sia CF sia P.IVA)
+     *
+     * @param taxId da validare
+     * @param isPf true se si vuole validare espressamente SOLO un CF a 16 cifre
+     * @return true se il taxId è valido
+     */
+    public static boolean validate(String taxId, boolean isPf){
         taxId = normalize(taxId);
         if( taxId.length() == 0 ){
             return false;
         }
-        else if( taxId.length() == 11 ){
+        else if(!isPf && taxId.length() == 11 ){
             return validateIva(taxId);
         }
         else if( taxId.length() == 16 ){
             return validateCf(taxId);
         }
         return false;
+    }
+
+    public static boolean validate(String taxId){
+        // non passare isPF sottointende validare sia PF che PG
+        return validate(taxId, false);
     }
 
     private static String normalize(String cf) {
