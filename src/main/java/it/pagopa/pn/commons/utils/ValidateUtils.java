@@ -29,7 +29,7 @@ public class ValidateUtils {
     }
 
     private static boolean validateCf(String cf) {
-        if(!cf.matches("^[A-Z]{6}[0-9LMNPQRSTUV]{2}[ABCDEHLMPRST]{1}[0-9LMNPQRSTUV]{2}[A-Z]{1}[0-9LMNPQRSTUV]{3}[A-Z]{1}$") )
+        if(!cf.matches("^[A-Z]{6}[0-9LMNPQRSTUV]{2}[ABCDEHLMPRST][0-9LMNPQRSTUV]{2}[A-Z][0-9LMNPQRSTUV]{3}[A-Z]$") )
             return false;
         int s = 0;
         String even_map = "BAFHJNPRTVCESULDGIMOQKWZYX";
@@ -48,7 +48,7 @@ public class ValidateUtils {
     }
 
     private static boolean validateIva(String iva){
-        if(!iva.matches("^[0-9]{11}$") )
+        if(!iva.matches("^\\d{11}$") )
             return false;
         int s = 0;
         for(int i = 0; i < 11; i++){
