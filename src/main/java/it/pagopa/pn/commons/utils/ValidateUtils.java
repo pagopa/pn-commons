@@ -32,7 +32,7 @@ public class ValidateUtils {
         if(!cf.matches("^[A-Z]{6}[0-9LMNPQRSTUV]{2}[ABCDEHLMPRST][0-9LMNPQRSTUV]{2}[A-Z][0-9LMNPQRSTUV]{3}[A-Z]$") )
             return false;
         int s = 0;
-        String even_map = "BAFHJNPRTVCESULDGIMOQKWZYX";
+        String evenMap = "BAFHJNPRTVCESULDGIMOQKWZYX";
         for(int i = 0; i < 15; i++){
             int c = cf.charAt(i);
             int n;
@@ -41,7 +41,7 @@ public class ValidateUtils {
             else
                 n = c - 'A';
             if( (i & 1) == 0 )
-                n = even_map.charAt(n) - 'A';
+                n = evenMap.charAt(n) - 'A';
             s += n;
         }
         return s % 26 + 'A' == cf.charAt(15);
