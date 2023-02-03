@@ -28,7 +28,7 @@ public enum PnAuditLogEventType {
     AUD_NT_PAYMENT(PnAuditLogMarker.AUDIT10Y),
     AUD_NT_REQCOST(PnAuditLogMarker.AUDIT10Y),
     AUD_NT_REQQR(PnAuditLogMarker.AUDIT10Y),
-    AUD_NT_DOWTIME(PnAuditLogMarker.AUDIT10Y),
+    AUD_NT_DOWNTIME(PnAuditLogMarker.AUDIT10Y),
     AUD_NT_SEARCH_DEL(PnAuditLogMarker.AUDIT10Y),
     AUD_NT_ATCHOPEN_DEL(PnAuditLogMarker.AUDIT10Y),
     AUD_NT_VIEW_DEL(PnAuditLogMarker.AUDIT10Y),
