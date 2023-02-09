@@ -49,4 +49,15 @@ class TaxIdInWhiteListParameterConsumerTest {
         Boolean invalidTaxIdInWhiteList = taxIdInWhiteListParameterConsumer.isInWhiteList(INVALID_TAX_ID_IN_WHITE_LIST);
         Assertions.assertFalse( invalidTaxIdInWhiteList );
     }
+
+    @ExtendWith(MockitoExtension.class)
+    @Test
+    void getTaxIdNotInWhiteList() {
+
+        Mockito.when( abstractCachedSsmParameterConsumer.getParameterValue( Mockito.anyString(), Mockito.any() ) )
+                .thenReturn(Optional.empty());
+
+        Boolean inWhiteList = taxIdInWhiteListParameterConsumer.isInWhiteList(TAX_ID_IN_WHITE_LIST);
+        Assertions.assertFalse( inWhiteList );
+    }
 }

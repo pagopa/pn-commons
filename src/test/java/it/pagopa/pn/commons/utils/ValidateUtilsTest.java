@@ -59,5 +59,12 @@ class ValidateUtilsTest {
         assertTrue(validateUtils.validate("4730 9842  806"));
     }
 
+    @Test
+    void validateInWitheList() {
+        TaxIdInWhiteListParameterConsumer taxIdInWhiteListParameterConsumer = Mockito.mock(TaxIdInWhiteListParameterConsumer.class);
+        validateUtils = new ValidateUtils(taxIdInWhiteListParameterConsumer);
+        Mockito.when( taxIdInWhiteListParameterConsumer.isInWhiteList( Mockito.anyString() ) ).thenReturn( true );
+        assertTrue(validateUtils.validate("AAAAEEEEEEEDDD"));
+    }
 }
 
