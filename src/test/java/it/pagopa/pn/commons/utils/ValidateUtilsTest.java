@@ -1,5 +1,6 @@
 package it.pagopa.pn.commons.utils;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Assertions;
@@ -20,12 +21,13 @@ class ValidateUtilsTest {
 
     @Test
     void testValidateCfFalse() {
-        Assertions.assertFalse(ValidateUtils.validate("@@@"));
-        Assertions.assertFalse(ValidateUtils.validate("@@@@@@@@@@@@@@@@"));
-        Assertions.assertFalse(ValidateUtils.validate("@@@@@@@@@@@"));
-        Assertions.assertFalse(ValidateUtils.validate("MRORSS00A00A000V"));
-        Assertions.assertFalse(ValidateUtils.validate("MRORSS00A+0A000V"));
-        Assertions.assertFalse(ValidateUtils.validate("00000+00000"));
+        assertFalse(ValidateUtils.validate("@@@"));
+        assertFalse(ValidateUtils.validate("@@@@@@@@@@@@@@@@"));
+        assertFalse(ValidateUtils.validate("@@@@@@@@@@@"));
+        assertFalse(ValidateUtils.validate("MRORSS00A00A000V"));
+        assertFalse(ValidateUtils.validate("MRORSS00A+0A000V"));
+        assertFalse(ValidateUtils.validate("00000+00000"));
+        assertFalse(ValidateUtils.validate("FRNSST75D50A717M"));
         assertTrue(ValidateUtils.validate("FRNSST75D50A717N"));
         assertTrue(ValidateUtils.validate("MRO rSs 00a00 A000U"));
         assertTrue(ValidateUtils.validate("KJWMFE88C50E205S"));
