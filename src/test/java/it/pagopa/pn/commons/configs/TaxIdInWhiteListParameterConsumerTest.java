@@ -22,7 +22,6 @@ import java.util.Optional;
 class TaxIdInWhiteListParameterConsumerTest {
 
     private static final String TAX_ID_IN_WHITE_LIST = "EEEEEEEEEEE";
-    private static final String INVALID_TAX_ID_IN_WHITE_LIST = "AAAAAAAAA";
 
     @MockBean
     ValidateUtils validateUtils;
@@ -38,16 +37,13 @@ class TaxIdInWhiteListParameterConsumerTest {
     void getTaxIdIsInWhiteList() {
 
         TaxIdInWhiteListParameterConsumer.TaxIdInWhiteList[] taxIdInWhiteLists = new TaxIdInWhiteListParameterConsumer.TaxIdInWhiteList[2];
-        taxIdInWhiteLists[0] = new TaxIdInWhiteListParameterConsumer.TaxIdInWhiteList( TAX_ID_IN_WHITE_LIST, true );
-        taxIdInWhiteLists[1] = new TaxIdInWhiteListParameterConsumer.TaxIdInWhiteList( INVALID_TAX_ID_IN_WHITE_LIST, false );
+        taxIdInWhiteLists[0] = new TaxIdInWhiteListParameterConsumer.TaxIdInWhiteList( TAX_ID_IN_WHITE_LIST );
 
         Mockito.when( abstractCachedSsmParameterConsumer.getParameterValue( Mockito.anyString(), Mockito.any() ) )
                 .thenReturn(Optional.of(taxIdInWhiteLists));
 
         Boolean inWhiteList = taxIdInWhiteListParameterConsumer.isInWhiteList(TAX_ID_IN_WHITE_LIST);
         Assertions.assertTrue( inWhiteList );
-        Boolean invalidTaxIdInWhiteList = taxIdInWhiteListParameterConsumer.isInWhiteList(INVALID_TAX_ID_IN_WHITE_LIST);
-        Assertions.assertFalse( invalidTaxIdInWhiteList );
     }
 
     @ExtendWith(MockitoExtension.class)

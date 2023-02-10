@@ -31,9 +31,8 @@ public class TaxIdInWhiteListParameterConsumer {
             TaxIdInWhiteList[] taxIdInWhiteListList = optionalTaxIdIsInWhiteList.get();
             for (TaxIdInWhiteList taxIdInWhiteList : taxIdInWhiteListList) {
                 if ( taxIdInWhiteList.taxId.equals( taxId ) ) {
-                    Boolean isValid = taxIdInWhiteList.isValid;
-                    log.debug("taxId={} isValid={}", maskedTaxId, isValid );
-                    return isValid;
+                    log.debug("taxId={} is in white list", maskedTaxId );
+                    return true;
                 }
             }
         }
@@ -46,6 +45,5 @@ public class TaxIdInWhiteListParameterConsumer {
     @NoArgsConstructor
     static class TaxIdInWhiteList {
         String taxId;
-        Boolean isValid;
     }
 }
