@@ -6,11 +6,19 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import it.pagopa.pn.commons.configs.TaxIdInWhiteListParameterConsumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+@ExtendWith(MockitoExtension.class)
 class ValidateUtilsTest {
 
     private ValidateUtils validateUtils;
+
+    @Mock
+    TaxIdInWhiteListParameterConsumer taxIdInWhiteListParameterConsumer;
+
 
     /**
      * Method under test: {@link ValidateUtils#validate(String)}
@@ -18,8 +26,7 @@ class ValidateUtilsTest {
 
     @BeforeEach
     void setup() {
-        TaxIdInWhiteListParameterConsumer taxIdInWhiteListParameterConsumer = Mockito.mock(TaxIdInWhiteListParameterConsumer.class);
-        validateUtils = new ValidateUtils(taxIdInWhiteListParameterConsumer);
+        validateUtils = new ValidateUtils( taxIdInWhiteListParameterConsumer );
         Mockito.when( taxIdInWhiteListParameterConsumer.isInWhiteList( Mockito.anyString() ) ).thenReturn( false );
     }
 
@@ -61,7 +68,6 @@ class ValidateUtilsTest {
 
     @Test
     void validateInWitheList() {
-        TaxIdInWhiteListParameterConsumer taxIdInWhiteListParameterConsumer = Mockito.mock(TaxIdInWhiteListParameterConsumer.class);
         validateUtils = new ValidateUtils(taxIdInWhiteListParameterConsumer);
         Mockito.when( taxIdInWhiteListParameterConsumer.isInWhiteList( Mockito.anyString() ) ).thenReturn( true );
         assertTrue(validateUtils.validate("AAAAEEEEEEEDDD"));

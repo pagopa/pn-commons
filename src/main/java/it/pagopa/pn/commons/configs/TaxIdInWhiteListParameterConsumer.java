@@ -5,14 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
 import static it.pagopa.pn.commons.utils.LogUtils.maskTaxId;
 
 @Slf4j
-@Component
 public class TaxIdInWhiteListParameterConsumer {
 
     private final ParameterConsumer parameterConsumer;

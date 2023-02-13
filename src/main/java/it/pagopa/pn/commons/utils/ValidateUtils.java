@@ -2,15 +2,13 @@ package it.pagopa.pn.commons.utils;
 
 import it.pagopa.pn.commons.configs.TaxIdInWhiteListParameterConsumer;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 @Slf4j
-@Component
 public class ValidateUtils {
 
     private final TaxIdInWhiteListParameterConsumer taxIdInWhiteListParameterConsumer;
 
-    ValidateUtils(TaxIdInWhiteListParameterConsumer taxIdInWhiteListParameterConsumer) {
+    public ValidateUtils(TaxIdInWhiteListParameterConsumer taxIdInWhiteListParameterConsumer) {
         this.taxIdInWhiteListParameterConsumer = taxIdInWhiteListParameterConsumer;
     }
 
