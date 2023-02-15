@@ -1,11 +1,15 @@
 package it.pagopa.pn.commons.utils;
 
+import it.pagopa.pn.commons.configs.TaxIdInWhiteListParameterConsumer;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class ValidateUtils {
 
-    private ValidateUtils() {
+    private final TaxIdInWhiteListParameterConsumer taxIdInWhiteListParameterConsumer;
+
+    public ValidateUtils(TaxIdInWhiteListParameterConsumer taxIdInWhiteListParameterConsumer) {
+        this.taxIdInWhiteListParameterConsumer = taxIdInWhiteListParameterConsumer;
     }
 
     /**
@@ -16,12 +20,16 @@ public class ValidateUtils {
      * @param isPf true se si vuole validare espressamente SOLO un CF a 16 cifre
      * @return true se il taxId è valido
      */
-    public static boolean validate(String taxId, boolean isPf){
+    public boolean validate(String taxId, boolean isPf){
         taxId = normalize(taxId);
         if( taxId.length() == 0 ){
             return false;
         }
-        else if(!isPf && taxId.length() == 11 ){
+        if (Boolean.TRUE.equals(taxIdInWhiteListParameterConsumer.isInWhiteList(taxId))) {
+            return true;
+        }
+
+        if(!isPf && taxId.length() == 11 ){
             return validateIva(taxId);
         }
         else if( taxId.length() == 16 ){
@@ -30,7 +38,7 @@ public class ValidateUtils {
         return false;
     }
 
-    public static boolean validate(String taxId){
+    public boolean validate(String taxId){
         // non passare isPF sottointende validare sia PF che PG
         return validate(taxId, false);
     }
@@ -41,7 +49,7 @@ public class ValidateUtils {
         return cf;
     }
 
-    private static boolean validateCf(String cf) {
+    private boolean validateCf(String cf) {
         if(!cf.matches("^[A-Z]{6}[0-9LMNPQRSTUV]{2}[ABCDEHLMPRST][0-9LMNPQRSTUV]{2}[A-Z][0-9LMNPQRSTUV]{3}[A-Z]$") )
             return false;
         int s = 0;
@@ -60,7 +68,7 @@ public class ValidateUtils {
         return s % 26 + 'A' == cf.charAt(15);
     }
 
-    private static boolean validateIva(String iva){
+    private boolean validateIva(String iva){
         if(!iva.matches("^\\d{11}$") )
             return false;
         int s = 0;
