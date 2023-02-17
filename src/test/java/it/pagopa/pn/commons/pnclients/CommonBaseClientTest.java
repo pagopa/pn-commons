@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -144,7 +145,7 @@ class CommonBaseClientTest {
         mockWebServer.enqueue(new MockResponse().setResponseCode(429));
         mockWebServer.enqueue(new MockResponse().setResponseCode(502));
         mockWebServer.enqueue(new MockResponse().setResponseCode(429));
-        mockWebServer.enqueue(new MockResponse().setResponseCode(429));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(503));
         mockWebServer.enqueue(new MockResponse().setResponseCode(200)
                 .setBody(expectedResponse));
 
@@ -160,7 +161,7 @@ class CommonBaseClientTest {
                 .bodyToMono(String.class);
 
         StepVerifier.create(responseMono)
-                .expectError()
+                .expectError(WebClientResponseException.ServiceUnavailable.class)
                 .verify();
 
         mockWebServer.shutdown();
@@ -188,7 +189,7 @@ class CommonBaseClientTest {
                 .bodyToMono(String.class);
 
         StepVerifier.create(responseMono)
-                .expectError()
+                .expectError(WebClientResponseException.InternalServerError.class)
                 .verify();
 
         mockWebServer.shutdown();

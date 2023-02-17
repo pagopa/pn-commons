@@ -130,7 +130,13 @@ public abstract class CommonBaseClient {
                 .flatMap(Mono::error)
                 .thenReturn(clientResponse))
                 .retryWhen( Retry.backoff(retryMaxAttempts, Duration.ofMillis(25)).jitter(0.75)
-                        .filter(this::isRetryableException));
+                        .filter(this::isRetryableException)
+                        .onRetryExhaustedThrow((retryBackoffSpec, retrySignal) -> {
+                            Throwable lastExceptionInRetry = retrySignal.failure();
+                            log.warn("Retries exhausted {}, with last Exception: {}", retrySignal.totalRetries(), lastExceptionInRetry.getMessage());
+                            return lastExceptionInRetry;
+                        })
+                );
     }
 
     private boolean isRetryableException(Throwable throwable) {
