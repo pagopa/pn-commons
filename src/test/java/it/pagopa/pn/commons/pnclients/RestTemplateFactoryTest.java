@@ -158,4 +158,67 @@ class RestTemplateFactoryTest {
         mockWebServer.shutdown();
     }
 
+    /* Work with:
+    - EncodingMode.TEMPLATE_AND_VALUES
+    - EncodingMode.VALUES_ONLY
+    (default of RestTemplate is EncodingMode.URI_COMPONENT)
+     */
+    @Test
+    void pathVariableWithSemicolonTest() throws IOException {
+        String contextPath = "/test/";
+        String pathVariable = "path;withsemicolon";
+        RestTemplate restTemplate = restTemplateFactory.restTemplateWithTracing(3, 10000);
+
+        MockWebServer mockWebServer = new MockWebServer();
+
+        String expectedResponse = "expect that it works";
+        mockWebServer.enqueue(new MockResponse().setResponseCode(200)
+                .setBody(expectedResponse));
+
+        mockWebServer.start();
+
+        HttpUrl url = mockWebServer.url(contextPath + pathVariable);
+        String basePath = url.scheme() + "://" + url.host() + ":" + url.port();
+        ResponseEntity<String> response = restTemplate.getForEntity(basePath + "/test/{key1}", String.class, pathVariable);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isEqualTo(expectedResponse);
+
+        URI expandURI = restTemplate.getUriTemplateHandler().expand(basePath + "/test/{key1}", pathVariable);
+        assertThat(expandURI.getRawPath()).isEqualTo("/test/path%3Bwithsemicolon");
+
+        mockWebServer.shutdown();
+    }
+
+    /* Work with:
+    - EncodingMode.TEMPLATE_AND_VALUES
+    - EncodingMode.VALUES_ONLY
+    - EncodingMode.URI_COMPONENT
+    (default of RestTemplate is EncodingMode.URI_COMPONENT)
+     */
+    @Test
+    void pathVariableWithSpaceTest() throws IOException {
+        String contextPath = "/test/";
+        String pathVariable = "path with space";
+        RestTemplate restTemplate = restTemplateFactory.restTemplateWithTracing(3, 10000);
+
+        MockWebServer mockWebServer = new MockWebServer();
+
+        String expectedResponse = "expect that it works";
+        mockWebServer.enqueue(new MockResponse().setResponseCode(200)
+                .setBody(expectedResponse));
+
+        mockWebServer.start();
+
+        HttpUrl url = mockWebServer.url(contextPath + pathVariable);
+        String basePath = url.scheme() + "://" + url.host() + ":" + url.port();
+        ResponseEntity<String> response = restTemplate.getForEntity(basePath + "/test/{key1}", String.class, pathVariable);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isEqualTo(expectedResponse);
+
+        URI expandURI = restTemplate.getUriTemplateHandler().expand(basePath + "/test/{key1}", pathVariable);
+        assertThat(expandURI.getRawPath()).isEqualTo("/test/path%20with%20space");
+
+        mockWebServer.shutdown();
+    }
+
 }
