@@ -195,4 +195,79 @@ class CommonBaseClientTest {
         mockWebServer.shutdown();
     }
 
+    /* Work with:
+   - EncodingMode.TEMPLATE_AND_VALUES
+   - EncodingMode.VALUES_ONLY
+   (default of WebClient is EncodingMode.TEMPLATE_AND_VALUES)
+    */
+    @Test
+    void pathVariableWithSemicolonTest() throws IOException {
+        String contextPath = "/test/";
+        String pathVariable = "path;withsemicolon";
+        WebClient webClient = commonBaseClient.initWebClient(WebClient.builder());
+
+        MockWebServer mockWebServer = new MockWebServer();
+
+        String expectedResponse = "expect that it works";
+        mockWebServer.enqueue(new MockResponse().setResponseCode(200)
+                .setBody(expectedResponse));
+
+        mockWebServer.start();
+
+        HttpUrl url = mockWebServer.url(contextPath + pathVariable);
+        String basePath = url.scheme() + "://" + url.host() + ":" + url.port();
+        Mono<String> webclientCall = webClient.get()
+                .uri(basePath + "/test/{key1}", pathVariable)
+                .retrieve()
+                .bodyToMono(String.class);
+
+        StepVerifier.create(webclientCall)
+                .expectNext(expectedResponse)
+                .verifyComplete();
+
+        mockWebServer.shutdown();
+
+        //dai log
+        //DEBUG org.springframework.web.reactive.function.client.ExchangeFunctions - [37f21974] HTTP GET http://localhost:53257/test/path%3Bwithsemicolon
+    }
+
+    /* Work with:
+    - EncodingMode.TEMPLATE_AND_VALUES
+    - EncodingMode.VALUES_ONLY
+    - EncodingMode.URI_COMPONENT
+    (default of WebClient is EncodingMode.TEMPLATE_AND_VALUES)
+     */
+    @Test
+    void pathVariableWithSpaceTest() throws IOException {
+        String contextPath = "/test/";
+        String pathVariable = "path with space";
+        WebClient webClient = commonBaseClient.initWebClient(WebClient.builder());
+
+        MockWebServer mockWebServer = new MockWebServer();
+
+        String expectedResponse = "expect that it works";
+        mockWebServer.enqueue(new MockResponse().setResponseCode(200)
+                .setBody(expectedResponse));
+
+        mockWebServer.start();
+
+        HttpUrl url = mockWebServer.url(contextPath + pathVariable);
+        String basePath = url.scheme() + "://" + url.host() + ":" + url.port();
+
+        Mono<String> webclientCall = webClient.get()
+                .uri(basePath + "/test/{key1}", pathVariable)
+                .retrieve()
+                .bodyToMono(String.class);
+
+        StepVerifier.create(webclientCall)
+                .expectNext(expectedResponse)
+                .verifyComplete();
+
+        mockWebServer.shutdown();
+
+        //dai log:
+        //DEBUG org.springframework.web.reactive.function.client.ExchangeFunctions - [4ef27d66] HTTP GET http://localhost:53252/test/path%20with%20space
+
+    }
+
 }

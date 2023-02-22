@@ -8,6 +8,7 @@ import org.springframework.http.HttpRequest;
 import org.springframework.http.client.*;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.DefaultUriBuilderFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -31,6 +32,7 @@ public class RestTemplateFactory {
         clientHttpRequestFactory.setReadTimeout(connectionTimeout);
         template.setRequestFactory(clientHttpRequestFactory);
         enrichWithTracing(template);
+        enrichURIEncoding(template);
         template.setErrorHandler(new RestTemplateResponseErrorHandler());
     }
 
@@ -42,6 +44,13 @@ public class RestTemplateFactory {
         }
         interceptors.add(new RestTemplateHeaderModifierInterceptor());
         template.setInterceptors(interceptors);
+    }
+
+    public void enrichURIEncoding(RestTemplate template) {
+        DefaultUriBuilderFactory uriBuilderFactory = new DefaultUriBuilderFactory();
+        //setto l'encoding a TEMPLATE_AND_VALUES (che è il default di WebClient)
+        uriBuilderFactory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.TEMPLATE_AND_VALUES);
+        template.setUriTemplateHandler(uriBuilderFactory);
     }
 
 
