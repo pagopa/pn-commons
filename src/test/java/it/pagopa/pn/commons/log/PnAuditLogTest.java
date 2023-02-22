@@ -114,4 +114,34 @@ class PnAuditLogTest {
         assertTrue(loggingEvent6.getFormattedMessage().startsWith("[AUD_NT_AAR] FAILURE"));
         assertTrue(loggingEvent6.getFormattedMessage().endsWith(" - ERROR in calling method pippo"));
     }
+
+    @Test
+    void testAuditLogWarning() {
+        // create AuditEvents
+        PnAuditLogEvent logEvent = auditLogger.before( AUD_NT_AAR, "Test1").iun("CNZS-RZBB-HJAT-202205-E-1").build();
+
+        // call method under test
+        logEvent.log();
+        final String message = "ERROR in calling method";
+        logEvent.generateWarning(message).log();
+
+        // JUnit assertions
+        List<ILoggingEvent> logsList = listAppender.list;
+        final ILoggingEvent loggingEvent1 = logsList.get(0);
+        assertEquals("AUDIT10Y", loggingEvent1.getMarker().getName());
+        assertEquals("INFO", loggingEvent1.getLevel().toString());
+        assertEquals("AUD_NT_AAR", loggingEvent1.getMDCPropertyMap().get(AUDIT_TYPE));
+        assertTrue(loggingEvent1.getFormattedMessage().startsWith("[AUD_NT_AAR] BEFORE"));
+        assertTrue(loggingEvent1.getFormattedMessage().endsWith(" - Test1"));
+        assertEquals("CNZS-RZBB-HJAT-202205-E-1", logEvent.getMdc().get("iun"));
+
+
+        final ILoggingEvent loggingEvent2 = logsList.get(1);
+        assertEquals("AUDIT10Y", loggingEvent2.getMarker().getName());
+        assertEquals("WARN", loggingEvent2.getLevel().toString());
+        assertEquals("AUD_NT_AAR", loggingEvent2.getMDCPropertyMap().get(AUDIT_TYPE));
+        assertTrue(loggingEvent2.getFormattedMessage().startsWith("[AUD_NT_AAR] WARNING"));
+        assertTrue(loggingEvent2.getFormattedMessage().endsWith(message));
+        assertEquals("CNZS-RZBB-HJAT-202205-E-1",logEvent.getMdc().get("iun"));
+    }
 }
