@@ -32,7 +32,7 @@ public class RestTemplateFactory {
         clientHttpRequestFactory.setReadTimeout(connectionTimeout);
         template.setRequestFactory(clientHttpRequestFactory);
         enrichWithTracing(template);
-        enrichURIEncoding(template);
+//        enrichURIEncoding(template);
         template.setErrorHandler(new RestTemplateResponseErrorHandler());
     }
 

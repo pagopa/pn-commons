@@ -6,6 +6,7 @@ import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -164,6 +165,7 @@ class RestTemplateFactoryTest {
     (default of RestTemplate is EncodingMode.URI_COMPONENT)
      */
     @Test
+    @Disabled("in quanto si utilizza l'encoding di default URI_COMPONENT")
     void pathVariableWithSemicolonTest() throws IOException {
         String contextPath = "/test/";
         String pathVariable = "path;withsemicolon";
