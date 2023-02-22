@@ -97,33 +97,29 @@ public class PnAuditLog {
         Level level = INFO;
 
         if (pnAuditLogEvent.getLevel() != null){
-            if(ERROR.equals(pnAuditLogEvent.getLevel())){
-                level = ERROR;
-            }else if(WARNING.equals(pnAuditLogEvent.getLevel())){
-                level = WARN;
-            }
+            level = switch (pnAuditLogEvent.getLevel()) {
+                case FAILURE -> ERROR;
+                case WARNING -> WARN;
+                case SUCCESS -> INFO;
+            };
         }
+        
         return level;
     }
 
     @NotNull
     private static String computePrefix(PnAuditLogEvent pnAuditLogEvent) {
+        String prefix;
         if( pnAuditLogEvent.getOriginEvent() == null ) {
-            return  "BEFORE";
+            prefix = "BEFORE";
         }
         else {
-            switch (pnAuditLogEvent.getLevel()) {
-                case FAILURE -> {
-                    return "FAILURE";
-                }
-                case WARNING -> {
-                    return "WARNING";
-                }
-                case SUCCESS -> {
-                    return "SUCCESS";
-                }
-                default -> throw new PnInternalException("AuditLog level not found", ERROR_CODE_AUDIT_LOG_LEVEL_NOT_SPECIFIED);
-            }
+            prefix = switch (pnAuditLogEvent.getLevel()) {
+                case FAILURE -> "FAILURE";
+                case WARNING -> "WARNING";
+                case SUCCESS -> "SUCCESS";
+            };
         }
+        return prefix;
     }
 }
