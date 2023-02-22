@@ -2,7 +2,6 @@ package it.pagopa.pn.commons.log;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
-import it.pagopa.pn.commons.exceptions.PnInternalException;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -12,8 +11,6 @@ import java.util.Arrays;
 import java.util.Set;
 
 import static ch.qos.logback.classic.Level.*;
-import static it.pagopa.pn.commons.exceptions.PnExceptionsCodes.ERROR_CODE_AUDIT_LOG_LEVEL_NOT_SPECIFIED;
-import static it.pagopa.pn.commons.log.PnAuditLogType.WARNING;
 
 public class PnAuditLog {
 
