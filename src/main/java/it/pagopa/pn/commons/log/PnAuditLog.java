@@ -13,6 +13,7 @@ import java.util.Set;
 
 import static ch.qos.logback.classic.Level.*;
 import static it.pagopa.pn.commons.exceptions.PnExceptionsCodes.ERROR_CODE_AUDIT_LOG_LEVEL_NOT_SPECIFIED;
+import static it.pagopa.pn.commons.log.PnAuditLogType.WARNING;
 
 public class PnAuditLog {
 
@@ -31,16 +32,9 @@ public class PnAuditLog {
     }
 
     static void log(PnAuditLogEvent pnAuditLogEvent) {
-        Level level = INFO;
-        
-        if (pnAuditLogEvent.getLevel() != null){
-            switch (pnAuditLogEvent.getLevel()) {
-                case FAILURE -> level = ERROR;
-                case WARNING -> level = WARN;
-                case SUCCESS -> level = INFO;
-            }
-        }
-        
+
+        Level level = getLevel(pnAuditLogEvent);
+
         Logger logger = LazyHolder.INSTANCE;
 
         if (logger.isEnabledFor(level)) {
@@ -74,16 +68,8 @@ public class PnAuditLog {
                 String originUuid =  (pnAuditLogEvent.getOriginEvent() == null ? pnAuditLogEvent.getUuid() : pnAuditLogEvent.getOriginEvent().getUuid());
                 MDC.put(AUDIT_UUID, originUuid);
 
-                if (WARN.equals(level)) {
-                    logger.warn(auditLogEventType.marker, format, arguments.toArray());
-                } else {
-                    if (ERROR.equals(level)) {
-                        logger.error(auditLogEventType.marker, format, arguments.toArray());
-                    } else {
-                        logger.info(auditLogEventType.marker, format, arguments.toArray());
-                    }
-                }
-                
+                setLogger(level, logger, format, arguments, auditLogEventType);
+
             } finally {
                 MDC.remove(AUDIT_TYPE);
                 MDC.remove(AUDIT_UUID);
@@ -92,6 +78,32 @@ public class PnAuditLog {
                 }
             }
         }
+    }
+
+    private static void setLogger(Level level, Logger logger, String format, ArrayList<Object> arguments, PnAuditLogEventType auditLogEventType) {
+        if (WARN.equals(level)) {
+            logger.warn(auditLogEventType.marker, format, arguments.toArray());
+        } else {
+            if (ERROR.equals(level)) {
+                logger.error(auditLogEventType.marker, format, arguments.toArray());
+            } else {
+                logger.info(auditLogEventType.marker, format, arguments.toArray());
+            }
+        }
+    }
+
+    @NotNull
+    private static Level getLevel(PnAuditLogEvent pnAuditLogEvent) {
+        Level level = INFO;
+
+        if (pnAuditLogEvent.getLevel() != null){
+            if(ERROR.equals(pnAuditLogEvent.getLevel())){
+                level = ERROR;
+            }else if(WARNING.equals(pnAuditLogEvent.getLevel())){
+                level = WARN;
+            }
+        }
+        return level;
     }
 
     @NotNull
