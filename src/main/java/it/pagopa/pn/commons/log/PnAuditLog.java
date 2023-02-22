@@ -2,6 +2,7 @@ package it.pagopa.pn.commons.log;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
+import it.pagopa.pn.commons.exceptions.PnInternalException;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -9,6 +10,9 @@ import org.slf4j.MDC;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Set;
+
+import static ch.qos.logback.classic.Level.*;
+import static it.pagopa.pn.commons.exceptions.PnExceptionsCodes.ERROR_CODE_AUDIT_LOG_LEVEL_NOT_SPECIFIED;
 
 public class PnAuditLog {
 
@@ -27,9 +31,16 @@ public class PnAuditLog {
     }
 
     static void log(PnAuditLogEvent pnAuditLogEvent) {
-
-        Level level = (Boolean.FALSE.equals( pnAuditLogEvent.getSuccess()) ? Level.ERROR : Level.INFO);
-
+        Level level = INFO;
+        
+        if (pnAuditLogEvent.getLevel() != null){
+            switch (pnAuditLogEvent.getLevel()) {
+                case FAILURE -> level = ERROR;
+                case WARNING -> level = WARN;
+                case SUCCESS -> level = INFO;
+            }
+        }
+        
         Logger logger = LazyHolder.INSTANCE;
 
         if (logger.isEnabledFor(level)) {
@@ -62,11 +73,17 @@ public class PnAuditLog {
                 MDC.put(AUDIT_TYPE, pnAuditLogEvent.getType().toString());
                 String originUuid =  (pnAuditLogEvent.getOriginEvent() == null ? pnAuditLogEvent.getUuid() : pnAuditLogEvent.getOriginEvent().getUuid());
                 MDC.put(AUDIT_UUID, originUuid);
-                if (Level.INFO.equals(level)) {
-                    logger.info(auditLogEventType.marker, format, arguments.toArray());
+
+                if (WARN.equals(level)) {
+                    logger.warn(auditLogEventType.marker, format, arguments.toArray());
                 } else {
-                    logger.error(auditLogEventType.marker, format, arguments.toArray());
+                    if (ERROR.equals(level)) {
+                        logger.error(auditLogEventType.marker, format, arguments.toArray());
+                    } else {
+                        logger.info(auditLogEventType.marker, format, arguments.toArray());
+                    }
                 }
+                
             } finally {
                 MDC.remove(AUDIT_TYPE);
                 MDC.remove(AUDIT_UUID);
@@ -84,7 +101,12 @@ public class PnAuditLog {
             prefix = "BEFORE";
         }
         else {
-            prefix = (pnAuditLogEvent.getSuccess() ? "SUCCESS": "FAILURE");
+            switch (pnAuditLogEvent.getLevel()) {
+                case FAILURE -> prefix = "FAILURE";
+                case WARNING -> prefix = "WARNING";
+                case SUCCESS -> prefix = "SUCCESS";
+                default -> throw new PnInternalException("AuditLog level not found", ERROR_CODE_AUDIT_LOG_LEVEL_NOT_SPECIFIED);
+            }
         }
         return prefix;
     }

@@ -35,7 +35,7 @@ class PnAuditLogTest {
         // call method under test
         logEvent.log();
         //---- Call to business method
-        logEvent.generateResult(false, "ERROR in calling method").log();
+        logEvent.generateResult(PnAuditLogType.FAILURE, "ERROR in calling method").log();
         // JUnit assertions
         List<ILoggingEvent> logsList = listAppender.list;
         final ILoggingEvent loggingEvent1 = logsList.get(0);
