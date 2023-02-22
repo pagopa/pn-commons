@@ -108,18 +108,22 @@ public class PnAuditLog {
 
     @NotNull
     private static String computePrefix(PnAuditLogEvent pnAuditLogEvent) {
-        String prefix;
         if( pnAuditLogEvent.getOriginEvent() == null ) {
-            prefix = "BEFORE";
+            return  "BEFORE";
         }
         else {
             switch (pnAuditLogEvent.getLevel()) {
-                case FAILURE -> prefix = "FAILURE";
-                case WARNING -> prefix = "WARNING";
-                case SUCCESS -> prefix = "SUCCESS";
+                case FAILURE -> {
+                    return "FAILURE";
+                }
+                case WARNING -> {
+                    return "WARNING";
+                }
+                case SUCCESS -> {
+                    return "SUCCESS";
+                }
                 default -> throw new PnInternalException("AuditLog level not found", ERROR_CODE_AUDIT_LOG_LEVEL_NOT_SPECIFIED);
             }
         }
-        return prefix;
     }
 }
