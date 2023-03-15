@@ -1,6 +1,5 @@
 package it.pagopa.pn.commons.utils;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -15,6 +14,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 class DynamoDbAsyncClientDecoratorTest {
 
@@ -36,7 +36,7 @@ class DynamoDbAsyncClientDecoratorTest {
 
     @Test
     void closeTest() {
-        Assertions.assertDoesNotThrow(() -> dynamoDbAsyncClientDecorator.close());
+        assertDoesNotThrow(() -> dynamoDbAsyncClientDecorator.close());
     }
 
 
@@ -164,6 +164,22 @@ class DynamoDbAsyncClientDecoratorTest {
         BatchGetItemPublisher publisher = new BatchGetItemPublisher(null, null);
         Mockito.when(delegate.batchGetItemPaginator(request)).thenReturn(publisher);
         assertThat(dynamoDbAsyncClientDecorator.batchGetItemPaginator(request)).isEqualTo(publisher);
+    }
+
+    @Test
+    void batchWriteItemTest() {
+        BatchWriteItemRequest request = BatchWriteItemRequest.builder().build();
+        BatchWriteItemResponse response = BatchWriteItemResponse.builder().build();
+        Mockito.when(delegate.batchWriteItem(request)).thenReturn(CompletableFuture.completedFuture(response));
+        assertDoesNotThrow(() -> dynamoDbAsyncClientDecorator.batchWriteItem(request));
+    }
+
+    @Test
+    void batchWriteItemConsumerTest() {
+        Consumer<BatchWriteItemRequest.Builder> consumer = SdkBuilder::build;
+        BatchWriteItemResponse response = BatchWriteItemResponse.builder().build();
+        Mockito.when(delegate.batchWriteItem(consumer)).thenReturn(CompletableFuture.completedFuture(response));
+        assertDoesNotThrow(() -> dynamoDbAsyncClientDecorator.batchWriteItem(consumer));
     }
 
 }
