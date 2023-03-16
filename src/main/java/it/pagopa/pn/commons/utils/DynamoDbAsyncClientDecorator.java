@@ -127,4 +127,18 @@ public class DynamoDbAsyncClientDecorator implements DynamoDbAsyncClient {
         return this.dynamoDbAsyncClient.updateItem(updateItemRequest)
                 .thenApply(deleteItemResponse -> MDCUtils.enrichWithMDC(deleteItemResponse, copyOfContextMap));
     }
+
+    @Override
+    public CompletableFuture<BatchWriteItemResponse> batchWriteItem(Consumer<BatchWriteItemRequest.Builder> batchWriteItemRequest) {
+        Map<String, String> copyOfContextMap = MDCUtils.retrieveMDCContextMap();
+        return this.dynamoDbAsyncClient.batchWriteItem(batchWriteItemRequest)
+                .thenApply(batchWriteItemResponse -> MDCUtils.enrichWithMDC(batchWriteItemResponse, copyOfContextMap));
+    }
+
+    @Override
+    public CompletableFuture<BatchWriteItemResponse> batchWriteItem(BatchWriteItemRequest batchWriteItemRequest) {
+        Map<String, String> copyOfContextMap = MDCUtils.retrieveMDCContextMap();
+        return this.dynamoDbAsyncClient.batchWriteItem(batchWriteItemRequest)
+                .thenApply(batchWriteItemResponse -> MDCUtils.enrichWithMDC(batchWriteItemResponse, copyOfContextMap));
+    }
 }

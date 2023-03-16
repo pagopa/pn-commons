@@ -6,9 +6,7 @@ import software.amazon.awssdk.core.async.SdkPublisher;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbAsyncTable;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedAsyncClient;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
-import software.amazon.awssdk.enhanced.dynamodb.model.BatchGetItemEnhancedRequest;
-import software.amazon.awssdk.enhanced.dynamodb.model.BatchGetResultPagePublisher;
-import software.amazon.awssdk.enhanced.dynamodb.model.TransactWriteItemsEnhancedRequest;
+import software.amazon.awssdk.enhanced.dynamodb.model.*;
 
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -48,5 +46,19 @@ public class DynamoDbEnhancedAsyncClientDecorator implements DynamoDbEnhancedAsy
         return BatchGetResultPagePublisher.create(SdkPublisher.adapt(
                 Mono.from(this.dynamoDbEnhancedAsyncClient.batchGetItem(request))
                         .doOnNext(response -> MDCUtils.enrichWithMDC(response, copyOfContextMap))));
+    }
+
+    @Override
+    public CompletableFuture<BatchWriteResult> batchWriteItem(BatchWriteItemEnhancedRequest request) {
+        Map<String, String> copyOfContextMap = MDCUtils.retrieveMDCContextMap();
+        return dynamoDbEnhancedAsyncClient.batchWriteItem(request)
+                .thenApply(response -> MDCUtils.enrichWithMDC(response, copyOfContextMap));
+    }
+
+    @Override
+    public CompletableFuture<BatchWriteResult> batchWriteItem(Consumer<BatchWriteItemEnhancedRequest.Builder> requestConsumer) {
+        Map<String, String> copyOfContextMap = MDCUtils.retrieveMDCContextMap();
+        return dynamoDbEnhancedAsyncClient.batchWriteItem(requestConsumer)
+                .thenApply(response -> MDCUtils.enrichWithMDC(response, copyOfContextMap));
     }
 }
