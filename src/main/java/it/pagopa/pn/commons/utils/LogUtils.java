@@ -1,6 +1,8 @@
 package it.pagopa.pn.commons.utils;
 
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Nullable;
@@ -10,6 +12,21 @@ import javax.validation.constraints.NotNull;
 public class LogUtils {
 
     private LogUtils(){}
+
+    // viene volutamente scritta "male", per essere più facilmente ricercabile nei log
+    private static final String ALARM_LOG = "ALLARM!";
+
+    public static void alarm( org.slf4j.Logger logger, String message, Object ...parameters) {
+        try {
+            Marker alarmMarker = MarkerFactory.getMarker(ALARM_LOG);
+            String finalMessage =  ALARM_LOG + ": " + (message==null?"errore grave":message);
+            logger.error(alarmMarker, finalMessage, parameters);
+        } catch (Exception e) {
+            Marker alarmMarker = MarkerFactory.getMarker(ALARM_LOG);
+            String finalMessage =  ALARM_LOG + ": errore grave";
+            logger.error(alarmMarker, finalMessage, e);
+        }
+    }
 
     public static String maskEmailAddress(String strEmail) {
         if (strEmail == null)
