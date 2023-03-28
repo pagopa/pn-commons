@@ -8,11 +8,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.awscore.client.builder.AwsClientBuilder;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedAsyncClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.cloudwatch.CloudWatchAsyncClient;
 import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.sqs.SqsClient;
@@ -74,6 +76,12 @@ public class AwsServicesClientsConfig {
 
     @Bean
     public SsmClient ssmClient() { return configureBuilder( SsmClient.builder() ); }
+
+    @Bean
+    @Lazy
+    public CloudWatchAsyncClient cloudWatchClient() {
+        return configureBuilder(CloudWatchAsyncClient.builder());
+    }
 
 
     private <C> C configureBuilder(AwsClientBuilder<?, C> builder) {
