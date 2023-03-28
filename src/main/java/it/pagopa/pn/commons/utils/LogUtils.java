@@ -16,7 +16,7 @@ public class LogUtils {
     // viene volutamente scritta "male", per essere più facilmente ricercabile nei log
     private static final String ALARM_LOG = "ALLARM!";
 
-    public static void alarm( org.slf4j.Logger logger, String message, Object ...parameters) {
+    public static void logAlarm( org.slf4j.Logger logger, String message, Object ...parameters) {
         try {
             Marker alarmMarker = MarkerFactory.getMarker(ALARM_LOG);
             String finalMessage =  ALARM_LOG + ": " + (message==null?"errore grave":message);

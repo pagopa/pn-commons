@@ -136,7 +136,7 @@ class LogUtilsTest {
 
 
         //When
-        LogUtils.alarm(log, str);
+        LogUtils.logAlarm(log, str);
 
         //Then
         // JUnit assertions
@@ -167,7 +167,7 @@ class LogUtilsTest {
 
 
         //When
-        LogUtils.alarm(log, str, 0, "pippo");
+        LogUtils.logAlarm(log, str, 0, "pippo");
 
         //Then
         // JUnit assertions
@@ -198,7 +198,7 @@ class LogUtilsTest {
 
 
         //When
-        LogUtils.alarm(log, str, 0, "pippo", new RuntimeException("errore"));
+        LogUtils.logAlarm(log, str, 0, "pippo", new RuntimeException("errore"));
 
         //Then
         // JUnit assertions
