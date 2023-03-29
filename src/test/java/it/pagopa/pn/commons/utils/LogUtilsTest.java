@@ -1,12 +1,22 @@
 package it.pagopa.pn.commons.utils;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.*;
 
+@Slf4j
 class LogUtilsTest {
 
     @ParameterizedTest
@@ -19,7 +29,7 @@ class LogUtilsTest {
 
         //Then
         Assertions.assertNotEquals( str, result);
-        assertEquals(expected, result);
+        Assertions.assertEquals(expected, result);
     }
 
 
@@ -33,7 +43,7 @@ class LogUtilsTest {
 
         //Then
         Assertions.assertNotEquals( str, result);
-        assertEquals(expected, result);
+        Assertions.assertEquals(expected, result);
     }
 
 
@@ -48,7 +58,7 @@ class LogUtilsTest {
 
         //Then
         Assertions.assertNotEquals( str, result);
-        assertEquals(expected, result);
+        Assertions.assertEquals(expected, result);
     }
 
 
@@ -63,7 +73,7 @@ class LogUtilsTest {
 
         //Then
         Assertions.assertNotEquals( str, result);
-        assertEquals(expected, result);
+        Assertions.assertEquals(expected, result);
     }
 
 
@@ -77,7 +87,7 @@ class LogUtilsTest {
 
         //Then
         Assertions.assertNotEquals( str, result);
-        assertEquals("u^^^^ualche stringa lunga", result);
+        Assertions.assertEquals("u^^^^ualche stringa lunga", result);
     }
 
     @Test
@@ -106,6 +116,101 @@ class LogUtilsTest {
         //Then
         Assertions.assertNotNull( messageResult );
         Assertions.assertEquals( "filename=filename.pdf, retryAfter=3600", messageResult );
+    }
+
+
+    @Test
+    void alarm_noparams() {
+        //Given
+        String str = "errore grave";
+        // get Logback Logger
+        Logger fooLogger = LoggerFactory.getLogger(LogUtilsTest.class);
+
+        // create and start a ListAppender
+        ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+        listAppender.start();
+
+        // add the appender to the logger
+        // addAppender is outdated now
+        ((ch.qos.logback.classic.Logger)fooLogger).addAppender(listAppender);
+
+
+        //When
+        LogUtils.logAlarm(log, str);
+
+        //Then
+        // JUnit assertions
+        List<ILoggingEvent> logsList = listAppender.list;
+        Assertions.assertEquals("ALLARM!: " + str, logsList.get(0)
+                .getFormattedMessage());
+        Assertions.assertEquals(Level.ERROR, logsList.get(0)
+                .getLevel());
+        Assertions.assertEquals("ALLARM!", logsList.get(0)
+                .getMarker().getName());
+    }
+
+
+    @Test
+    void alarm_someparams() {
+        //Given
+        String str = "errore grave p1={} p2={}";
+        // get Logback Logger
+        Logger fooLogger = LoggerFactory.getLogger(LogUtilsTest.class);
+
+        // create and start a ListAppender
+        ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+        listAppender.start();
+
+        // add the appender to the logger
+        // addAppender is outdated now
+        ((ch.qos.logback.classic.Logger)fooLogger).addAppender(listAppender);
+
+
+        //When
+        LogUtils.logAlarm(log, str, 0, "pippo");
+
+        //Then
+        // JUnit assertions
+        List<ILoggingEvent> logsList = listAppender.list;
+        Assertions.assertEquals("ALLARM!: " + "errore grave p1=0 p2=pippo", logsList.get(0)
+                .getFormattedMessage());
+        Assertions.assertEquals(Level.ERROR, logsList.get(0)
+                .getLevel());
+        Assertions.assertEquals("ALLARM!", logsList.get(0)
+                .getMarker().getName());
+    }
+
+
+    @Test
+    void alarm_someparams_exc() {
+        //Given
+        String str = "errore grave p1={} p2={}";
+        // get Logback Logger
+        Logger fooLogger = LoggerFactory.getLogger(LogUtilsTest.class);
+
+        // create and start a ListAppender
+        ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+        listAppender.start();
+
+        // add the appender to the logger
+        // addAppender is outdated now
+        ((ch.qos.logback.classic.Logger)fooLogger).addAppender(listAppender);
+
+
+        //When
+        LogUtils.logAlarm(log, str, 0, "pippo", new RuntimeException("errore"));
+
+        //Then
+        // JUnit assertions
+        List<ILoggingEvent> logsList = listAppender.list;
+        Assertions.assertEquals("ALLARM!: " + "errore grave p1=0 p2=pippo", logsList.get(0)
+                .getFormattedMessage());
+        assertTrue(logsList.get(0)
+                .getThrowableProxy().getClassName().contains("java.lang.RuntimeException"));
+        Assertions.assertEquals(Level.ERROR, logsList.get(0)
+                .getLevel());
+        Assertions.assertEquals("ALLARM!", logsList.get(0)
+                .getMarker().getName());
     }
 
 }
