@@ -40,6 +40,8 @@ public enum PnAuditLogEventType {
     AUD_AB_DA_DEL(PnAuditLogMarker.AUDIT10Y),
     AUD_AB_DA_IO_INSUP(PnAuditLogMarker.AUDIT10Y),
     AUD_AB_DA_IO_DEL(PnAuditLogMarker.AUDIT10Y),
+    AUD_AB_VALIDATE_PEC(PnAuditLogMarker.AUDIT10Y),
+    AUD_AB_VALIDATE_CODE(PnAuditLogMarker.AUDIT10Y),
     AUD_AB_VERIFY_PEC(PnAuditLogMarker.AUDIT10Y),
     AUD_AB_VERIFY_MAIL(PnAuditLogMarker.AUDIT10Y),
     AUD_AB_VERIFY_SMS(PnAuditLogMarker.AUDIT10Y),
