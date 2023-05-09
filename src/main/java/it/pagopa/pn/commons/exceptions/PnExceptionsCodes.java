@@ -9,6 +9,7 @@ public class PnExceptionsCodes {
     public static final String ERROR_CODE_PN_GENERIC_ERROR = "PN_GENERIC_ERROR";
     public static final String ERROR_CODE_PN_WEB_GENERIC_ERROR = "PN_WEB_GENERIC_ERROR";
     public static final String ERROR_CODE_PN_HTTPRESPONSE_GENERIC_ERROR = "PN_HTTPRESPONSE_GENERIC_ERROR";
+    public static final String ERROR_CODE_PN_TOO_MANY_REQUESTS = "PN_GENERIC_TOO_MANY_REQUESTS";
 
     // codici legati alla validazione
     public static final String ERROR_CODE_PN_GENERIC_INVALIDPARAMETER = "PN_GENERIC_INVALIDPARAMETER";

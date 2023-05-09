@@ -7,8 +7,10 @@ import it.pagopa.pn.commons.exceptions.mapper.FieldErrorToProblemErrorMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.FieldError;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import javax.validation.ConstraintViolation;
 import java.lang.annotation.Annotation;
@@ -52,6 +54,11 @@ public class ExceptionHelper {
                     .cause(ex)
                     .message(ex.getMessage())
                     .build();
+        }
+        else if (ex instanceof WebClientResponseException webClientResponseException) {
+            // per il caso di 429, si vuole ritornare il 429
+            if (webClientResponseException.getStatusCode().equals(HttpStatus.TOO_MANY_REQUESTS))
+                ex = new PnTooManyRequestException(ex.getMessage(), ex);
         }
         else if (ex instanceof org.springframework.web.bind.support.WebExchangeBindException webExchangeBindException){
             // eccezione di spring riguardante errori di validazione, recupero le info dei campi
