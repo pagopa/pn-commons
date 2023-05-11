@@ -1,13 +1,11 @@
 package it.pagopa.pn.commons.log;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
-@Component
 public class PnAuditLogBuilder {
     private PnAuditLogEventType type;
     private String msg;
@@ -28,21 +26,6 @@ public class PnAuditLogBuilder {
 
     public PnAuditLogBuilder iun(String iun) {
         mdcMap.put("iun", iun);
-        return this;
-    }
-
-    public PnAuditLogBuilder uid(String uid) {
-        mdcMap.put("uid", uid);
-        return this;
-    }
-
-    public PnAuditLogBuilder cxId(String cxId) {
-        mdcMap.put("cx_id", cxId);
-        return this;
-    }
-
-    public PnAuditLogBuilder cxType(String cxType) {
-        mdcMap.put("cx_type", cxType);
         return this;
     }
 

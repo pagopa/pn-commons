@@ -12,6 +12,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.MapBindingResult;
 import org.springframework.web.bind.support.WebExchangeBindException;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.server.MethodNotAllowedException;
 
 import javax.validation.*;
@@ -173,6 +174,46 @@ class ExceptionHelperTest {
         assertNotNull(res.getTimestamp());
         assertNotNull(res.getErrors());
         assertEquals( PnExceptionsCodes.ERROR_CODE_PN_WEB_GENERIC_ERROR, res.getErrors().get(0).getCode());
+    }
+
+
+
+    @Test
+    void handleWebClientResponseException()  {
+
+        //When
+        WebClientResponseException exception =
+                new WebClientResponseException(HttpStatus.FORBIDDEN.value(), "test", null, null, null);
+
+        Problem res = exceptionHelper.handleException(exception);
+
+        //Then
+        assertNotNull(res);
+        assertEquals(ExceptionHelper.MESSAGE_UNEXPECTED_ERROR, res.getTitle());
+        assertEquals(500, res.getStatus());
+        assertNotNull(res.getTimestamp());
+        assertNotNull(res.getErrors());
+        assertEquals( PnExceptionsCodes.ERROR_CODE_PN_GENERIC_ERROR, res.getErrors().get(0).getCode());
+    }
+
+
+
+    @Test
+    void handleWebClientResponseException_toomany()  {
+
+        //When
+        WebClientResponseException exception =
+                new WebClientResponseException(HttpStatus.TOO_MANY_REQUESTS.value(), "test", null, null, null);
+
+        Problem res = exceptionHelper.handleException(exception);
+
+        //Then
+        assertNotNull(res);
+        assertEquals(ExceptionHelper.MESSAGE_HANDLED_ERROR, res.getTitle());
+        assertEquals(HttpStatus.TOO_MANY_REQUESTS.value(), res.getStatus());
+        assertNotNull(res.getTimestamp());
+        assertNotNull(res.getErrors());
+        assertEquals( PnExceptionsCodes.ERROR_CODE_PN_TOO_MANY_REQUESTS, res.getErrors().get(0).getCode());
     }
 
 

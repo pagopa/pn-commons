@@ -8,7 +8,7 @@ public class PnAuditLogEvent {
     private final PnAuditLogEventType type;
     private final String message;
     private final Object[] arguments;
-    private Boolean success;
+    private PnAuditLogType level;
     private final String uuid;
     private final Map<String, String> mdc;
 
@@ -27,8 +27,8 @@ public class PnAuditLogEvent {
     String getUuid() {
         return uuid;
     }
-    boolean getSuccess() {
-        return (success==null) || (success);
+    PnAuditLogType getLevel() {
+        return level;
     }
 
     public PnAuditLogEvent(PnAuditLogEventType type, Map<String, String> mdc, String message, Object... arguments) {
@@ -40,21 +40,25 @@ public class PnAuditLogEvent {
     }
 
     public PnAuditLogEvent generateSuccess() {
-        return generateResult(true, this.message, this.arguments);
+        return generateResult(PnAuditLogType.SUCCESS, this.message, this.arguments);
     }
 
     public PnAuditLogEvent generateSuccess(String message, Object... arguments) {
-        return generateResult(true, message, arguments);
+        return generateResult(PnAuditLogType.SUCCESS, message, arguments);
     }
 
     public PnAuditLogEvent generateFailure(String message, Object... arguments) {
-        return generateResult(false, message, arguments);
+        return generateResult(PnAuditLogType.FAILURE, message, arguments);
     }
 
-    public PnAuditLogEvent generateResult(boolean success, String message, Object... arguments) {
+    public PnAuditLogEvent generateWarning(String message, Object... arguments) {
+        return generateResult(PnAuditLogType.WARNING, message, arguments);
+    }
+    
+    public PnAuditLogEvent generateResult(PnAuditLogType level, String message, Object... arguments) {
         PnAuditLogEvent resultEvent = new PnAuditLogEvent(type, mdc, message, arguments);
         resultEvent.originEvent = this;
-        resultEvent.success = success;
+        resultEvent.level = level;
         return resultEvent;
     }
 

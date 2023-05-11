@@ -7,14 +7,15 @@ import it.pagopa.pn.commons.exceptions.mapper.FieldErrorToProblemErrorMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.FieldError;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import javax.validation.ConstraintViolation;
 import java.lang.annotation.Annotation;
 import java.time.Instant;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static it.pagopa.pn.commons.exceptions.PnExceptionsCodes.*;
 import static it.pagopa.pn.commons.log.MDCWebFilter.MDC_TRACE_ID_KEY;
@@ -46,31 +47,33 @@ public class ExceptionHelper {
         Problem res;
 
         // gestione dedicata delle constraintviolation, lanciate da spring direttamente
-        if (ex instanceof javax.validation.ConstraintViolationException) {
-            javax.validation.ConstraintViolationException cex = (javax.validation.ConstraintViolationException)ex;
+        if (ex instanceof javax.validation.ConstraintViolationException constraintViolationException) {
             // eccezione di constraint, recupero le info dei campi
             ex = new PnValidationExceptionBuilder<>(this)
-                    .validationErrors(cex.getConstraintViolations())
+                    .validationErrors(constraintViolationException.getConstraintViolations())
                     .cause(ex)
                     .message(ex.getMessage())
                     .build();
         }
-        else if (ex instanceof org.springframework.web.bind.support.WebExchangeBindException){
-            org.springframework.web.bind.support.WebExchangeBindException cex = (org.springframework.web.bind.support.WebExchangeBindException)ex;
+        else if (ex instanceof WebClientResponseException webClientResponseException) {
+            // per il caso di 429, si vuole ritornare il 429
+            if (webClientResponseException.getStatusCode().equals(HttpStatus.TOO_MANY_REQUESTS))
+                ex = new PnTooManyRequestException(ex.getMessage(), ex);
+        }
+        else if (ex instanceof org.springframework.web.bind.support.WebExchangeBindException webExchangeBindException){
             // eccezione di spring riguardante errori di validazione, recupero le info dei campi
             ex = new PnValidationExceptionBuilder<>(this)
-                    .fieldErrors(cex.getFieldErrors())
+                    .fieldErrors(webExchangeBindException.getFieldErrors())
                     .cause(ex)
                     .message(ex.getMessage())
                     .build();
         }
-        else if (ex instanceof org.springframework.web.server.ResponseStatusException){
-            org.springframework.web.server.ResponseStatusException cex = (org.springframework.web.server.ResponseStatusException)ex;
+        else if (ex instanceof org.springframework.web.server.ResponseStatusException responseStatusException){
             // eccezione di spring riguardante errori di altra natura
-            ex = new PnRuntimeException(Objects.requireNonNull(cex.getMessage()==null?"Web error":cex.getMessage()),
-                                        Objects.requireNonNull(cex.getReason()==null?"Web error":cex.getReason()),
-                                        cex.getRawStatusCode(),
-                                        ERROR_CODE_PN_WEB_GENERIC_ERROR, null, null, cex);
+            ex = new PnRuntimeException(Objects.requireNonNull(responseStatusException.getMessage() == null ? "Web error" : responseStatusException.getMessage()),
+                                        Objects.requireNonNull(responseStatusException.getReason() == null ?  "Web error" : responseStatusException.getReason()),
+                    responseStatusException.getRawStatusCode(),
+                                        ERROR_CODE_PN_WEB_GENERIC_ERROR, null, null, responseStatusException);
         }
 
         // se l'eccezione non è di tipo pnXXX, ne genero una generica per wrapparla, di fatto la tratto come 500
@@ -104,7 +107,7 @@ public class ExceptionHelper {
         // se è ancora nullo, ci metto un uuid
         if (res.getTraceId() == null)
         {
-            res.setTraceId("FALLBACK-UUID:" + UUID.randomUUID().toString());
+            res.setTraceId("FALLBACK-UUID:" + UUID.randomUUID());
         }
     }
 
@@ -128,20 +131,22 @@ public class ExceptionHelper {
     }
 
     public String generateFallbackProblem(){
-        String fallback = "{\n" +
-                "    \"status\": 500,\n" +
-                "    \"title\": \"Internal Server Error\",\n" +
-                "    \"detail\": \"Cannot output problem\",\n" +
-                "    \"traceId\": \"{traceid}\",\n" +
-                "    \"timestamp\": \"{timestamp}\",\n" +
-                "    \"errors\": [\n" +
-                "        {\n" +
-                "            \"code\": \"{errorcode}\",\n" +
-                "            \"element\": null,\n" +
-                "            \"detail\": null\n" +
-                "        }\n" +
-                "    ]\n" +
-                "}";
+        String fallback = """
+                {
+                    "status": 500,
+                    "title": "Internal Server Error",
+                    "detail": "Cannot output problem",
+                    "traceId": "{traceid}",
+                    "timestamp": "{timestamp}",
+                    "errors": [
+                        {
+                            "code": "{errorcode}",
+                            "element": null,
+                            "detail": null
+                        }
+                    ]
+                }
+                """;
 
         fallback = fallback.replace("{traceid}", UUID.randomUUID().toString());
         fallback = fallback.replace("{timestamp}", Instant.now().toString());
@@ -153,13 +158,13 @@ public class ExceptionHelper {
     public List<ProblemError> generateProblemErrorsFromConstraintViolation(Set<? extends ConstraintViolation<?>> constraintViolations)
     {
         return constraintViolations.stream().map(constraintViolation ->
-               ConstraintViolationToProblemErrorMapper.toProblemError(constraintViolation, this)).collect(Collectors.toList());
+               ConstraintViolationToProblemErrorMapper.toProblemError(constraintViolation, this)).toList();
     }
 
 
     public List<ProblemError> generateProblemErrorsFromFieldError(List<FieldError> fieldErrors)
     {
-        return fieldErrors.stream().map(FieldErrorToProblemErrorMapper::toProblemError).collect(Collectors.toList());
+        return fieldErrors.stream().map(FieldErrorToProblemErrorMapper::toProblemError).toList();
     }
 
     public String getCodeFromAnnotation(Annotation annotation){

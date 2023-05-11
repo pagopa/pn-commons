@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Set;
 
+import static ch.qos.logback.classic.Level.*;
+
 public class PnAuditLog {
 
     public static final String AUDIT_TYPE = "aud_type";
@@ -28,7 +30,7 @@ public class PnAuditLog {
 
     static void log(PnAuditLogEvent pnAuditLogEvent) {
 
-        Level level = (Boolean.FALSE.equals( pnAuditLogEvent.getSuccess()) ? Level.ERROR : Level.INFO);
+        Level level = getLevel(pnAuditLogEvent);
 
         Logger logger = LazyHolder.INSTANCE;
 
@@ -62,11 +64,9 @@ public class PnAuditLog {
                 MDC.put(AUDIT_TYPE, pnAuditLogEvent.getType().toString());
                 String originUuid =  (pnAuditLogEvent.getOriginEvent() == null ? pnAuditLogEvent.getUuid() : pnAuditLogEvent.getOriginEvent().getUuid());
                 MDC.put(AUDIT_UUID, originUuid);
-                if (Level.INFO.equals(level)) {
-                    logger.info(auditLogEventType.marker, format, arguments.toArray());
-                } else {
-                    logger.error(auditLogEventType.marker, format, arguments.toArray());
-                }
+
+                setLogger(level, logger, format, arguments, auditLogEventType);
+
             } finally {
                 MDC.remove(AUDIT_TYPE);
                 MDC.remove(AUDIT_UUID);
@@ -77,6 +77,33 @@ public class PnAuditLog {
         }
     }
 
+    private static void setLogger(Level level, Logger logger, String format, ArrayList<Object> arguments, PnAuditLogEventType auditLogEventType) {
+        if (WARN.equals(level)) {
+            logger.warn(auditLogEventType.marker, format, arguments.toArray());
+        } else {
+            if (ERROR.equals(level)) {
+                logger.error(auditLogEventType.marker, format, arguments.toArray());
+            } else {
+                logger.info(auditLogEventType.marker, format, arguments.toArray());
+            }
+        }
+    }
+
+    @NotNull
+    private static Level getLevel(PnAuditLogEvent pnAuditLogEvent) {
+        Level level = INFO;
+
+        if (pnAuditLogEvent.getLevel() != null){
+            level = switch (pnAuditLogEvent.getLevel()) {
+                case FAILURE -> ERROR;
+                case WARNING -> WARN;
+                case SUCCESS -> INFO;
+            };
+        }
+        
+        return level;
+    }
+
     @NotNull
     private static String computePrefix(PnAuditLogEvent pnAuditLogEvent) {
         String prefix;
@@ -84,7 +111,11 @@ public class PnAuditLog {
             prefix = "BEFORE";
         }
         else {
-            prefix = (pnAuditLogEvent.getSuccess() ? "SUCCESS": "FAILURE");
+            prefix = switch (pnAuditLogEvent.getLevel()) {
+                case FAILURE -> "FAILURE";
+                case WARNING -> "WARNING";
+                case SUCCESS -> "SUCCESS";
+            };
         }
         return prefix;
     }

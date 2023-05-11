@@ -3,7 +3,6 @@ package it.pagopa.pn.commons.exceptions;
 import it.pagopa.pn.commons.exceptions.dto.ProblemError;
 
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class PnIdConflictException extends PnRuntimeException {
 
@@ -22,6 +21,6 @@ public class PnIdConflictException extends PnRuntimeException {
                         .code(errorCode)
                         .element(x)
                         .detail(x  + "=" + invalidFields.get(x))
-                        .build()).collect(Collectors.toList()), cause );
+                        .build()).toList(), cause );
     }
 }

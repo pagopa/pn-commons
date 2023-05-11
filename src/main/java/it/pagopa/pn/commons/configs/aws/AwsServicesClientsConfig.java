@@ -1,16 +1,20 @@
 package it.pagopa.pn.commons.configs.aws;
 
 import it.pagopa.pn.commons.configs.RuntimeMode;
+import it.pagopa.pn.commons.utils.DynamoDbAsyncClientDecorator;
+import it.pagopa.pn.commons.utils.DynamoDbEnhancedAsyncClientDecorator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.awscore.client.builder.AwsClientBuilder;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedAsyncClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.cloudwatch.CloudWatchAsyncClient;
 import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.sqs.SqsClient;
@@ -31,16 +35,26 @@ public class AwsServicesClientsConfig {
         log.info("AWS RuntimeMode is={}", runtimeMode);
     }
 
-    @Bean
+//    @Bean
     public DynamoDbAsyncClient dynamoDbAsyncClient() {
         return this.configureBuilder( DynamoDbAsyncClient.builder() );
     }
 
-    @Bean
+//    @Bean
     public DynamoDbEnhancedAsyncClient dynamoDbEnhancedAsyncClient( DynamoDbAsyncClient baseAsyncClient) {
         return DynamoDbEnhancedAsyncClient.builder()
                 .dynamoDbClient( baseAsyncClient )
                 .build();
+    }
+
+    @Bean
+    public DynamoDbAsyncClient dynamoDbAsyncClientWithMDC() {
+        return new DynamoDbAsyncClientDecorator(this.dynamoDbAsyncClient());
+    }
+
+    @Bean
+    public DynamoDbEnhancedAsyncClient dynamoDbEnhancedAsyncClientWithMDC(DynamoDbAsyncClient delegate) {
+        return new DynamoDbEnhancedAsyncClientDecorator(this.dynamoDbEnhancedAsyncClient(delegate));
     }
 
     @Bean
@@ -62,6 +76,12 @@ public class AwsServicesClientsConfig {
 
     @Bean
     public SsmClient ssmClient() { return configureBuilder( SsmClient.builder() ); }
+
+    @Bean
+    @Lazy
+    public CloudWatchAsyncClient cloudWatchClient() {
+        return configureBuilder(CloudWatchAsyncClient.builder());
+    }
 
 
     private <C> C configureBuilder(AwsClientBuilder<?, C> builder) {

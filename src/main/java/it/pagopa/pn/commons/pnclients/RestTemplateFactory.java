@@ -5,11 +5,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpRequest;
-import org.springframework.http.client.ClientHttpRequestExecution;
-import org.springframework.http.client.ClientHttpRequestInterceptor;
-import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.http.client.*;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.DefaultUriBuilderFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,12 +18,22 @@ public class RestTemplateFactory {
 
     @Bean
     @Qualifier("withTracing")
-    public RestTemplate restTemplateWithTracing(){
-        RestTemplate template = new RestTemplate();
-        enrichWithTracing(template);
-        template.setErrorHandler(new RestTemplateResponseErrorHandler());
-        
+    public RestTemplate restTemplateWithTracing(@Value("${pn.commons.retry.max-attempts}") int retryMaxAttempts,
+                                                @Value("${pn.commons.connection-timeout-millis}") int connectionTimeout) {
+        //RetryTemplate nel parametro retryMaxAttempts vuole le invocazioni totali (compresa la prima che non è fallita)
+        RestTemplate template = new RestTemplateRetryable(retryMaxAttempts + 1);
+        configureRestTemplate(connectionTimeout, template);
         return template;
+    }
+
+    protected void configureRestTemplate(int connectionTimeout, RestTemplate template) {
+        SimpleClientHttpRequestFactory clientHttpRequestFactory = new SimpleClientHttpRequestFactory();
+        clientHttpRequestFactory.setConnectTimeout(connectionTimeout);
+        clientHttpRequestFactory.setReadTimeout(connectionTimeout);
+        template.setRequestFactory(clientHttpRequestFactory);
+        enrichWithTracing(template);
+//        enrichURIEncoding(template);
+        template.setErrorHandler(new RestTemplateResponseErrorHandler());
     }
 
     public void enrichWithTracing(RestTemplate template) {
@@ -35,6 +44,13 @@ public class RestTemplateFactory {
         }
         interceptors.add(new RestTemplateHeaderModifierInterceptor());
         template.setInterceptors(interceptors);
+    }
+
+    public void enrichURIEncoding(RestTemplate template) {
+        DefaultUriBuilderFactory uriBuilderFactory = new DefaultUriBuilderFactory();
+        //setto l'encoding a TEMPLATE_AND_VALUES (che è il default di WebClient)
+        uriBuilderFactory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.TEMPLATE_AND_VALUES);
+        template.setUriTemplateHandler(uriBuilderFactory);
     }
 
 
