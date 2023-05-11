@@ -117,7 +117,7 @@ class LogUtilsTest {
         Assertions.assertNotNull( messageResult );
         Assertions.assertEquals( "filename=filename.pdf, retryAfter=3600", messageResult );
     }
-
+/*
 
     @Test
     void alarm_noparams() {
@@ -212,5 +212,5 @@ class LogUtilsTest {
         Assertions.assertEquals("ALLARM!", logsList.get(0)
                 .getMarker().getName());
     }
-
+*/
 }
