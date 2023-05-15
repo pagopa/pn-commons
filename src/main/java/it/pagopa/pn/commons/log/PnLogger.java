@@ -68,14 +68,38 @@ public interface PnLogger extends Logger {
 
     // metodi shortcut applicativi
 
+    /**
+     * Logga a info lo start di uno step logico
+     * @param process nome processo
+     */
     void logStartingProcess(String process);
 
+    /**
+     * Logga a info la fine di uno step logico
+     * @param process nome processo
+     */
     void logEndingProcess(String process);
 
+    /**
+     * Logga a info lo start della validazione di uno step logico
+     * @param process nome processo
+     */
     void logChecking(String process);
 
+    /**
+     * Logga a info (warn nel caso di fallimento) la fine della validazione di uno step logico
+     * @param process nome processo
+     * @param success indica se la validazione è stata superata o meno
+     */
     void logCheckingOutcome(String process, boolean success);
 
+    /**
+     * Logga a info (warn nel caso di fallimento) la fine della validazione di uno step logico, con causale
+     *
+     * @param process nome processo
+     * @param success indica se la validazione è stata superata o meno
+     * @param description causale sul mancato superamento
+     */
     void logCheckingOutcome(String process, boolean success, String description);
 
     /**
