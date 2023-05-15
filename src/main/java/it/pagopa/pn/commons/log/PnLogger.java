@@ -68,11 +68,15 @@ public interface PnLogger extends Logger {
 
     // metodi shortcut applicativi
 
-    void infoStartingProcess(String process);
+    void logStartingProcess(String process);
 
-    void infoEndingProcess(String process);
+    void logEndingProcess(String process);
 
-    void infoChecking(String process);
+    void logChecking(String process);
+
+    void logCheckingOutcome(String process, boolean success);
+
+    void logCheckingOutcome(String process, boolean success, String description);
 
     /**
      * metodo per loggare l'invocazione a un servizio esterno
@@ -80,7 +84,7 @@ public interface PnLogger extends Logger {
      * @param service nome servizio, possibilmente usare quelli definiti in PnLogger.EXTERNAL_SERVICES
      * @param process descrizione
      */
-    void infoInvokingExternalService(String service, String process);
+    void logInvokingExternalService(String service, String process);
 
     /**
      * metodo per loggare l'invocazione a un servizio esterno
@@ -89,6 +93,6 @@ public interface PnLogger extends Logger {
      * @param process descrizione
      * @param correlationId correlationId
      */
-    void infoInvokingAsyncExternalService(String service, String process, String correlationId);
+    void logInvokingAsyncExternalService(String service, String process, String correlationId);
 
 }

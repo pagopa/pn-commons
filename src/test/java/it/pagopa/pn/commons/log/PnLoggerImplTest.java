@@ -37,7 +37,7 @@ class PnLoggerImplTest {
 
 
         //When
-        fooLogger.infoStartingProcess(str);
+        fooLogger.logStartingProcess(str);
 
         //Then
         // JUnit assertions
@@ -55,7 +55,7 @@ class PnLoggerImplTest {
 
 
         //When
-        fooLogger.infoEndingProcess(str);
+        fooLogger.logEndingProcess(str);
 
         //Then
         // JUnit assertions
@@ -73,7 +73,7 @@ class PnLoggerImplTest {
 
 
         //When
-        fooLogger.infoChecking(str);
+        fooLogger.logChecking(str);
 
         //Then
         // JUnit assertions
@@ -81,6 +81,65 @@ class PnLoggerImplTest {
         Assertions.assertEquals("Checking " + str, logsList.get(0)
                 .getFormattedMessage());
         Assertions.assertEquals(Level.INFO, logsList.get(0)
+                .getLevel());
+    }
+
+
+    @Test
+    void infoCheckingOutcome() {
+        //Given
+        String str = "processo";
+
+
+        //When
+        fooLogger.logCheckingOutcome(str, true);
+
+        //Then
+        // JUnit assertions
+        List<ILoggingEvent> logsList = listAppender.list;
+        Assertions.assertEquals("Checking " + str + " passed", logsList.get(0)
+                .getFormattedMessage());
+        Assertions.assertEquals(Level.INFO, logsList.get(0)
+                .getLevel());
+    }
+
+
+
+    @Test
+    void infoCheckingOutcomeFail() {
+        //Given
+        String str = "processo";
+
+
+        //When
+        fooLogger.logCheckingOutcome(str, false, "some error");
+
+        //Then
+        // JUnit assertions
+        List<ILoggingEvent> logsList = listAppender.list;
+        Assertions.assertEquals("Checking " + str + " failed reason=some error", logsList.get(0)
+                .getFormattedMessage());
+        Assertions.assertEquals(Level.WARN, logsList.get(0)
+                .getLevel());
+    }
+
+
+
+    @Test
+    void infoCheckingOutcomeFail2() {
+        //Given
+        String str = "processo";
+
+
+        //When
+        fooLogger.logCheckingOutcome(str, false, null);
+
+        //Then
+        // JUnit assertions
+        List<ILoggingEvent> logsList = listAppender.list;
+        Assertions.assertEquals("Checking " + str + " failed reason=<not specified>", logsList.get(0)
+                .getFormattedMessage());
+        Assertions.assertEquals(Level.WARN, logsList.get(0)
                 .getLevel());
     }
 
@@ -92,7 +151,7 @@ class PnLoggerImplTest {
 
 
         //When
-        fooLogger.infoInvokingExternalService(service, str);
+        fooLogger.logInvokingExternalService(service, str);
 
         //Then
         // JUnit assertions
@@ -112,7 +171,7 @@ class PnLoggerImplTest {
 
 
         //When
-        fooLogger.infoInvokingAsyncExternalService(service, str, correlationid);
+        fooLogger.logInvokingAsyncExternalService(service, str, correlationid);
 
         //Then
         // JUnit assertions

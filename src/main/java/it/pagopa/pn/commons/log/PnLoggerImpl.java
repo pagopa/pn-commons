@@ -32,27 +32,39 @@ class PnLoggerImpl implements PnLogger {
 
 
     @Override
-    public void infoStartingProcess(String process) {
+    public void logStartingProcess(String process) {
         log.info("Starting process {}", process);
     }
 
     @Override
-    public void infoEndingProcess(String process) {
+    public void logEndingProcess(String process) {
         log.info("Ending process {}", process);
     }
 
     @Override
-    public void infoChecking(String process) {
+    public void logChecking(String process) {
         log.info("Checking {}", process);
     }
 
+
+    public void logCheckingOutcome(String process, boolean success) {
+        logCheckingOutcome(process, success, null);
+    }
+
+    public void logCheckingOutcome(String process, boolean success, String description) {
+        if (success)
+            log.info("Checking {} passed", process);
+        else
+            log.warn("Checking {} failed reason={}", process, description==null?"<not specified>":description);
+    }
+
     @Override
-    public void infoInvokingExternalService(String service, String process) {
+    public void logInvokingExternalService(String service, String process) {
         log.info("Invoking external service {} {}. Waiting Sync response.", service, process);
     }
 
     @Override
-    public void infoInvokingAsyncExternalService(String service, String process, String correlationId) {
+    public void logInvokingAsyncExternalService(String service, String process, String correlationId) {
         log.info("Invoking external service {} {}. {} for Async response.", service, process, correlationId);
     }
 
