@@ -56,15 +56,6 @@ public interface PnLogger extends Logger {
 
     boolean isFatalEnabled(Marker var1);
 
-    void fatal(Marker var1, String var2);
-
-    void fatal(Marker var1, String var2, Object var3);
-
-    void fatal(Marker var1, String var2, Object var3, Object var4);
-
-    void fatal(Marker var1, String var2, Object... var3);
-
-    void fatal(Marker var1, String var2, Throwable var3);
 
     // metodi shortcut applicativi, l'idea è farli iniziare tutti con il prefisso log*, così son più facili da recuperare
 

@@ -104,31 +104,6 @@ class PnLoggerImpl implements PnLogger {
         return true;
     }
 
-    @Override
-    public void fatal(Marker var1, String var2) {
-        logAlarm(log, var2);
-    }
-
-    @Override
-    public void fatal(Marker var1, String var2, Object var3) {
-        logAlarm(log, var2, var3);
-    }
-
-    @Override
-    public void fatal(Marker var1, String var2, Object var3, Object var4) {
-        logAlarm(log, var2, var3, var4);
-    }
-
-    @Override
-    public void fatal(Marker var1, String var2, Object... var3) {
-        logAlarm(log, var2, var3);
-    }
-
-    @Override
-    public void fatal(Marker var1, String var2, Throwable var3) {
-        logAlarm(log, var2, var3);
-    }
-
 
 
     @Override
@@ -348,7 +323,7 @@ class PnLoggerImpl implements PnLogger {
 
     @Override
     public boolean isWarnEnabled(Marker marker) {
-        return log.isInfoEnabled(marker);
+        return log.isWarnEnabled(marker);
     }
 
     @Override
