@@ -4,7 +4,7 @@ import it.pagopa.pn.common.rest.error.v1.dto.Problem;
 import it.pagopa.pn.commons.exceptions.dto.ProblemError;
 import it.pagopa.pn.commons.exceptions.mapper.ConstraintViolationToProblemErrorMapper;
 import it.pagopa.pn.commons.exceptions.mapper.FieldErrorToProblemErrorMapper;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -20,7 +20,7 @@ import java.util.*;
 import static it.pagopa.pn.commons.exceptions.PnExceptionsCodes.*;
 import static it.pagopa.pn.commons.log.MDCWebFilter.MDC_TRACE_ID_KEY;
 
-@Slf4j
+@lombok.CustomLog
 @Component
 public class ExceptionHelper {
 
