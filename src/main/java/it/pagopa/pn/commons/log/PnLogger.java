@@ -66,7 +66,7 @@ public interface PnLogger extends Logger {
 
     void fatal(Marker var1, String var2, Throwable var3);
 
-    // metodi shortcut applicativi
+    // metodi shortcut applicativi, l'idea è farli iniziare tutti con il prefisso log*, così son più facili da recuperare
 
     /**
      * Logga a info lo start di uno step logico
