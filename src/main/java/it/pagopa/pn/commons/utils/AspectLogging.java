@@ -1,5 +1,6 @@
 package it.pagopa.pn.commons.utils;
 
+import lombok.CustomLog;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.*;
@@ -8,7 +9,7 @@ import reactor.core.publisher.Mono;
 
 
 @Aspect
-@Slf4j
+@CustomLog
 public class AspectLogging {
     @Pointcut("@within(org.springframework.validation.annotation.Validated)")
     public void validatedInterface() {
@@ -22,14 +23,15 @@ public class AspectLogging {
 
     @Before(value = "validatedInterface()")
     public void logApiInvocation(JoinPoint joinPoint) {
+        log.logStartingProcess(joinPoint.getSignature().getName());
         log.debug("Invoked operationId {} with args: {}", joinPoint.getSignature().getName(), joinPoint.getArgs());
-
     }
 
     @AfterReturning(value = "validatedInterface()", returning = "result")
     public void returnApiInvocation(JoinPoint joinPoint, Object result) {
         String message = "Successful API operation: {}() = {} ";
         logResult(joinPoint, result, message);
+        log.logEndingProcess(joinPoint.getSignature().getName());
     }
 
     @Before(value = "client()")
