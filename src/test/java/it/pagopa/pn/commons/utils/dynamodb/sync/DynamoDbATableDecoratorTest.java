@@ -1,6 +1,5 @@
 package it.pagopa.pn.commons.utils.dynamodb.sync;
 
-import it.pagopa.pn.commons.utils.dynamodb.async.sync.DynamoDbTableDecorator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

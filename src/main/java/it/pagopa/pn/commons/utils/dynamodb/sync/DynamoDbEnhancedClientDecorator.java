@@ -1,8 +1,7 @@
-package it.pagopa.pn.commons.utils.dynamodb.async.sync;
+package it.pagopa.pn.commons.utils.dynamodb.sync;
 
-import it.pagopa.pn.commons.utils.LogUtils;
+import lombok.CustomLog;
 import lombok.EqualsAndHashCode;
-import lombok.extern.slf4j.Slf4j;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
@@ -11,7 +10,7 @@ import software.amazon.awssdk.enhanced.dynamodb.model.*;
 import java.util.function.Consumer;
 
 @EqualsAndHashCode
-@Slf4j
+@CustomLog
 public class DynamoDbEnhancedClientDecorator implements DynamoDbEnhancedClient {
 
     private final DynamoDbEnhancedClient dynamoDbEnhancedClient;
@@ -32,7 +31,7 @@ public class DynamoDbEnhancedClientDecorator implements DynamoDbEnhancedClient {
 
     @Override
     public Void transactWriteItems(TransactWriteItemsEnhancedRequest request) {
-        request.transactWriteItems().forEach(LogUtils::logTransactionDynamoDBEntity);
+        request.transactWriteItems().forEach(log::logTransactionDynamoDBEntity);
         return this.dynamoDbEnhancedClient.transactWriteItems(request);
     }
 

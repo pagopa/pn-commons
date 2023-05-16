@@ -3,7 +3,7 @@ package it.pagopa.pn.commons.configs.aws;
 import it.pagopa.pn.commons.configs.RuntimeMode;
 import it.pagopa.pn.commons.utils.dynamodb.async.DynamoDbAsyncClientDecorator;
 import it.pagopa.pn.commons.utils.dynamodb.async.DynamoDbEnhancedAsyncClientDecorator;
-import it.pagopa.pn.commons.utils.dynamodb.async.sync.DynamoDbEnhancedClientDecorator;
+import it.pagopa.pn.commons.utils.dynamodb.sync.DynamoDbEnhancedClientDecorator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

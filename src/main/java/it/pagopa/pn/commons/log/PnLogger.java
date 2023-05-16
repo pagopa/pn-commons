@@ -4,6 +4,7 @@ package it.pagopa.pn.commons.log;
 
 import org.slf4j.Logger;
 import org.slf4j.Marker;
+import software.amazon.awssdk.services.dynamodb.model.TransactWriteItem;
 
 public interface PnLogger extends Logger {
 
@@ -109,5 +110,46 @@ public interface PnLogger extends Logger {
      * @param correlationId correlationId
      */
     void logInvokingAsyncExternalService(String service, String process, String correlationId);
+
+    /**
+     * metodo per loggare la PUT item su dynamoDB
+     *
+     * @param tableName nome della tabella dynamoDB
+     * @param entity il dato da salvare su dynamoDB
+     */
+    <T> void logPuttingDynamoDBEntity(String tableName, T entity);
+
+    /**
+     * metodo per loggare la GET item su dynamoDB
+     *
+     * @param tableName nome della tabella dynamoDB
+     * @param key la chiave della tabella dynamodb su cui fare la GET item
+     * @param entity il dato restituito da dynamoDB
+     */
+    <T> void logGetDynamoDBEntity(String tableName, Object key, T entity);
+
+    /**
+     * metodo per loggare la DELETE item su dynamoDB
+     *
+     * @param tableName nome della tabella dynamoDB
+     * @param key la chiave della tabella dynamoDB su cui effettuare la delete
+     * @param entity il dato eliminato
+     */
+    <T> void logDeleteDynamoDBEntity(String tableName, Object key, T entity);
+
+    /**
+     * metodo per loggare la UPDATE item su dynamoDB
+     *
+     * @param tableName nome della tabella dynamoDB
+     * @param entity il dato modificato restituito da dynamoDB
+     */
+    <T> void logUpdateDynamoDBEntity(String tableName, T entity);
+
+    /**
+     * metodo per loggare la tabella su una transactWriteItem di dynamoDB
+     *
+     * @param transactWriteItem la transactionWrite item inserita su dynamoDB
+     */
+    void logTransactionDynamoDBEntity(TransactWriteItem transactWriteItem);
 
 }

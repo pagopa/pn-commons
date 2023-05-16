@@ -1,15 +1,14 @@
-package it.pagopa.pn.commons.utils.dynamodb.async.sync;
+package it.pagopa.pn.commons.utils.dynamodb.sync;
 
-import it.pagopa.pn.commons.utils.LogUtils;
+import lombok.CustomLog;
 import lombok.EqualsAndHashCode;
-import lombok.extern.slf4j.Slf4j;
 import software.amazon.awssdk.enhanced.dynamodb.*;
 import software.amazon.awssdk.enhanced.dynamodb.model.*;
 
 import java.util.function.Consumer;
 
 @EqualsAndHashCode
-@Slf4j
+@CustomLog
 public class DynamoDbTableDecorator<T> implements DynamoDbTable<T> {
 
     private final DynamoDbTable<T> dynamoDbTable;
@@ -61,7 +60,7 @@ public class DynamoDbTableDecorator<T> implements DynamoDbTable<T> {
 
     @Override
     public void putItem(PutItemEnhancedRequest<T> request) {
-        LogUtils.logPuttingDynamoDBEntity(dynamoDbTable.tableName(), request.item());
+        log.logPuttingDynamoDBEntity(dynamoDbTable.tableName(), request.item());
         this.dynamoDbTable.putItem(request);
     }
 
@@ -72,84 +71,80 @@ public class DynamoDbTableDecorator<T> implements DynamoDbTable<T> {
 
     @Override
     public void putItem(T item) {
-        LogUtils.logPuttingDynamoDBEntity(this.dynamoDbTable.tableName(), item);
+        log.logPuttingDynamoDBEntity(this.dynamoDbTable.tableName(), item);
         this.dynamoDbTable.putItem(item);
     }
 
     @Override
     public T getItem(Key key) {
         T item = this.dynamoDbTable.getItem(key);
-        LogUtils.logGetDynamoDBEntity(this.dynamoDbTable.tableName(), item);
+        log.logGetDynamoDBEntity(this.dynamoDbTable.tableName(), key, item);
         return item;
     }
 
     @Override
     public T getItem(T keyItem) {
         T item = this.dynamoDbTable.getItem(keyItem);
-        LogUtils.logGetDynamoDBEntity(this.dynamoDbTable.tableName(), item);
+        log.logGetDynamoDBEntity(this.dynamoDbTable.tableName(), keyItem, item);
         return item;
     }
 
     @Override
     public T getItem(Consumer<GetItemEnhancedRequest.Builder> requestConsumer) {
-        T item = this.dynamoDbTable.getItem(requestConsumer);
-        LogUtils.logGetDynamoDBEntity(this.dynamoDbTable.tableName(), item);
-        return item;
+        return this.dynamoDbTable.getItem(requestConsumer);
     }
 
     @Override
     public T getItem(GetItemEnhancedRequest request) {
         T item = this.dynamoDbTable.getItem(request);
-        LogUtils.logGetDynamoDBEntity(this.dynamoDbTable.tableName(), item);
+        log.logGetDynamoDBEntity(this.dynamoDbTable.tableName(), request.key(), item);
         return item;
     }
 
     @Override
     public T deleteItem(Consumer<DeleteItemEnhancedRequest.Builder> requestConsumer) {
-        T item = this.dynamoDbTable.deleteItem(requestConsumer);
-        LogUtils.logDeleteDynamoDBEntity(this.dynamoDbTable.tableName(), item);
-        return item;
+        return this.dynamoDbTable.deleteItem(requestConsumer);
     }
 
     @Override
     public T deleteItem(DeleteItemEnhancedRequest request) {
         T item = this.dynamoDbTable.deleteItem(request);
-        LogUtils.logDeleteDynamoDBEntity(this.dynamoDbTable.tableName(), item);
+        log.logDeleteDynamoDBEntity(this.dynamoDbTable.tableName(), request.key(), item);
         return item;
     }
 
     @Override
     public T deleteItem(Key key) {
         T item = this.dynamoDbTable.deleteItem(key);
-        LogUtils.logDeleteDynamoDBEntity(this.dynamoDbTable.tableName(), item);
+        log.logDeleteDynamoDBEntity(this.dynamoDbTable.tableName(), key, item);
         return item;
     }
 
     @Override
     public T deleteItem(T keyItem) {
         T item = this.dynamoDbTable.deleteItem(keyItem);
-        LogUtils.logDeleteDynamoDBEntity(this.dynamoDbTable.tableName(), item);
+        log.logDeleteDynamoDBEntity(this.dynamoDbTable.tableName(), keyItem, item);
         return item;
     }
 
     @Override
     public T updateItem(T item) {
         T updateItem = this.dynamoDbTable.updateItem(item);
-        LogUtils.logUpdateDynamoDBEntity(this.dynamoDbTable.tableName(), updateItem);
+        log.logUpdateDynamoDBEntity(this.dynamoDbTable.tableName(), updateItem);
         return updateItem;
     }
 
     @Override
     public T updateItem(Consumer<UpdateItemEnhancedRequest.Builder<T>> requestConsumer) {
         T updateItem = this.dynamoDbTable.updateItem(requestConsumer);
-        LogUtils.logUpdateDynamoDBEntity(this.dynamoDbTable.tableName(), updateItem);
+        log.logUpdateDynamoDBEntity(this.dynamoDbTable.tableName(), updateItem);
         return updateItem;
     }
 
     @Override
     public T updateItem(UpdateItemEnhancedRequest<T> request) {
         T updateItem = this.dynamoDbTable.updateItem(request);
-        LogUtils.logUpdateDynamoDBEntity(this.dynamoDbTable.tableName(), updateItem);
+        log.logUpdateDynamoDBEntity(this.dynamoDbTable.tableName(), updateItem);
         return updateItem;
     }
 
