@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 import org.springframework.util.StringUtils;
+import software.amazon.awssdk.services.dynamodb.model.TransactWriteItem;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
@@ -117,4 +118,38 @@ public class LogUtils {
         }
         return message;
     }
+
+    public static <T> void logPuttingDynamoDBEntity(String tableName, T entity) {
+        log.info("Putting data in DynamoDb table: {}, entity: {}", tableName, entity);
+    }
+
+    public static <T> void logGetDynamoDBEntity(String tableName, T entity) {
+        log.info("Get data in DynamoDb table: {}, entity: {}", tableName, entity);
+    }
+
+    public static <T> void logDeleteDynamoDBEntity(String tableName, T entity) {
+        log.info("Delete data in DynamoDb table: {}, entity: {}", tableName, entity);
+    }
+
+    public static <T> void logUpdateDynamoDBEntity(String tableName, T entity) {
+        log.info("Update data in DynamoDb table: {}, entity: {}", tableName, entity);
+    }
+
+    public static void logTransactionDynamoDBEntity(TransactWriteItem transactWriteItem) {
+        if(transactWriteItem.put() != null) {
+            logTransactionDynamoDBEntity("Put", transactWriteItem.put().tableName());
+        }
+        else if(transactWriteItem.delete() != null) {
+            logTransactionDynamoDBEntity("Delete", transactWriteItem.delete().tableName());
+        }
+        else if(transactWriteItem.update() != null) {
+            logTransactionDynamoDBEntity("Update", transactWriteItem.update().tableName());
+        }
+
+    }
+
+    private static void logTransactionDynamoDBEntity(String action, String tableName) {
+        log.info("{} Transaction in DynamoDb table: {}", action, tableName);
+    }
+
 }

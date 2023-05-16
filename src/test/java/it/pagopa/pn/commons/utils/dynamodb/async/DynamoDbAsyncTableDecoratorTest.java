@@ -1,4 +1,4 @@
-package it.pagopa.pn.commons.utils;
+package it.pagopa.pn.commons.utils.dynamodb.async;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,6 +23,7 @@ class DynamoDbAsyncTableDecoratorTest {
     @BeforeEach
     public void init() {
         delegate = Mockito.mock(DynamoDbAsyncTable.class);
+        Mockito.when(delegate.tableName()).thenReturn("DYNAMODB_TABLE_NAME");
         dynamoDbAsyncTableDecorator = new DynamoDbAsyncTableDecorator<>(delegate);
     }
 
@@ -86,14 +87,18 @@ class DynamoDbAsyncTableDecoratorTest {
 
     @Test
     void putItemTest() {
-        PutItemEnhancedRequest<String> request = PutItemEnhancedRequest.builder(String.class).build();
+        String entity = "anEntity";
+        PutItemEnhancedRequest<String> request = PutItemEnhancedRequest.builder(String.class)
+                .item(entity)
+                .build();
         Mockito.when(delegate.putItem(request)).thenReturn(CompletableFuture.completedFuture(null));
         Assertions.assertDoesNotThrow(() -> dynamoDbAsyncTableDecorator.putItem(request));
     }
 
     @Test
     void putItemConsumerTest() {
-        Consumer<PutItemEnhancedRequest.Builder<String>> consumer = PutItemEnhancedRequest.Builder::build;
+        String entity = "anEntity";
+        Consumer<PutItemEnhancedRequest.Builder<String>> consumer = (builder) -> builder.item(entity);
         Mockito.when(delegate.putItem(consumer)).thenReturn(CompletableFuture.completedFuture(null));
         Assertions.assertDoesNotThrow(() -> dynamoDbAsyncTableDecorator.putItem(consumer));
     }
