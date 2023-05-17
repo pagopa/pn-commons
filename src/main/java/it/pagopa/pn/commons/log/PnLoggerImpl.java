@@ -4,7 +4,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
+import software.amazon.awssdk.enhanced.dynamodb.Key;
+import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.TransactWriteItem;
+
+import java.util.Map;
 
 class PnLoggerImpl implements PnLogger {
 
@@ -75,12 +79,22 @@ class PnLoggerImpl implements PnLogger {
     }
 
     @Override
-    public <T> void logGetDynamoDBEntity(String tableName, Object key, T entity) {
+    public <T> void logGetDynamoDBEntity(String tableName, Key key, T entity) {
+        log.info("Get data in DynamoDb table: {}, partitionKey: {}, sortKey: {}, entity: {}", tableName, key.partitionKeyValue(), key.sortKeyValue(), entity);
+    }
+
+    @Override
+    public <T, K> void logGetDynamoDBEntity(String tableName, K key, T entity) {
         log.info("Get data in DynamoDb table: {}, key: {}, entity: {}", tableName, key, entity);
     }
 
     @Override
-    public <T> void logDeleteDynamoDBEntity(String tableName, Object key, T entity) {
+    public <T> void logDeleteDynamoDBEntity(String tableName, Key key, T entity) {
+        log.info("Delete data in DynamoDb table: {}, partitionKey: {}, sortKey: {}, entity: {}", tableName, key.partitionKeyValue(), key.sortKeyValue(), entity);
+    }
+
+    @Override
+    public <T, K> void logDeleteDynamoDBEntity(String tableName, K key, T entity) {
         log.info("Delete data in DynamoDb table: {}, key: {}, entity: {}", tableName, key, entity);
     }
 
@@ -103,7 +117,7 @@ class PnLoggerImpl implements PnLogger {
 
     }
 
-    private void logTransactionDynamoDBEntity(String action, String tableName, Object keyOrItem) {
+    private void logTransactionDynamoDBEntity(String action, String tableName, Map<String, AttributeValue> keyOrItem) {
         log.info("{} Transaction in DynamoDb table: {}, keyOrItem: {}", action, tableName, keyOrItem);
     }
 

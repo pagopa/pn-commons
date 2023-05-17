@@ -136,7 +136,7 @@ class DynamoDbAsyncTableDecoratorTest {
 
     @Test
     void getItemEnhancedRequestTest() throws ExecutionException, InterruptedException {
-        GetItemEnhancedRequest request = GetItemEnhancedRequest.builder().build();
+        GetItemEnhancedRequest request = GetItemEnhancedRequest.builder().key(Key.builder().partitionValue("aKey").sortValue("aSortKey").build()).build();
         String expectedValue = "RESPONSE";
         Mockito.when(delegate.getItem(request)).thenReturn(CompletableFuture.completedFuture(expectedValue));
         assertThat(dynamoDbAsyncTableDecorator.getItem(request).get()).isEqualTo(expectedValue);
