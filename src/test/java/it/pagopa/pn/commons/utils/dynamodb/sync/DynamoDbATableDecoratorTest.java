@@ -130,7 +130,7 @@ class DynamoDbATableDecoratorTest {
 
     @Test
     void getItemEnhancedRequestTest() {
-        GetItemEnhancedRequest request = GetItemEnhancedRequest.builder().build();
+        GetItemEnhancedRequest request = GetItemEnhancedRequest.builder().key(Key.builder().partitionValue("aKey").build()).build();
         String expectedValue = "RESPONSE";
         Mockito.when(delegate.getItem(request)).thenReturn(expectedValue);
         assertThat(dynamoDbTableDecorator.getItem(request)).isEqualTo(expectedValue);
@@ -162,7 +162,7 @@ class DynamoDbATableDecoratorTest {
 
     @Test
     void deleteItemEnhancedRequestTest() {
-        DeleteItemEnhancedRequest request = DeleteItemEnhancedRequest.builder().build();
+        DeleteItemEnhancedRequest request = DeleteItemEnhancedRequest.builder().key(Key.builder().partitionValue("aKey").build()).build();
         String expectedValue = "RESPONSE";
         Mockito.when(delegate.deleteItem(request)).thenReturn(expectedValue);
         assertThat(dynamoDbTableDecorator.deleteItem(request)).isEqualTo(expectedValue);

@@ -168,7 +168,7 @@ class DynamoDbAsyncTableDecoratorTest {
 
     @Test
     void deleteItemEnhancedRequestTest() throws ExecutionException, InterruptedException {
-        DeleteItemEnhancedRequest request = DeleteItemEnhancedRequest.builder().build();
+        DeleteItemEnhancedRequest request = DeleteItemEnhancedRequest.builder().key(Key.builder().partitionValue("aKey").build()).build();
         String expectedValue = "RESPONSE";
         Mockito.when(delegate.deleteItem(request)).thenReturn(CompletableFuture.completedFuture(expectedValue));
         assertThat(dynamoDbAsyncTableDecorator.deleteItem(request).get()).isEqualTo(expectedValue);
