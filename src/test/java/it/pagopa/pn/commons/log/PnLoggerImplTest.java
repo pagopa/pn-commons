@@ -72,6 +72,25 @@ class PnLoggerImplTest {
                 .getLevel());
     }
 
+
+    @Test
+    void infoEndingProcessFail() {
+        //Given
+        String str = "processo";
+
+
+        //When
+        fooLogger.logEndingProcess(str, false, "test");
+
+        //Then
+        // JUnit assertions
+        List<ILoggingEvent> logsList = listAppender.list;
+        Assertions.assertEquals("Ending process " + str + " with errors=test", logsList.get(0)
+                .getFormattedMessage());
+        Assertions.assertEquals(Level.WARN, logsList.get(0)
+                .getLevel());
+    }
+
     @Test
     void infoChecking() {
         //Given
