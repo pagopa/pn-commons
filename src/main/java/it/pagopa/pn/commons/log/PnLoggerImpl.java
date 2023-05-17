@@ -4,6 +4,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
+import software.amazon.awssdk.enhanced.dynamodb.Key;
+import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
+import software.amazon.awssdk.services.dynamodb.model.TransactWriteItem;
+
+import java.util.Map;
 
 class PnLoggerImpl implements PnLogger {
 
@@ -66,6 +71,54 @@ class PnLoggerImpl implements PnLogger {
     @Override
     public void logInvokingAsyncExternalService(String service, String process, String correlationId) {
         log.info("Invoking external service {} {}. {} for Async response.", service, process, correlationId);
+    }
+
+    @Override
+    public <T> void logPuttingDynamoDBEntity(String tableName, T entity) {
+        log.info("Putting data in DynamoDb table: {}, entity: {}", tableName, entity);
+    }
+
+    @Override
+    public <T> void logGetDynamoDBEntity(String tableName, Key key, T entity) {
+        log.info("Get data in DynamoDb table: {}, partitionKey: {}, sortKey: {}, entity: {}", tableName, key.partitionKeyValue(), key.sortKeyValue(), entity);
+    }
+
+    @Override
+    public <T, K> void logGetDynamoDBEntity(String tableName, K key, T entity) {
+        log.info("Get data in DynamoDb table: {}, key: {}, entity: {}", tableName, key, entity);
+    }
+
+    @Override
+    public <T> void logDeleteDynamoDBEntity(String tableName, Key key, T entity) {
+        log.info("Delete data in DynamoDb table: {}, partitionKey: {}, sortKey: {}, entity: {}", tableName, key.partitionKeyValue(), key.sortKeyValue(), entity);
+    }
+
+    @Override
+    public <T, K> void logDeleteDynamoDBEntity(String tableName, K key, T entity) {
+        log.info("Delete data in DynamoDb table: {}, key: {}, entity: {}", tableName, key, entity);
+    }
+
+    @Override
+    public <T> void logUpdateDynamoDBEntity(String tableName, T entity) {
+        log.info("Update data in DynamoDb table: {}, entity: {}", tableName, entity);
+    }
+
+    @Override
+    public void logTransactionDynamoDBEntity(TransactWriteItem transactWriteItem) {
+        if(transactWriteItem.put() != null) {
+            logTransactionDynamoDBEntity("Put", transactWriteItem.put().tableName(), transactWriteItem.put().item());
+        }
+        else if(transactWriteItem.delete() != null) {
+            logTransactionDynamoDBEntity("Delete", transactWriteItem.delete().tableName(), transactWriteItem.delete().key());
+        }
+        else if(transactWriteItem.update() != null) {
+            logTransactionDynamoDBEntity("Update", transactWriteItem.update().tableName(), transactWriteItem.update().key());
+        }
+
+    }
+
+    private void logTransactionDynamoDBEntity(String action, String tableName, Map<String, AttributeValue> keyOrItem) {
+        log.info("{} Transaction in DynamoDb table: {}, keyOrItem: {}", action, tableName, keyOrItem);
     }
 
 

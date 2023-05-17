@@ -1,5 +1,7 @@
-package it.pagopa.pn.commons.utils;
+package it.pagopa.pn.commons.utils.dynamodb.async;
 
+import it.pagopa.pn.commons.utils.MDCUtils;
+import lombok.CustomLog;
 import lombok.EqualsAndHashCode;
 import reactor.core.publisher.Mono;
 import software.amazon.awssdk.core.async.SdkPublisher;
@@ -13,6 +15,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 @EqualsAndHashCode
+@CustomLog
 public class DynamoDbEnhancedAsyncClientDecorator implements DynamoDbEnhancedAsyncClient {
 
     private final DynamoDbEnhancedAsyncClient dynamoDbEnhancedAsyncClient;
@@ -35,6 +38,7 @@ public class DynamoDbEnhancedAsyncClientDecorator implements DynamoDbEnhancedAsy
 
     @Override
     public CompletableFuture<Void> transactWriteItems(TransactWriteItemsEnhancedRequest request) {
+        request.transactWriteItems().forEach(log::logTransactionDynamoDBEntity);
         Map<String, String> copyOfContextMap = MDCUtils.retrieveMDCContextMap();
         return this.dynamoDbEnhancedAsyncClient.transactWriteItems(request)
                 .thenApply(queryResponse -> MDCUtils.enrichWithMDC(queryResponse, copyOfContextMap));
@@ -61,4 +65,5 @@ public class DynamoDbEnhancedAsyncClientDecorator implements DynamoDbEnhancedAsy
         return dynamoDbEnhancedAsyncClient.batchWriteItem(requestConsumer)
                 .thenApply(response -> MDCUtils.enrichWithMDC(response, copyOfContextMap));
     }
+
 }
