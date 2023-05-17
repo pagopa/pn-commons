@@ -76,7 +76,7 @@ class PnLoggerImpl implements PnLogger {
 
     @Override
     public <T> void logGetDynamoDBEntity(String tableName, Object key, T entity) {
-        log.info("Get data in DynamoDb table: {}, entity: {}", tableName, entity);
+        log.info("Get data in DynamoDb table: {}, key: {}, entity: {}", tableName, key, entity);
     }
 
     @Override
@@ -92,19 +92,19 @@ class PnLoggerImpl implements PnLogger {
     @Override
     public void logTransactionDynamoDBEntity(TransactWriteItem transactWriteItem) {
         if(transactWriteItem.put() != null) {
-            logTransactionDynamoDBEntity("Put", transactWriteItem.put().tableName());
+            logTransactionDynamoDBEntity("Put", transactWriteItem.put().tableName(), transactWriteItem.put().item());
         }
         else if(transactWriteItem.delete() != null) {
-            logTransactionDynamoDBEntity("Delete", transactWriteItem.delete().tableName());
+            logTransactionDynamoDBEntity("Delete", transactWriteItem.delete().tableName(), transactWriteItem.delete().key());
         }
         else if(transactWriteItem.update() != null) {
-            logTransactionDynamoDBEntity("Update", transactWriteItem.update().tableName());
+            logTransactionDynamoDBEntity("Update", transactWriteItem.update().tableName(), transactWriteItem.update().key());
         }
 
     }
 
-    private void logTransactionDynamoDBEntity(String action, String tableName) {
-        log.info("{} Transaction in DynamoDb table: {}", action, tableName);
+    private void logTransactionDynamoDBEntity(String action, String tableName, Object keyOrItem) {
+        log.info("{} Transaction in DynamoDb table: {}, keyOrItem: {}", action, tableName, keyOrItem);
     }
 
 
