@@ -2,10 +2,19 @@ package it.pagopa.pn.commons.utils;
 
 import org.slf4j.MDC;
 import org.springframework.util.CollectionUtils;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.Map;
 
 public class MDCUtils {
+
+    public static final String MDC_PN_CTX_IUN = "ctx_iun";
+    public static final String MDC_PN_CTX_MANDATEID = "ctx_mandate_id";
+    public static final String MDC_PN_CTX_RECIPIENT_INDEX = "ctx_recipient_index";
+    public static final String MDC_PN_CTX_REQUEST_ID = "ctx_request_id";
+    public static final String MDC_PN_CTX_TOPIC = "ctx_topic";
+    public static final String MDC_PN_CTX_MESSAGE_ID = "ctx_awsMessageId";
 
     private MDCUtils() {}
 
@@ -20,40 +29,17 @@ public class MDCUtils {
         return t;
     }
 
-    public static void setIUN(String iun){
-        MDC.put("ctx_iun", iun);
+
+    public static <T> Mono<T> addMDCToContextAndExecute(Mono<T> mono) {
+        final Map<String, String> mdc = MDC.getCopyOfContextMap();
+        return Mono.just(mdc).flatMap(x -> mono)
+                .contextWrite(context -> context.putAllMap(mdc));
     }
 
-    public static void setInternalId(String internalId){
-        MDC.put("ctx_internal_id", internalId);
-    }
 
-    public static void setUid(String uid){
-        MDC.put("ctx_uid", uid);
-    }
-
-    public static void setMandateid(String mandateid){
-        MDC.put("ctx_mandate_id", mandateid);
-    }
-
-    public static void setRecipientIndex(int recipientIndex){
-        MDC.put("ctx_recipient_index", recipientIndex+"");
-    }
-
-    public static void setRequestId(String requestId){
-        MDC.put("ctx_request_id", requestId);
-    }
-
-    public static void setTopic(String topic){
-        MDC.put("ctx_topic", topic);
-    }
-
-    /**
-     * aggiunge all'MDC una coppia chiave valore
-     * @param key chiave da aggiungere, alla quale verrà aggiunto automaticamente il prefisso ctx_
-     * @param value valore da associare alla chiave
-     */
-    public static void setCustom(String key, String value){
-        MDC.put("ctx_" + key, value);
+    public static <T> Flux<T> addMDCToContextAndExecute(Flux<T> flux) {
+        final Map<String, String> mdc = MDC.getCopyOfContextMap();
+        return Mono.just(mdc).thenMany(flux)
+                .contextWrite(context -> context.putAllMap(mdc));
     }
 }
