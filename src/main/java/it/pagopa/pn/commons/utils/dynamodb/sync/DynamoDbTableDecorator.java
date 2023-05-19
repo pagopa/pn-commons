@@ -62,20 +62,20 @@ public class DynamoDbTableDecorator<T> implements DynamoDbTable<T> {
     public void putItem(PutItemEnhancedRequest<T> request) {
         log.logPuttingDynamoDBEntity(dynamoDbTable.tableName(), request.item());
         this.dynamoDbTable.putItem(request);
-        log.logPutDynamoDBEntity(this.dynamoDbTable.tableName());
+        log.logPutDoneDynamoDBEntity(this.dynamoDbTable.tableName());
     }
 
     @Override
     public void putItem(Consumer<PutItemEnhancedRequest.Builder<T>> requestConsumer) {
         this.dynamoDbTable.putItem(requestConsumer);
-        log.logPutDynamoDBEntity(this.dynamoDbTable.tableName());
+        log.logPutDoneDynamoDBEntity(this.dynamoDbTable.tableName());
     }
 
     @Override
     public void putItem(T item) {
         log.logPuttingDynamoDBEntity(this.dynamoDbTable.tableName(), item);
         this.dynamoDbTable.putItem(item);
-        log.logPutDynamoDBEntity(this.dynamoDbTable.tableName());
+        log.logPutDoneDynamoDBEntity(this.dynamoDbTable.tableName());
     }
 
     @Override

@@ -125,7 +125,7 @@ public interface PnLogger extends Logger {
      *
      * @param tableName nome della tabella dynamoDB
      */
-    void logPutDynamoDBEntity(String tableName);
+    void logPutDoneDynamoDBEntity(String tableName);
 
     /**
      * metodo per loggare la GET item su dynamoDB

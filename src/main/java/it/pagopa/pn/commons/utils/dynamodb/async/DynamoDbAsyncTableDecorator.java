@@ -78,7 +78,7 @@ public class DynamoDbAsyncTableDecorator<T> implements DynamoDbAsyncTable<T> {
         return this.dynamoDbAsyncTable.putItem(request)
                 .thenApply(unused -> MDCUtils.enrichWithMDC(unused, copyOfContextMap))
                 .thenApply(unused -> {
-                    log.logPutDynamoDBEntity(dynamoDbAsyncTable.tableName());
+                    log.logPutDoneDynamoDBEntity(dynamoDbAsyncTable.tableName());
                     return unused;
                 });
     }
@@ -89,7 +89,7 @@ public class DynamoDbAsyncTableDecorator<T> implements DynamoDbAsyncTable<T> {
         return this.dynamoDbAsyncTable.putItem(requestConsumer)
                 .thenApply(unused -> MDCUtils.enrichWithMDC(unused, copyOfContextMap))
                 .thenApply(unused -> {
-                    log.logPutDynamoDBEntity(dynamoDbAsyncTable.tableName());
+                    log.logPutDoneDynamoDBEntity(dynamoDbAsyncTable.tableName());
                     return unused;
                 });
     }
@@ -101,7 +101,7 @@ public class DynamoDbAsyncTableDecorator<T> implements DynamoDbAsyncTable<T> {
         return this.dynamoDbAsyncTable.putItem(item)
                 .thenApply(unused -> MDCUtils.enrichWithMDC(unused, copyOfContextMap))
                 .thenApply(unused -> {
-                    log.logPutDynamoDBEntity(dynamoDbAsyncTable.tableName());
+                    log.logPutDoneDynamoDBEntity(dynamoDbAsyncTable.tableName());
                     return unused;
                 });
     }

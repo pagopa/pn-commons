@@ -79,7 +79,7 @@ class PnLoggerImpl implements PnLogger {
     }
 
     @Override
-    public void logPutDynamoDBEntity(String tableName) {
+    public void logPutDoneDynamoDBEntity(String tableName) {
         log.debug("Put data done in DynamoDb table: {}", tableName);
     }
 
