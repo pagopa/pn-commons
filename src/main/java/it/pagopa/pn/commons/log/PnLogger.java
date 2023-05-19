@@ -113,12 +113,19 @@ public interface PnLogger extends Logger {
     void logInvokingAsyncExternalService(String service, String process, String correlationId);
 
     /**
-     * metodo per loggare la PUT item su dynamoDB
+     * metodo per loggare la PUT item su dynamoDB. Indica quale record e su quale tabella si effettuerà la PUT
      *
      * @param tableName nome della tabella dynamoDB
      * @param entity il dato da salvare su dynamoDB
      */
     <T> void logPuttingDynamoDBEntity(String tableName, T entity);
+
+    /**
+     * metodo per loggare la fine di una PUT item su dynamoDB
+     *
+     * @param tableName nome della tabella dynamoDB
+     */
+    void logPutDynamoDBEntity(String tableName);
 
     /**
      * metodo per loggare la GET item su dynamoDB

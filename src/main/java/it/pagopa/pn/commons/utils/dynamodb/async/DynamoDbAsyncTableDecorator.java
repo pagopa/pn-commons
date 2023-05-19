@@ -76,14 +76,22 @@ public class DynamoDbAsyncTableDecorator<T> implements DynamoDbAsyncTable<T> {
         log.logPuttingDynamoDBEntity(dynamoDbAsyncTable.tableName(), request.item());
         Map<String, String> copyOfContextMap = MDCUtils.retrieveMDCContextMap();
         return this.dynamoDbAsyncTable.putItem(request)
-                .thenApply(unused -> MDCUtils.enrichWithMDC(unused, copyOfContextMap));
+                .thenApply(unused -> MDCUtils.enrichWithMDC(unused, copyOfContextMap))
+                .thenApply(unused -> {
+                    log.logPutDynamoDBEntity(dynamoDbAsyncTable.tableName());
+                    return unused;
+                });
     }
 
     @Override
     public CompletableFuture<Void> putItem(Consumer<PutItemEnhancedRequest.Builder<T>> requestConsumer) {
         Map<String, String> copyOfContextMap = MDCUtils.retrieveMDCContextMap();
         return this.dynamoDbAsyncTable.putItem(requestConsumer)
-                .thenApply(unused -> MDCUtils.enrichWithMDC(unused, copyOfContextMap));
+                .thenApply(unused -> MDCUtils.enrichWithMDC(unused, copyOfContextMap))
+                .thenApply(unused -> {
+                    log.logPutDynamoDBEntity(dynamoDbAsyncTable.tableName());
+                    return unused;
+                });
     }
 
     @Override
@@ -91,7 +99,11 @@ public class DynamoDbAsyncTableDecorator<T> implements DynamoDbAsyncTable<T> {
         log.logPuttingDynamoDBEntity(dynamoDbAsyncTable.tableName(), item);
         Map<String, String> copyOfContextMap = MDCUtils.retrieveMDCContextMap();
         return this.dynamoDbAsyncTable.putItem(item)
-                .thenApply(unused -> MDCUtils.enrichWithMDC(unused, copyOfContextMap));
+                .thenApply(unused -> MDCUtils.enrichWithMDC(unused, copyOfContextMap))
+                .thenApply(unused -> {
+                    log.logPutDynamoDBEntity(dynamoDbAsyncTable.tableName());
+                    return unused;
+                });
     }
 
     @Override
