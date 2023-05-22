@@ -1,4 +1,4 @@
-package it.pagopa.pn.commons.utils;
+package it.pagopa.pn.commons.utils.dynamodb.async;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,6 +9,7 @@ import software.amazon.awssdk.services.dynamodb.paginators.BatchGetItemPublisher
 import software.amazon.awssdk.services.dynamodb.paginators.QueryPublisher;
 import software.amazon.awssdk.utils.builder.SdkBuilder;
 
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
@@ -90,7 +91,14 @@ class DynamoDbAsyncClientDecoratorTest {
 
     @Test
     void transactWriteItemsTest() throws ExecutionException, InterruptedException {
-        TransactWriteItemsRequest request = TransactWriteItemsRequest.builder().build();
+        TransactWriteItemsRequest request = TransactWriteItemsRequest.builder()
+                .transactItems(TransactWriteItem.builder()
+                        .put(Put.builder()
+                        .tableName("TABLE")
+                        .item(Map.of("name", AttributeValue.builder().s("aName").build()))
+                                .build()).build())
+                .build();
+
         TransactWriteItemsResponse expectedValue = TransactWriteItemsResponse.builder().consumedCapacity(ConsumedCapacity
                 .builder().tableName("TABLE").build())
                 .build();

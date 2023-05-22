@@ -1,8 +1,9 @@
 package it.pagopa.pn.commons.configs.aws;
 
 import it.pagopa.pn.commons.configs.RuntimeMode;
-import it.pagopa.pn.commons.utils.DynamoDbAsyncClientDecorator;
-import it.pagopa.pn.commons.utils.DynamoDbEnhancedAsyncClientDecorator;
+import it.pagopa.pn.commons.utils.dynamodb.async.DynamoDbAsyncClientDecorator;
+import it.pagopa.pn.commons.utils.dynamodb.async.DynamoDbEnhancedAsyncClientDecorator;
+import it.pagopa.pn.commons.utils.dynamodb.sync.DynamoDbEnhancedClientDecorator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -35,17 +36,6 @@ public class AwsServicesClientsConfig {
         log.info("AWS RuntimeMode is={}", runtimeMode);
     }
 
-//    @Bean
-    public DynamoDbAsyncClient dynamoDbAsyncClient() {
-        return this.configureBuilder( DynamoDbAsyncClient.builder() );
-    }
-
-//    @Bean
-    public DynamoDbEnhancedAsyncClient dynamoDbEnhancedAsyncClient( DynamoDbAsyncClient baseAsyncClient) {
-        return DynamoDbEnhancedAsyncClient.builder()
-                .dynamoDbClient( baseAsyncClient )
-                .build();
-    }
 
     @Bean
     public DynamoDbAsyncClient dynamoDbAsyncClientWithMDC() {
@@ -63,12 +53,10 @@ public class AwsServicesClientsConfig {
     }
 
     @Bean
-    public DynamoDbEnhancedClient dynamoDbEnhancedClient( DynamoDbClient baseClient ) {
-        return DynamoDbEnhancedClient.builder()
-                .dynamoDbClient( baseClient )
-                .build();
+    public DynamoDbEnhancedClient dynamoDbEnhancedClientWithLog(DynamoDbClient delegate) {
+        return new DynamoDbEnhancedClientDecorator(dynamoDbEnhancedClient(delegate));
     }
-    
+
     @Bean
     public SqsClient sqsClient() {
         return configureBuilder( SqsClient.builder() );
@@ -105,6 +93,22 @@ public class AwsServicesClientsConfig {
         }
 
         return builder.build();
+    }
+
+    private DynamoDbAsyncClient dynamoDbAsyncClient() {
+        return this.configureBuilder( DynamoDbAsyncClient.builder() );
+    }
+
+    private DynamoDbEnhancedAsyncClient dynamoDbEnhancedAsyncClient( DynamoDbAsyncClient baseAsyncClient) {
+        return DynamoDbEnhancedAsyncClient.builder()
+                .dynamoDbClient( baseAsyncClient )
+                .build();
+    }
+
+    public DynamoDbEnhancedClient dynamoDbEnhancedClient( DynamoDbClient baseClient ) {
+        return DynamoDbEnhancedClient.builder()
+                .dynamoDbClient( baseClient )
+                .build();
     }
 
 }

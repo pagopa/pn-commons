@@ -4,6 +4,8 @@ package it.pagopa.pn.commons.log;
 
 import org.slf4j.Logger;
 import org.slf4j.Marker;
+import software.amazon.awssdk.enhanced.dynamodb.Key;
+import software.amazon.awssdk.services.dynamodb.model.TransactWriteItem;
 
 public interface PnLogger extends Logger {
 
@@ -109,5 +111,75 @@ public interface PnLogger extends Logger {
      * @param correlationId correlationId
      */
     void logInvokingAsyncExternalService(String service, String process, String correlationId);
+
+    /**
+     * metodo per loggare la PUT item su dynamoDB. Indica quale record e su quale tabella si effettuerà la PUT
+     *
+     * @param tableName nome della tabella dynamoDB
+     * @param entity il dato da salvare su dynamoDB
+     */
+    <T> void logPuttingDynamoDBEntity(String tableName, T entity);
+
+    /**
+     * metodo per loggare la fine di una PUT item su dynamoDB
+     *
+     * @param tableName nome della tabella dynamoDB
+     */
+    void logPutDoneDynamoDBEntity(String tableName);
+
+    /**
+     * metodo per loggare la GET item su dynamoDB
+     *
+     * @param tableName nome della tabella dynamoDB
+     * @param key la chiave di tipo {@link Key} della tabella dynamodb su cui fare la GET item.
+     *            Stampa partitionKey ed eventuale sortKey
+     * @param entity il dato restituito da dynamoDB
+     */
+    <T> void logGetDynamoDBEntity(String tableName, Key key, T entity);
+
+    /**
+     * metodo per loggare la GET item su dynamoDB
+     *
+     * @param tableName nome della tabella dynamoDB
+     * @param key la chiave di tipo {@link K} della tabella dynamodb su cui fare la GET item.
+     *            Stampa la chiave data in input per effettuare la GET
+     * @param entity il dato restituito da dynamoDB
+     */
+    <T, K> void logGetDynamoDBEntity(String tableName, K key, T entity);
+
+    /**
+     * metodo per loggare la DELETE item su dynamoDB
+     *
+     * @param tableName nome della tabella dynamoDB
+     * @param key la chiave di tipo {@link Key} della tabella dynamoDB su cui effettuare la delete.
+     *            Stampa partitionKey ed eventuale sortKey
+     * @param entity il dato eliminato
+     */
+    <T> void logDeleteDynamoDBEntity(String tableName, Key key, T entity);
+
+    /**
+     * metodo per loggare la DELETE item su dynamoDB
+     *
+     * @param tableName nome della tabella dynamoDB
+     * @param key la chiave di tipo {@link K} della tabella dynamoDB su cui effettuare la delete.
+     *            Stampa la chiave data in input per effettuare la DELETE
+     * @param entity il dato eliminato
+     */
+    <T, K> void logDeleteDynamoDBEntity(String tableName, K key, T entity);
+
+    /**
+     * metodo per loggare la UPDATE item su dynamoDB
+     *
+     * @param tableName nome della tabella dynamoDB
+     * @param entity il dato modificato restituito da dynamoDB
+     */
+    <T> void logUpdateDynamoDBEntity(String tableName, T entity);
+
+    /**
+     * metodo per loggare la tabella su una transactWriteItem di dynamoDB
+     *
+     * @param transactWriteItem la transactionWrite item inserita su dynamoDB
+     */
+    void logTransactionDynamoDBEntity(TransactWriteItem transactWriteItem);
 
 }
