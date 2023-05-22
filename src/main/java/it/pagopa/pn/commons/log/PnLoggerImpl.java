@@ -83,32 +83,37 @@ class PnLoggerImpl implements PnLogger {
 
     @Override
     public <T> void logPuttingDynamoDBEntity(String tableName, T entity) {
-        log.info("Putting data in DynamoDb table: {}, entity: {}", tableName, entity);
+        log.debug("Putting data in DynamoDb table: {}, entity: {}", tableName, entity);
+    }
+
+    @Override
+    public void logPutDoneDynamoDBEntity(String tableName) {
+        log.debug("Put data done in DynamoDb table: {}", tableName);
     }
 
     @Override
     public <T> void logGetDynamoDBEntity(String tableName, Key key, T entity) {
-        log.info("Get data in DynamoDb table: {}, partitionKey: {}, sortKey: {}, entity: {}", tableName, key.partitionKeyValue(), key.sortKeyValue(), entity);
+        log.debug("Get data in DynamoDb table: {}, partitionKey: {}, sortKey: {}, entity: {}", tableName, key.partitionKeyValue(), key.sortKeyValue(), entity);
     }
 
     @Override
     public <T, K> void logGetDynamoDBEntity(String tableName, K key, T entity) {
-        log.info("Get data in DynamoDb table: {}, key: {}, entity: {}", tableName, key, entity);
+        log.debug("Get data in DynamoDb table: {}, key: {}, entity: {}", tableName, key, entity);
     }
 
     @Override
     public <T> void logDeleteDynamoDBEntity(String tableName, Key key, T entity) {
-        log.info("Delete data in DynamoDb table: {}, partitionKey: {}, sortKey: {}, entity: {}", tableName, key.partitionKeyValue(), key.sortKeyValue(), entity);
+        log.debug("Delete data in DynamoDb table: {}, partitionKey: {}, sortKey: {}, entity: {}", tableName, key.partitionKeyValue(), key.sortKeyValue(), entity);
     }
 
     @Override
     public <T, K> void logDeleteDynamoDBEntity(String tableName, K key, T entity) {
-        log.info("Delete data in DynamoDb table: {}, key: {}, entity: {}", tableName, key, entity);
+        log.debug("Delete data in DynamoDb table: {}, key: {}, entity: {}", tableName, key, entity);
     }
 
     @Override
     public <T> void logUpdateDynamoDBEntity(String tableName, T entity) {
-        log.info("Update data in DynamoDb table: {}, entity: {}", tableName, entity);
+        log.debug("Update data in DynamoDb table: {}, entity: {}", tableName, entity);
     }
 
     @Override
@@ -126,7 +131,7 @@ class PnLoggerImpl implements PnLogger {
     }
 
     private void logTransactionDynamoDBEntity(String action, String tableName, Map<String, AttributeValue> keyOrItem) {
-        log.info("{} Transaction in DynamoDb table: {}, keyOrItem: {}", action, tableName, keyOrItem);
+        log.debug("{} Transaction in DynamoDb table: {}, keyOrItem: {}", action, tableName, keyOrItem);
     }
 
 
