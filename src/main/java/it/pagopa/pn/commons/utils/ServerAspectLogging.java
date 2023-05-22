@@ -19,17 +19,15 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 
 @Aspect
 @CustomLog
 public class ServerAspectLogging {
 
-    private static final String sensitiveData = "Sensitive Data";
+    private static final String sensitiveData = "<Hidden Data>";
 
-    //GESTIRE POINTCUT CON NUOVI STANDARD
-    @Pointcut("execution(* it.pagopa.pn..generated.openapi.server..*.*(..))")
+    @Pointcut("execution(* it.pagopa.pn..generated.openapi.server..api.*.*(..))")
     public void server() {
         // all rest controller method
     }
@@ -37,7 +35,7 @@ public class ServerAspectLogging {
     @Around(value = "server()")
     public Object logAroundServer(ProceedingJoinPoint joinPoint) throws Throwable {
         String process = joinPoint.getSignature().getName();
-        String endingMessage = "Successful API operation: {}(). Result {} ";
+        String endingMessage = "Successful API operation: {}(). Result: {} ";
         log.logStartingProcess(process);
         Method m = ((MethodSignature) joinPoint.getSignature()).getMethod();
         Object[] arguments = Arrays.stream(joinPoint.getArgs()).toArray();
@@ -110,27 +108,19 @@ public class ServerAspectLogging {
     private Object proceed(ProceedingJoinPoint joinPoint, Object result, String endingMessage, String process) throws Throwable {
         if (result instanceof Mono<?> monoResult) {
             return monoResult.doOnSuccess(o -> {
-                        var response = "";
-                        if (Objects.nonNull(o)) {
-                            response = o.toString();
-                        }
-                        logResult(joinPoint, response, endingMessage);
+                        logResult(joinPoint, o, endingMessage);
                         log.logEndingProcess(process);
                     })
                     .doOnError(o->{
-                        log.warn("ERRORE ON MONO");
+                        log.warn("Warning: {} on mono", o.getMessage());
                     });
         }
         else if (result instanceof Flux<?> fluxResult) {
             return fluxResult.doOnNext(o -> {
-                var response = "";
-                if (Objects.nonNull(o)) {
-                    response = o.toString();
-                }
-                logResult(joinPoint, response, endingMessage);
+                logResult(joinPoint, o, endingMessage);
                 log.logEndingProcess(process);
             }).doOnError(o->{
-                log.warn("Warning: {} ON FLUX", o.getMessage());
+                log.warn("Warning: {} on flux", o.getMessage());
             });
         }
         else {

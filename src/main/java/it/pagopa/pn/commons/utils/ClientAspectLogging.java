@@ -10,16 +10,14 @@ import reactor.core.publisher.Mono;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 
 @Aspect
 @CustomLog
 public class ClientAspectLogging {
 
-    private static final String sensitiveData = "Sensitive Data";
+    private static final String sensitive_data = "<Hidden Data>";
 
-    //GESTIRE POINTCUT CON NUOVI STANDARD
     @Pointcut("execution(* it.pagopa.pn..generated.openapi.msclient..api.*.*(..))")
     public void client() {
         // all client methods
@@ -40,15 +38,15 @@ public class ClientAspectLogging {
         if (result instanceof Mono<?> monoResult) {
             monoResult.doOnNext(o -> log.info(message,
                     joinPoint.getSignature().toShortString(),
-                    o instanceof String ? sensitiveData : o)).subscribe();
+                    o instanceof String ? sensitive_data : o)).subscribe();
             //Case: Flux
         } else if (result instanceof Flux<?> fluxResult) {
             fluxResult.doOnNext(o -> log.info(message,
                     joinPoint.getSignature().toShortString(),
-                    o instanceof String ? sensitiveData : o)).subscribe();
+                    o instanceof String ? sensitive_data : o)).subscribe();
             //Case: Other
         } else {
-            log.info(message, joinPoint.getSignature().toShortString(), result instanceof String ? sensitiveData : result);
+            log.info(message, joinPoint.getSignature().toShortString(), result instanceof String ? sensitive_data : result);
         }
     }
 
@@ -59,32 +57,27 @@ public class ClientAspectLogging {
             if (!(param instanceof String || param instanceof List<?>)) {
                 result.add(param);
             }
+            else {
+                result.add(param.getClass());
+            }
         }
         return result;
     }
 
     private Object proceed(ProceedingJoinPoint joinPoint, Object result, String endingMessage) throws Throwable {
         if (result instanceof Mono<?> monoResult) {
-            return monoResult.doOnSuccess(o -> {
-                        var response = "";
-                        if (Objects.nonNull(o)) {
-                            response = o.toString();
-                        }
-                        logResult(joinPoint, response, endingMessage);
+            return monoResult.doOnSuccess(res -> {
+                        logResult(joinPoint, res, endingMessage);
                     })
                     .doOnError(o->{
-                        log.warn("ERRORE ON MONO");
+                        log.warn("Warning: {} on mono", o.getMessage());
                     });
         }
         else if (result instanceof Flux<?> fluxResult) {
-            return fluxResult.doOnNext(o -> {
-                var response = "";
-                if (Objects.nonNull(o)) {
-                    response = o.toString();
-                }
-                logResult(joinPoint, response, endingMessage);
+            return fluxResult.doOnNext(res -> {
+                logResult(joinPoint, res, endingMessage);
             }).doOnError(o->{
-                log.warn("Warning: {} ON FLUX", o.getMessage());
+                log.warn("Warning: {} on flux", o.getMessage());
             });
         }
         else {
