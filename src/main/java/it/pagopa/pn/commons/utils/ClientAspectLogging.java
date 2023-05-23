@@ -16,7 +16,7 @@ import java.util.List;
 @CustomLog
 public class ClientAspectLogging {
 
-    private static final String sensitive_data = "<Hidden Data>";
+    private static final String SENSITIVE_DATA = "<Hidden Data>";
 
     @Pointcut("execution(* it.pagopa.pn..generated.openapi.msclient..api.*.*(..))")
     public void client() {
@@ -38,15 +38,15 @@ public class ClientAspectLogging {
         if (result instanceof Mono<?> monoResult) {
             monoResult.doOnNext(o -> log.info(message,
                     joinPoint.getSignature().toShortString(),
-                    o instanceof String ? sensitive_data : o)).subscribe();
+                    o instanceof String ? SENSITIVE_DATA : o)).subscribe();
             //Case: Flux
         } else if (result instanceof Flux<?> fluxResult) {
             fluxResult.doOnNext(o -> log.info(message,
                     joinPoint.getSignature().toShortString(),
-                    o instanceof String ? sensitive_data : o)).subscribe();
+                    o instanceof String ? SENSITIVE_DATA : o)).subscribe();
             //Case: Other
         } else {
-            log.info(message, joinPoint.getSignature().toShortString(), result instanceof String ? sensitive_data : result);
+            log.info(message, joinPoint.getSignature().toShortString(), result instanceof String ? SENSITIVE_DATA : result);
         }
     }
 
@@ -66,19 +66,19 @@ public class ClientAspectLogging {
 
     private Object proceed(ProceedingJoinPoint joinPoint, Object result, String endingMessage) throws Throwable {
         if (result instanceof Mono<?> monoResult) {
-            return monoResult.doOnSuccess(res -> {
-                        logResult(joinPoint, res, endingMessage);
-                    })
-                    .doOnError(o->{
-                        log.warn("Warning: {} on mono", o.getMessage());
-                    });
+            return monoResult.doOnSuccess(res ->
+                        logResult(joinPoint, res, endingMessage)
+                    )
+                    .doOnError(o->
+                        log.warn("Warning: {} on mono", o.getMessage())
+                    );
         }
         else if (result instanceof Flux<?> fluxResult) {
-            return fluxResult.doOnNext(res -> {
-                logResult(joinPoint, res, endingMessage);
-            }).doOnError(o->{
-                log.warn("Warning: {} on flux", o.getMessage());
-            });
+            return fluxResult.doOnNext(res ->
+                logResult(joinPoint, res, endingMessage)
+            ).doOnError(o->
+                log.warn("Warning: {} on flux", o.getMessage())
+            );
         }
         else {
             logResult(joinPoint, result, endingMessage);

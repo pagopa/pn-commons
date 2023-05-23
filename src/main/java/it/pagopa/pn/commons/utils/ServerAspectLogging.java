@@ -1,7 +1,6 @@
 package it.pagopa.pn.commons.utils;
 
 import lombok.CustomLog;
-import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -25,7 +24,7 @@ import java.util.List;
 @CustomLog
 public class ServerAspectLogging {
 
-    private static final String sensitiveData = "<Hidden Data>";
+    private static final String SENSITIVE_DATA = "<Hidden Data>";
 
     @Pointcut("execution(* it.pagopa.pn..generated.openapi.server..api.*.*(..))")
     public void server() {
@@ -44,7 +43,7 @@ public class ServerAspectLogging {
         //RETRIEVE ARGUMENTS TO PRINT
         List<Annotation[]> annotationsParams = Arrays.stream(m.getParameterAnnotations()).toList();
         ArrayList<Object> argsDefined = getEvaluableArguments(annotationsParams, arguments);
-        log.debug("Invoked operationId {} with uri {} with args: {}", joinPoint.getSignature().getName(), url, argsDefined);
+        log.debug("Invoked operationId {} with path {} with args: {}", joinPoint.getSignature().toShortString(), url, argsDefined);
 
         for (Object v : arguments) {
             if (v instanceof Mono<?> mono) {
@@ -68,39 +67,20 @@ public class ServerAspectLogging {
 
     }
 
-    private void logResult(JoinPoint joinPoint, Object result, String message) {
-        //Case: Mono
-        if (result instanceof Mono<?> monoResult) {
-            monoResult.doOnNext(o -> log.info(message,
-                    joinPoint.getSignature().toShortString(),
-                    o instanceof String ? sensitiveData : result)).subscribe();
-            //Case: Flux
-        } else if (result instanceof Flux<?> fluxResult) {
-            fluxResult.doOnNext(o -> log.info(message,
-                    joinPoint.getSignature().toShortString(),
-                    o instanceof String ? sensitiveData : result)).subscribe();
-            //Case: Other
-        } else {
-            log.info(message, joinPoint.getSignature().toShortString(), result instanceof String ? sensitiveData : result);
-        }
-    }
-
     private ArrayList<Object> getEvaluableArguments(List<Annotation[]> parametersAnnotation, Object[] parameterValue){
         ArrayList<Object> result = new ArrayList<>();
         for(int i = 0; i < parametersAnnotation.size(); i++){
-            final int index = i;
             List<Annotation> ann = Arrays.stream(parametersAnnotation.get(i)).toList();
             if (!ann.isEmpty()) {
                 for (Annotation value : ann) {
                     if (!(value instanceof RequestHeader || value instanceof RequestParam)) {
-                        result.add(parameterValue[index]);
+                        result.add(parameterValue[i]);
                         break;
                     }
                 }
             }
-            else
-            if(!(parameterValue[index] instanceof ServerWebExchange))
-                result.add(parameterValue[index]);
+            else if(!(parameterValue[i] instanceof ServerWebExchange))
+                result.add(parameterValue[i]);
         }
         return result;
     }
@@ -108,23 +88,25 @@ public class ServerAspectLogging {
     private Object proceed(ProceedingJoinPoint joinPoint, Object result, String endingMessage, String process) throws Throwable {
         if (result instanceof Mono<?> monoResult) {
             return monoResult.doOnSuccess(o -> {
-                        logResult(joinPoint, o, endingMessage);
+                        log.info(endingMessage, joinPoint.getSignature().toShortString(), o);
                         log.logEndingProcess(process);
                     })
-                    .doOnError(o->{
-                        log.warn("Warning: {} on mono", o.getMessage());
-                    });
+                    .doOnError(o->
+                            //TODO add customlog ending process instead warning below
+                        log.warn("Warning: {} on mono", o.getMessage())
+                    );
         }
         else if (result instanceof Flux<?> fluxResult) {
             return fluxResult.doOnNext(o -> {
-                logResult(joinPoint, o, endingMessage);
+                log.info(endingMessage, joinPoint.getSignature().toShortString(), o);
                 log.logEndingProcess(process);
-            }).doOnError(o->{
-                log.warn("Warning: {} on flux", o.getMessage());
-            });
+            }).doOnError(o->
+                    //TODO add customlog ending process instead warning below
+                log.warn("Warning: {} on flux", o.getMessage())
+            );
         }
         else {
-            logResult(joinPoint, result, endingMessage);
+            log.info(endingMessage, joinPoint.getSignature().toShortString(), result);
             log.logEndingProcess(process);
             return result;
         }
