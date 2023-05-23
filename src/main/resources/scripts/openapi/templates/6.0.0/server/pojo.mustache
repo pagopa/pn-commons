@@ -2,7 +2,6 @@
  * {{description}}{{^description}}{{classname}}{{/description}}
  */
 {{>additionalModelTypeAnnotations}}
-@lombok.ToString
 {{#description}}
 {{#swagger1AnnotationLibrary}}
 @ApiModel(description = "{{{description}}}")
@@ -26,6 +25,7 @@
 {{#vendorExtensions.x-class-extra-annotation}}
 {{{vendorExtensions.x-class-extra-annotation}}}
 {{/vendorExtensions.x-class-extra-annotation}}
+@lombok.ToString
 public class {{classname}}{{#parent}} extends {{{parent}}}{{/parent}}{{^parent}}{{#hateoas}} extends RepresentationModel<{{classname}}> {{/hateoas}}{{/parent}}{{#vendorExtensions.x-implements}}{{#-first}} implements {{{.}}}{{/-first}}{{^-first}}, {{{.}}}{{/-first}}{{/vendorExtensions.x-implements}} {
 {{#serializableModel}}
 

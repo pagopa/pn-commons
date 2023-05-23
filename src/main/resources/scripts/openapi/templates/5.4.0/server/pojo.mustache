@@ -2,7 +2,6 @@
  * {{description}}{{^description}}{{classname}}{{/description}}
  */
 {{>additionalModelTypeAnnotations}}
-@lombok.ToString
 {{#description}}
 {{#swagger1AnnotationLibrary}}
 @ApiModel(description = "{{{description}}}")
@@ -18,6 +17,7 @@
 {{>xmlAnnotation}}
 {{/withXml}}
 {{>generatedAnnotation}}
+@lombok.ToString
 public class {{classname}} {{#parent}}extends {{{.}}}{{/parent}}{{^parent}}{{#hateoas}}extends RepresentationModel<{{classname}}> {{/hateoas}}{{/parent}} {{#serializableModel}}implements Serializable{{/serializableModel}} {
 {{#serializableModel}}
 
@@ -50,19 +50,21 @@ public class {{classname}} {{#parent}}extends {{{.}}}{{/parent}}{{^parent}}{{#ha
   {{#isContainer}}
   {{#useBeanValidation}}@Valid{{/useBeanValidation}}
   {{#openApiNullable}}
-  {{#openApiNullable}}{{#isNullable}}JsonNullable<{{{datatypeWithEnum}}}>{{/isNullable}}{{^isNullable}}{{{datatypeWithEnum}}}{{/isNullable}}{{/openApiNullable}}{{^openApiNullable}}{{{datatypeWithEnum}}}{{/openApiNullable}}
   private {{>nullableDataType}} {{name}} = {{#isNullable}}JsonNullable.undefined(){{/isNullable}}{{^isNullable}}{{#required}}{{{defaultValue}}}{{/required}}{{^required}}null{{/required}}{{/isNullable}};
   {{/openApiNullable}}
   {{^openApiNullable}}
+  {{#vendorExtensions.x-pn-fieldannotations}}
+  {{{.}}}
+  {{/vendorExtensions.x-pn-fieldannotations}}
   private {{>nullableDataType}} {{name}} = {{#required}}{{{defaultValue}}}{{/required}}{{^required}}null{{/required}};
   {{/openApiNullable}}
   {{/isContainer}}
   {{^isContainer}}
   {{#isDate}}
-  @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE)
+  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
   {{/isDate}}
   {{#isDateTime}}
-  @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME)
+  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   {{/isDateTime}}
   {{#openApiNullable}}
   private {{>nullableDataType}} {{name}}{{#isNullable}} = JsonNullable.undefined(){{/isNullable}}{{^isNullable}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{/isNullable}};
@@ -189,6 +191,4 @@ public class {{classname}} {{#parent}}extends {{{.}}}{{/parent}}{{^parent}}{{#ha
     }
     return a.isPresent() ? Arrays.deepHashCode(new Object[]{a.get()}) : 31;
   }{{/vendorExtensions.x-jackson-optional-nullable-helpers}}
-
-
 }
