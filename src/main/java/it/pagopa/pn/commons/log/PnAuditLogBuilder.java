@@ -1,5 +1,6 @@
 package it.pagopa.pn.commons.log;
 
+import it.pagopa.pn.commons.utils.MDCUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
@@ -25,7 +26,7 @@ public class PnAuditLogBuilder {
     }
 
     public PnAuditLogBuilder iun(String iun) {
-        mdcMap.put("iun", iun);
+        mdcMap.put(MDCUtils.MDC_PN_IUN_KEY, iun);
         return this;
     }
 

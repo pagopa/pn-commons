@@ -1,9 +1,9 @@
 package it.pagopa.pn.commons.log;
 
+import it.pagopa.pn.commons.utils.MDCUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.reactivestreams.Subscription;
-import org.slf4j.MDC;
 import reactor.core.CoreSubscriber;
 import reactor.util.context.Context;
 
@@ -51,8 +51,8 @@ class MdcContextLifter<T> implements CoreSubscriber<T> {
     private void injectMdc(Runnable task) {
 
         try {
-            MDC.clear();
-            coreSubscriber.currentContext().forEach((key, value) -> MDC.putCloseable(key.toString(), value == null ? null : value.toString()));
+            // pulisco/aggiorno le chiavi di pertinenza di PN
+            MDCUtils.alignMDCToWebfluxContext(coreSubscriber.currentContext());
             task.run();
         } catch (Exception e) {
             log.error("cannot update MDC with context key-values", e);

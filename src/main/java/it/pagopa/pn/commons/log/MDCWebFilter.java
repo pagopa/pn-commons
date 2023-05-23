@@ -1,6 +1,7 @@
 package it.pagopa.pn.commons.log;
 
 
+import it.pagopa.pn.commons.utils.MDCUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.MDC;
@@ -21,22 +22,14 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+import static it.pagopa.pn.commons.utils.MDCUtils.*;
+
 /**
  * This WebFilter reads the request header configured in 'pn.log.trace-id-header' property
  * and put in the MDC log map to use to correlate log between micro-services calls.
  */
 @Slf4j
 public class MDCWebFilter implements WebFilter {
-
-    public static final String MDC_TRACE_ID_KEY = "trace_id";
-    public static final String MDC_JTI_KEY = "jti";
-    public static final String MDC_PN_UID_KEY = "uid";
-    public static final String MDC_CX_ID_KEY = "cx_id";
-    public static final String MDC_PN_CX_TYPE_KEY = "cx_type";
-    public static final String MDC_PN_CX_GROUPS_KEY = "cx_groups";
-    public static final String MDC_PN_CX_ROLE_KEY = "cx_role";
-
-
 
 
     @Value("${pn.log.trace-id-header}")
@@ -92,15 +85,8 @@ public class MDCWebFilter implements WebFilter {
             addToMDC(requestHeaders.get(pnCxRoleHeader), MDC_PN_CX_ROLE_KEY);
         };
 
-        Consumer<SignalType> mdcCleaner = ignored -> {
-            MDC.remove(MDC_TRACE_ID_KEY);
-            MDC.remove(MDC_JTI_KEY);
-            MDC.remove(MDC_PN_UID_KEY);
-            MDC.remove(MDC_CX_ID_KEY);
-            MDC.remove(MDC_PN_CX_TYPE_KEY);
-            MDC.remove(MDC_PN_CX_GROUPS_KEY);
-            MDC.remove(MDC_PN_CX_ROLE_KEY);
-        };
+        Consumer<SignalType> mdcCleaner = ignored -> MDCUtils.clearMDCKeys();
+
 
         return webFilterChain.filter(serverWebExchange)
                 .doFirst(mdcSetter)

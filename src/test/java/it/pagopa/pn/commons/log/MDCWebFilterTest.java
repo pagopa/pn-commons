@@ -1,5 +1,6 @@
 package it.pagopa.pn.commons.log;
 
+import it.pagopa.pn.commons.utils.MDCUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -52,7 +53,7 @@ class MDCWebFilterTest {
         ServerWebExchange exchange = MockServerWebExchange.from(request);
 
         WebHandler webHandler = serverWebExchange -> {
-            Assertions.assertEquals(MY_HEADER, MDC.get(MDCWebFilter.MDC_TRACE_ID_KEY));
+            Assertions.assertEquals(MY_HEADER, MDC.get(MDCUtils.MDC_TRACE_ID_KEY));
             return Mono.empty();
         };
         WebFilterChain filterChain = new DefaultWebFilterChain(webHandler, Collections.emptyList());
@@ -70,8 +71,8 @@ class MDCWebFilterTest {
         ServerWebExchange exchange = MockServerWebExchange.from(request);
 
         WebHandler webHandler = serverWebExchange -> {
-            Assertions.assertEquals(MY_HEADER, MDC.get(MDCWebFilter.MDC_TRACE_ID_KEY));
-            Assertions.assertEquals(MY_HEADER_JTI, MDC.get(MDCWebFilter.MDC_JTI_KEY));
+            Assertions.assertEquals(MY_HEADER, MDC.get(MDCUtils.MDC_TRACE_ID_KEY));
+            Assertions.assertEquals(MY_HEADER_JTI, MDC.get(MDCUtils.MDC_JTI_KEY));
             return Mono.empty();
         };
         WebFilterChain filterChain = new DefaultWebFilterChain(webHandler, Collections.emptyList());
@@ -89,8 +90,8 @@ class MDCWebFilterTest {
         ServerWebExchange exchange = MockServerWebExchange.from(request);
 
         WebHandler webHandler = serverWebExchange -> {
-            Assertions.assertNotNull(MDC.get(MDCWebFilter.MDC_TRACE_ID_KEY));
-            Assertions.assertEquals(MY_HEADER_JTI, MDC.get(MDCWebFilter.MDC_JTI_KEY));
+            Assertions.assertNotNull(MDC.get(MDCUtils.MDC_TRACE_ID_KEY));
+            Assertions.assertEquals(MY_HEADER_JTI, MDC.get(MDCUtils.MDC_JTI_KEY));
             return Mono.empty();
         };
         WebFilterChain filterChain = new DefaultWebFilterChain(webHandler, Collections.emptyList());
@@ -108,7 +109,7 @@ class MDCWebFilterTest {
         ServerWebExchange exchange = MockServerWebExchange.from(request);
 
         WebHandler webHandler = serverWebExchange -> {
-            Assertions.assertEquals("uid-value", MDC.get(MDCWebFilter.MDC_PN_UID_KEY));
+            Assertions.assertEquals("uid-value", MDC.get(MDCUtils.MDC_PN_UID_KEY));
             return Mono.empty();
         };
         WebFilterChain filterChain = new DefaultWebFilterChain(webHandler, Collections.emptyList());
@@ -126,7 +127,7 @@ class MDCWebFilterTest {
         ServerWebExchange exchange = MockServerWebExchange.from(request);
 
         WebHandler webHandler = serverWebExchange -> {
-            Assertions.assertEquals("cx-id-value", MDC.get(MDCWebFilter.MDC_CX_ID_KEY));
+            Assertions.assertEquals("cx-id-value", MDC.get(MDCUtils.MDC_CX_ID_KEY));
             return Mono.empty();
         };
         WebFilterChain filterChain = new DefaultWebFilterChain(webHandler, Collections.emptyList());
@@ -144,7 +145,7 @@ class MDCWebFilterTest {
         ServerWebExchange exchange = MockServerWebExchange.from(request);
 
         WebHandler webHandler = serverWebExchange -> {
-            Assertions.assertEquals("PF", MDC.get(MDCWebFilter.MDC_PN_CX_TYPE_KEY));
+            Assertions.assertEquals("PF", MDC.get(MDCUtils.MDC_PN_CX_TYPE_KEY));
             return Mono.empty();
         };
         WebFilterChain filterChain = new DefaultWebFilterChain(webHandler, Collections.emptyList());
@@ -162,7 +163,7 @@ class MDCWebFilterTest {
         ServerWebExchange exchange = MockServerWebExchange.from(request);
 
         WebHandler webHandler = serverWebExchange -> {
-            Assertions.assertEquals("cx-groups-value", MDC.get(MDCWebFilter.MDC_PN_CX_GROUPS_KEY));
+            Assertions.assertEquals("cx-groups-value", MDC.get(MDCUtils.MDC_PN_CX_GROUPS_KEY));
             return Mono.empty();
         };
         WebFilterChain filterChain = new DefaultWebFilterChain(webHandler, Collections.emptyList());
@@ -180,7 +181,7 @@ class MDCWebFilterTest {
         ServerWebExchange exchange = MockServerWebExchange.from(request);
 
         WebHandler webHandler = serverWebExchange -> {
-            Assertions.assertEquals("role-value", MDC.get(MDCWebFilter.MDC_PN_CX_ROLE_KEY));
+            Assertions.assertEquals("role-value", MDC.get(MDCUtils.MDC_PN_CX_ROLE_KEY));
             return Mono.empty();
         };
         WebFilterChain filterChain = new DefaultWebFilterChain(webHandler, Collections.emptyList());
@@ -204,13 +205,13 @@ class MDCWebFilterTest {
         ServerWebExchange exchange = MockServerWebExchange.from(request);
 
         WebHandler webHandler = serverWebExchange -> {
-            Assertions.assertEquals(MY_HEADER, MDC.get(MDCWebFilter.MDC_TRACE_ID_KEY));
-            Assertions.assertEquals(MY_HEADER_JTI, MDC.get(MDCWebFilter.MDC_JTI_KEY));
-            Assertions.assertEquals("uid-value", MDC.get(MDCWebFilter.MDC_PN_UID_KEY));
-            Assertions.assertEquals("cx-id-value", MDC.get(MDCWebFilter.MDC_CX_ID_KEY));
-            Assertions.assertEquals("PF", MDC.get(MDCWebFilter.MDC_PN_CX_TYPE_KEY));
-            Assertions.assertEquals("cx-groups-value", MDC.get(MDCWebFilter.MDC_PN_CX_GROUPS_KEY));
-            Assertions.assertEquals("role-value", MDC.get(MDCWebFilter.MDC_PN_CX_ROLE_KEY));
+            Assertions.assertEquals(MY_HEADER, MDC.get(MDCUtils.MDC_TRACE_ID_KEY));
+            Assertions.assertEquals(MY_HEADER_JTI, MDC.get(MDCUtils.MDC_JTI_KEY));
+            Assertions.assertEquals("uid-value", MDC.get(MDCUtils.MDC_PN_UID_KEY));
+            Assertions.assertEquals("cx-id-value", MDC.get(MDCUtils.MDC_CX_ID_KEY));
+            Assertions.assertEquals("PF", MDC.get(MDCUtils.MDC_PN_CX_TYPE_KEY));
+            Assertions.assertEquals("cx-groups-value", MDC.get(MDCUtils.MDC_PN_CX_GROUPS_KEY));
+            Assertions.assertEquals("role-value", MDC.get(MDCUtils.MDC_PN_CX_ROLE_KEY));
             return Mono.empty();
         };
         WebFilterChain filterChain = new DefaultWebFilterChain(webHandler, Collections.emptyList());

@@ -18,7 +18,7 @@ import java.time.Instant;
 import java.util.*;
 
 import static it.pagopa.pn.commons.exceptions.PnExceptionsCodes.*;
-import static it.pagopa.pn.commons.log.MDCWebFilter.MDC_TRACE_ID_KEY;
+import static it.pagopa.pn.commons.utils.MDCUtils.MDC_TRACE_ID_KEY;
 
 @lombok.CustomLog
 @Component
