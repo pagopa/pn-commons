@@ -86,7 +86,7 @@ public abstract class CommonBaseClient {
     }
 
 
-    protected String elabExceptionMessage(Throwable x)
+    public static String elabExceptionMessage(Throwable x)
     {
         try {
             String message = x.getMessage()==null?"":x.getMessage();
