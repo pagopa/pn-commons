@@ -1,5 +1,6 @@
-package it.pagopa.pn.commons.utils;
+package it.pagopa.pn.commons.utils.dynamodb.async;
 
+import it.pagopa.pn.commons.utils.MDCUtils;
 import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
 import software.amazon.awssdk.services.dynamodb.model.*;
 import software.amazon.awssdk.services.dynamodb.paginators.BatchGetItemPublisher;

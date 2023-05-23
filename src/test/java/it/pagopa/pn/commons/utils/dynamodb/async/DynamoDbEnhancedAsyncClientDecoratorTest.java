@@ -1,12 +1,10 @@
-package it.pagopa.pn.commons.utils;
+package it.pagopa.pn.commons.utils.dynamodb.async;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import software.amazon.awssdk.enhanced.dynamodb.DynamoDbAsyncTable;
-import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedAsyncClient;
-import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
+import software.amazon.awssdk.enhanced.dynamodb.*;
 import software.amazon.awssdk.enhanced.dynamodb.model.*;
 
 import java.util.Map;
@@ -38,7 +36,16 @@ class DynamoDbEnhancedAsyncClientDecoratorTest {
 
     @Test
     void transactWriteItemsTest() {
-        TransactWriteItemsEnhancedRequest request = TransactWriteItemsEnhancedRequest.builder().build();
+        DynamoDbAsyncTable<String> table = Mockito.mock(DynamoDbAsyncTable.class);
+        TableSchema<String> tableSchema = Mockito.mock(TableSchema.class);
+        TableMetadata tableMetadata = Mockito.mock(TableMetadata.class);
+        Mockito.when(tableSchema.tableMetadata()).thenReturn(tableMetadata);
+        Mockito.when(table.tableName()).thenReturn("MANDATE");
+        Mockito.when(table.tableSchema()).thenReturn(tableSchema);
+        TransactWriteItemsEnhancedRequest.Builder builder = TransactWriteItemsEnhancedRequest.builder();
+        builder.addDeleteItem(table, Key.builder().partitionValue("aKey").build());
+
+        TransactWriteItemsEnhancedRequest request = builder.build();
         Mockito.when(delegate.transactWriteItems(request)).thenReturn(CompletableFuture.completedFuture(null));
         Assertions.assertDoesNotThrow(() -> dynamoDbEnhancedAsyncClientDecorator.transactWriteItems(request));
     }

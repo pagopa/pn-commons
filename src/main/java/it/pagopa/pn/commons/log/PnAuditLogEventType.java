@@ -56,6 +56,7 @@ public enum PnAuditLogEventType {
     AUD_DA_SEND_IO(PnAuditLogMarker.AUDIT5Y),
     AUD_DL_CREATE(PnAuditLogMarker.AUDIT10Y),
     AUD_DL_ACCEPT(PnAuditLogMarker.AUDIT10Y),
+    AUD_DL_UPDATE(PnAuditLogMarker.AUDIT10Y),
     AUD_DL_REJECT(PnAuditLogMarker.AUDIT10Y),
     AUD_DL_REVOKE(PnAuditLogMarker.AUDIT10Y),
     AUD_DL_EXPIRE(PnAuditLogMarker.AUDIT10Y),
