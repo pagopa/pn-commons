@@ -58,6 +58,11 @@
 			<groupId>com.fasterxml.jackson.datatype</groupId>
 			<artifactId>jackson-datatype-jsr310</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>it.pagopa.tech.lollipop-consumer-java-sdk</groupId>
+			<artifactId>core</artifactId>
+			<version>1.0.0-RC1</version>
+		</dependency>
 
 
 		<dependency>
