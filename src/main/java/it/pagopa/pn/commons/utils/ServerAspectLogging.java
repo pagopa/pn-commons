@@ -94,8 +94,7 @@ public class ServerAspectLogging {
                         log.logEndingProcess(process);
                     })
                     .doOnError(o->
-                            //TODO add customlog ending process instead warning below
-                        log.warn("Warning: {} on mono", o.getMessage())
+                        log.logEndingProcess(process, false, o.getMessage())
                     );
         }
         else if (result instanceof Flux<?> fluxResult) {
@@ -104,8 +103,7 @@ public class ServerAspectLogging {
                 log.info(endingMessage, joinPoint.getSignature().toShortString(), response.getBody() instanceof String ? SENSITIVE_DATA : response);
                 log.logEndingProcess(process);
             }).doOnError(o->
-                    //TODO add customlog ending process instead warning below
-                log.warn("Warning: {} on flux", o.getMessage())
+                log.logEndingProcess(process, false, o.getMessage())
             );
         }
         else {
