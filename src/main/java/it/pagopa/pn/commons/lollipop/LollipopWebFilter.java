@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -22,6 +23,7 @@ import reactor.core.publisher.Mono;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import static it.pagopa.tech.lollipop.consumer.command.impl.LollipopConsumerCommandImpl.VERIFICATION_SUCCESS_CODE;
 
@@ -34,27 +36,36 @@ public class LollipopWebFilter implements WebFilter {
 
     private LollipopConsumerCommandBuilder consumerCommandBuilder;
 
+    private static final String HEADER_FIELD = "x-pagopa-pn-src-ch";
+    private static final String HEADER_VALUE = "IO";
+
     @Override
     public @NotNull Mono<Void> filter(@NotNull ServerWebExchange exchange, @NotNull WebFilterChain chain) {
 
         ServerHttpRequest request = exchange.getRequest();
-        HttpMethod method = request.getMethod();
+        HttpHeaders headers = exchange.getRequest().getHeaders();
 
-        // Get request body as String
-        if (method != HttpMethod.GET && method != HttpMethod.DELETE) {
-            return request.getBody()
-                    .map(buffer -> buffer.toString(StandardCharsets.UTF_8))
-                    .defaultIfEmpty("")
-                    .doOnNext( reqBody -> validateRequest( exchange, request, reqBody ))
-                    .collectList()
-                    .flatMap( requests -> chain.filter(exchange) );
-        } else {
-            return Mono.fromSupplier( () ->  {
-                validateRequest( exchange, request, null);
-                return Mono.just("Ok");}
-            ).flatMap( stringMono -> chain.filter(exchange) );
+        if (headers.containsKey(HEADER_FIELD)
+                && Objects.equals(headers.getFirst(HEADER_FIELD), HEADER_VALUE)) {
+            HttpMethod method = request.getMethod();
+
+            // Get request body as String
+            if (method != HttpMethod.GET && method != HttpMethod.DELETE) {
+                return request.getBody()
+                        .map(buffer -> buffer.toString(StandardCharsets.UTF_8))
+                        .defaultIfEmpty("")
+                        .doOnNext(reqBody -> validateRequest(exchange, request, reqBody))
+                        .collectList()
+                        .flatMap(requests -> chain.filter(exchange));
+            } else {
+                return Mono.fromSupplier(() -> {
+                            validateRequest(exchange, request, null);
+                            return Mono.just("Ok");
+                        }
+                ).flatMap(stringMono -> chain.filter(exchange));
+            }
         }
-
+        return Mono.empty();
     }
 
     private void validateRequest(@NotNull ServerWebExchange exchange, ServerHttpRequest request, String requestBody) {
