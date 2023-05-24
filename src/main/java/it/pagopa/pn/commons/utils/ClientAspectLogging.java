@@ -25,7 +25,7 @@ public class ClientAspectLogging {
 
     @Around(value = "client()")
     public Object logAroundClient(ProceedingJoinPoint joinPoint) throws Throwable {
-        Object[] arguments = Arrays.stream(joinPoint.getArgs()).toArray();
+        Object[] arguments = joinPoint.getArgs();
         ArrayList<Object> argsDefined = getEvaluableArguments(arguments);
         log.debug("Client method {} with args: {}", joinPoint.getSignature().toShortString(), argsDefined);
         String endingMessage = "Return client method: {}() Result: {} ";
@@ -64,20 +64,15 @@ public class ClientAspectLogging {
         return result;
     }
 
-    private Object proceed(ProceedingJoinPoint joinPoint, Object result, String endingMessage) throws Throwable {
+    private Object proceed(ProceedingJoinPoint joinPoint, Object result, String endingMessage) {
         if (result instanceof Mono<?> monoResult) {
             return monoResult.doOnSuccess(res ->
                         logResult(joinPoint, res, endingMessage)
-                    )
-                    .doOnError(o->
-                        log.warn("Warning: {} on mono", o.getMessage())
                     );
         }
         else if (result instanceof Flux<?> fluxResult) {
             return fluxResult.doOnNext(res ->
                 logResult(joinPoint, res, endingMessage)
-            ).doOnError(o->
-                log.warn("Warning: {} on flux", o.getMessage())
             );
         }
         else {

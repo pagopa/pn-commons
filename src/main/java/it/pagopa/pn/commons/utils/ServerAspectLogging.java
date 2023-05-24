@@ -37,7 +37,7 @@ public class ServerAspectLogging {
         String endingMessage = "Successful API operation: {}(). Result: {} ";
         log.logStartingProcess(process);
         Method m = ((MethodSignature) joinPoint.getSignature()).getMethod();
-        Object[] arguments = Arrays.stream(joinPoint.getArgs()).toArray();
+        Object[] arguments = joinPoint.getArgs();
         String url = ((DefaultServerWebExchange) arguments[arguments.length-1]).getRequest().getPath().toString();
 
         //RETRIEVE ARGUMENTS TO PRINT
