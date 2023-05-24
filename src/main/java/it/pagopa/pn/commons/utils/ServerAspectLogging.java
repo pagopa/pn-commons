@@ -6,6 +6,7 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ServerWebExchange;
@@ -88,7 +89,8 @@ public class ServerAspectLogging {
     private Object proceed(ProceedingJoinPoint joinPoint, Object result, String endingMessage, String process) throws Throwable {
         if (result instanceof Mono<?> monoResult) {
             return monoResult.doOnSuccess(o -> {
-                        log.info(endingMessage, joinPoint.getSignature().toShortString(), o);
+                        ResponseEntity<?> response = (ResponseEntity<?>) o;
+                        log.info(endingMessage, joinPoint.getSignature().toShortString(), response.getBody() instanceof String ? SENSITIVE_DATA : response);
                         log.logEndingProcess(process);
                     })
                     .doOnError(o->
@@ -98,7 +100,8 @@ public class ServerAspectLogging {
         }
         else if (result instanceof Flux<?> fluxResult) {
             return fluxResult.doOnNext(o -> {
-                log.info(endingMessage, joinPoint.getSignature().toShortString(), o);
+                ResponseEntity<?> response = (ResponseEntity<?>) o;
+                log.info(endingMessage, joinPoint.getSignature().toShortString(), response.getBody() instanceof String ? SENSITIVE_DATA : response);
                 log.logEndingProcess(process);
             }).doOnError(o->
                     //TODO add customlog ending process instead warning below
@@ -106,7 +109,8 @@ public class ServerAspectLogging {
             );
         }
         else {
-            log.info(endingMessage, joinPoint.getSignature().toShortString(), result);
+            ResponseEntity<?> response = (ResponseEntity<?>) result;
+            log.info(endingMessage, joinPoint.getSignature().toShortString(), response.getBody() instanceof String ? SENSITIVE_DATA : response);
             log.logEndingProcess(process);
             return result;
         }
