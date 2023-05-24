@@ -1,9 +1,6 @@
 package it.pagopa.pn.commons.log;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
-import org.slf4j.MarkerFactory;
+import org.slf4j.*;
 import software.amazon.awssdk.enhanced.dynamodb.Key;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.TransactWriteItem;
@@ -43,7 +40,15 @@ class PnLoggerImpl implements PnLogger {
 
     @Override
     public void logEndingProcess(String process) {
-        log.info("Ending process {}", process);
+        logEndingProcess(process, true, null);
+    }
+
+    @Override
+    public void logEndingProcess(String process, boolean success, String description) {
+        if (success)
+            log.info("Ending process {}", process);
+        else
+            log.warn("Ending process {} with errors={}", process, description==null?"<not specified>":description);
     }
 
     @Override

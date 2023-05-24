@@ -72,6 +72,13 @@ public interface PnLogger extends Logger {
      * @param process nome processo
      */
     void logEndingProcess(String process);
+    /**
+     * Logga a info (warn nel caso di fallimento) la fine di uno step logico
+     * @param process nome processo
+     * @param success indica l'esito del processo
+     * @param description eventuale descrizione nel caso di success negativo
+     */
+    void logEndingProcess(String process, boolean success, String description);
 
     /**
      * Logga a info lo start della validazione di uno step logico

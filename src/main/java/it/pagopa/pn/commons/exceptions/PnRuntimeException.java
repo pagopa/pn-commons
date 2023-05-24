@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static it.pagopa.pn.commons.exceptions.PnExceptionsCodes.ERROR_CODE_PN_GENERIC_ERROR;
-import static it.pagopa.pn.commons.log.MDCWebFilter.MDC_TRACE_ID_KEY;
+import static it.pagopa.pn.commons.utils.MDCUtils.MDC_TRACE_ID_KEY;
 
 /**
  * Eccezione base da estendere all'occorrenza, genera già in automatico il problem da ritornare 
