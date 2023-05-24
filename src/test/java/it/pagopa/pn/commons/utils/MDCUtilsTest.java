@@ -14,6 +14,7 @@ class MDCUtilsTest {
 
     @BeforeEach
     public void init() {
+        MDC.clear();
         MDC.put("key", "value");
     }
 
