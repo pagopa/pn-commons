@@ -7,7 +7,6 @@ import it.pagopa.tech.lollipop.consumer.model.CommandResult;
 import it.pagopa.tech.lollipop.consumer.model.LollipopConsumerRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -29,16 +28,13 @@ import static it.pagopa.tech.lollipop.consumer.command.impl.LollipopConsumerComm
 
 @Slf4j
 public class LollipopWebFilter implements WebFilter {
-    @Autowired
-    public void setConsumerCommandBuilder(LollipopConsumerCommandBuilder consumerCommandBuilder) {
-        this.consumerCommandBuilder = consumerCommandBuilder;
-    }
-
-    private LollipopConsumerCommandBuilder consumerCommandBuilder;
-
+    private final LollipopConsumerCommandBuilder consumerCommandBuilder;
     private static final String HEADER_FIELD = "x-pagopa-pn-src-ch";
     private static final String HEADER_VALUE = "IO";
 
+    public LollipopWebFilter(LollipopConsumerCommandBuilder consumerCommandBuilder) {
+        this.consumerCommandBuilder = consumerCommandBuilder;
+    }
     @Override
     public @NotNull Mono<Void> filter(@NotNull ServerWebExchange exchange, @NotNull WebFilterChain chain) {
 
@@ -65,7 +61,7 @@ public class LollipopWebFilter implements WebFilter {
                 ).flatMap(stringMono -> chain.filter(exchange));
             }
         }
-        return Mono.empty();
+        return chain.filter(exchange);
     }
 
     private void validateRequest(@NotNull ServerWebExchange exchange, ServerHttpRequest request, String requestBody) {
