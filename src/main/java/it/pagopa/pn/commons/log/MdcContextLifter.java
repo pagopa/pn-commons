@@ -4,8 +4,12 @@ import it.pagopa.pn.commons.utils.MDCUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.reactivestreams.Subscription;
+import org.slf4j.MDC;
 import reactor.core.CoreSubscriber;
 import reactor.util.context.Context;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Helper that copies the state of Reactor [Context] to MDC on the #onNext function.
@@ -49,13 +53,18 @@ class MdcContextLifter<T> implements CoreSubscriber<T> {
      * @param task task da eseguire
      */
     private void injectMdc(Runnable task) {
-
+        List<MDC.MDCCloseable> closeables = new ArrayList<>();
         try {
             // pulisco/aggiorno le chiavi di pertinenza di PN
-            MDCUtils.alignMDCToWebfluxContext(coreSubscriber.currentContext());
+            closeables = MDCUtils.alignMDCToWebfluxContext(coreSubscriber.currentContext());
             task.run();
         } catch (Exception e) {
             log.error("cannot update MDC with context key-values", e);
+        } finally {
+            for (MDC.MDCCloseable c :
+                    closeables) {
+                c.close();
+            }
         }
     }
 

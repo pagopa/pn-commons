@@ -5,6 +5,7 @@ import org.springframework.util.CollectionUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -56,16 +57,18 @@ public class MDCUtils {
     }
 
 
-    public static void alignMDCToWebfluxContext( reactor.util.context.Context context){
+    public static List<MDC.MDCCloseable> alignMDCToWebfluxContext(reactor.util.context.Context context){
+        List<MDC.MDCCloseable> closeables = new ArrayList<>();
         getAllMDCKeys().forEach(key -> {
             if (context.hasKey(key))
             {
-                MDC.putCloseable(key, context.get(key).toString());
+                closeables.add(MDC.putCloseable(key, context.get(key).toString()));
             }
             else {
                 MDC.remove(key);
             }
         });
+        return closeables;
     }
 
     public static <T> Mono<T> addMDCToContextAndExecute(Mono<T> mono) {
