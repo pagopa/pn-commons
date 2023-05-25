@@ -90,8 +90,13 @@ public class ServerAspectLogging {
     private Object proceed(ProceedingJoinPoint joinPoint, Object result, String endingMessage, String process) throws Throwable {
         if (result instanceof Mono<?> monoResult) {
             return monoResult.doOnSuccess(o -> {
-                        ResponseEntity<?> response = (ResponseEntity<?>) o;
-                        log.info(endingMessage, joinPoint.getSignature().toShortString(), response.getBody() instanceof String ? SENSITIVE_DATA : response);
+                        if (o != null){
+                            ResponseEntity<?> response = (ResponseEntity<?>) o;
+                            log.info(endingMessage, joinPoint.getSignature().toShortString(), response.getBody() instanceof String ? SENSITIVE_DATA : response);
+                        }
+                        else {
+                            log.info(endingMessage, joinPoint.getSignature().toShortString(), "<Null>");
+                        }
                         log.logEndingProcess(process);
                     })
                     .doOnError(o->
@@ -100,8 +105,13 @@ public class ServerAspectLogging {
         }
         else if (result instanceof Flux<?> fluxResult) {
             return fluxResult.doOnNext(o -> {
-                ResponseEntity<?> response = (ResponseEntity<?>) o;
-                log.info(endingMessage, joinPoint.getSignature().toShortString(), response.getBody() instanceof String ? SENSITIVE_DATA : response);
+                if (o != null) {
+                    ResponseEntity<?> response = (ResponseEntity<?>) o;
+                    log.info(endingMessage, joinPoint.getSignature().toShortString(), response.getBody() instanceof String ? SENSITIVE_DATA : response);
+                }
+                else {
+                    log.info(endingMessage, joinPoint.getSignature().toShortString(), "<Null>");
+                }
                 log.logEndingProcess(process);
             }).doOnError(o->
                 log.logEndingProcess(process, false, o.getMessage())
