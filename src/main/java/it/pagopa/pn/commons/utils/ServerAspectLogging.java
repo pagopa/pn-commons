@@ -118,8 +118,12 @@ public class ServerAspectLogging {
             );
         }
         else {
-            ResponseEntity<?> response = (ResponseEntity<?>) result;
-            log.info(endingMessage, joinPoint.getSignature().toShortString(), response.getBody() instanceof String ? SENSITIVE_DATA : response);
+            if (result != null) {
+                ResponseEntity<?> response = (ResponseEntity<?>) result;
+                log.info(endingMessage, joinPoint.getSignature().toShortString(), response.getBody() instanceof String ? SENSITIVE_DATA : response);
+            } else {
+                log.info(endingMessage, joinPoint.getSignature().toShortString(), "<Null>");
+            }
             log.logEndingProcess(process);
             return result;
         }
