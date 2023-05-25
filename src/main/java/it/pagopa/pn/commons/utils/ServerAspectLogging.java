@@ -77,7 +77,7 @@ public class ServerAspectLogging {
                 }
                 else if (value instanceof PathVariable v) {
                     toAdd = false;
-                    url = url.replace("{" + v.value() + "}", (CharSequence) parameterValue[i]);
+                    url = url.replace("{" + v.value() + "}", String.valueOf(parameterValue[i]));
                 }
             }
             if(toAdd && !(parameterValue[i] instanceof ServerWebExchange)){
