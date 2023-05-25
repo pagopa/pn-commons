@@ -90,7 +90,7 @@ public class ServerAspectLogging {
         if (response == null) {
             log.info(endingMessage, method, "<Null>");
         } else if (response instanceof ResponseEntity<?> res) {
-            log.info(endingMessage, method, res.getBody() instanceof String ? SENSITIVE_DATA : response);
+            log.info(endingMessage, method, res.getBody() instanceof String ? SENSITIVE_DATA : res);
         } else {
             log.info(endingMessage, method, "<unsupported return type>");
         }
