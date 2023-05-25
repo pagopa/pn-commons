@@ -74,56 +74,46 @@ public class ServerAspectLogging {
             for (Annotation value : ann) {
                 if (value instanceof RequestHeader || value instanceof RequestParam) {
                     toAdd = false;
-                }
-                else if (value instanceof PathVariable v) {
+                } else if (value instanceof PathVariable v) {
                     toAdd = false;
                     url = url.replace("{" + v.value() + "}", String.valueOf(parameterValue[i]));
                 }
             }
-            if(toAdd && !(parameterValue[i] instanceof ServerWebExchange)){
+            if (toAdd && !(parameterValue[i] instanceof ServerWebExchange)) {
                 args.add(parameterValue[i]);
             }
         }
         log.debug("Invoked operationId {} with path {} with args: {}", operationId, url, args);
     }
 
+    private void logEndingMessage(String endingMessage, String method, Object response) {
+        if (response == null) {
+            log.info(endingMessage, method, "<Null>");
+        } else if (response instanceof ResponseEntity<?> res) {
+            log.info(endingMessage, method, res.getBody() instanceof String ? SENSITIVE_DATA : response);
+        } else {
+            log.info(endingMessage, method, "<unsupported return type>");
+        }
+    }
+
     private Object proceed(ProceedingJoinPoint joinPoint, Object result, String endingMessage, String process) throws Throwable {
         if (result instanceof Mono<?> monoResult) {
             return monoResult.doOnSuccess(o -> {
-                        if (o != null){
-                            ResponseEntity<?> response = (ResponseEntity<?>) o;
-                            log.info(endingMessage, joinPoint.getSignature().toShortString(), response.getBody() instanceof String ? SENSITIVE_DATA : response);
-                        }
-                        else {
-                            log.info(endingMessage, joinPoint.getSignature().toShortString(), "<Null>");
-                        }
+                        this.logEndingMessage(endingMessage, joinPoint.getSignature().toShortString(), o);
                         log.logEndingProcess(process);
                     })
-                    .doOnError(o->
-                        log.logEndingProcess(process, false, o.getMessage())
+                    .doOnError(o ->
+                            log.logEndingProcess(process, false, o.getMessage())
                     );
-        }
-        else if (result instanceof Flux<?> fluxResult) {
+        } else if (result instanceof Flux<?> fluxResult) {
             return fluxResult.doOnNext(o -> {
-                if (o != null) {
-                    ResponseEntity<?> response = (ResponseEntity<?>) o;
-                    log.info(endingMessage, joinPoint.getSignature().toShortString(), response.getBody() instanceof String ? SENSITIVE_DATA : response);
-                }
-                else {
-                    log.info(endingMessage, joinPoint.getSignature().toShortString(), "<Null>");
-                }
+                this.logEndingMessage(endingMessage, joinPoint.getSignature().toShortString(), o);
                 log.logEndingProcess(process);
-            }).doOnError(o->
-                log.logEndingProcess(process, false, o.getMessage())
+            }).doOnError(o ->
+                    log.logEndingProcess(process, false, o.getMessage())
             );
-        }
-        else {
-            if (result != null) {
-                ResponseEntity<?> response = (ResponseEntity<?>) result;
-                log.info(endingMessage, joinPoint.getSignature().toShortString(), response.getBody() instanceof String ? SENSITIVE_DATA : response);
-            } else {
-                log.info(endingMessage, joinPoint.getSignature().toShortString(), "<Null>");
-            }
+        } else {
+            this.logEndingMessage(endingMessage, joinPoint.getSignature().toShortString(), result);
             log.logEndingProcess(process);
             return result;
         }
