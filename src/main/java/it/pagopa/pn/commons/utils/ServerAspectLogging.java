@@ -7,7 +7,9 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.adapter.DefaultServerWebExchange;
@@ -34,21 +36,17 @@ public class ServerAspectLogging {
 
     @Around(value = "server()")
     public Object logAroundServer(ProceedingJoinPoint joinPoint) throws Throwable {
-        String process = joinPoint.getSignature().getName();
         String endingMessage = "Successful API operation: {}(). Result: {} ";
+        String process = joinPoint.getSignature().getName();
         log.logStartingProcess(process);
         Method m = ((MethodSignature) joinPoint.getSignature()).getMethod();
-        Object[] arguments = joinPoint.getArgs();
-        String url = ((DefaultServerWebExchange) arguments[arguments.length-1]).getRequest().getPath().toString();
-
-        //RETRIEVE ARGUMENTS TO PRINT
+        String url = m.getAnnotation(RequestMapping.class).value()[0];
         List<Annotation[]> annotationsParams = Arrays.stream(m.getParameterAnnotations()).toList();
-        ArrayList<Object> argsDefined = getEvaluableArguments(annotationsParams, arguments);
-        log.debug("Invoked operationId {} with path {} with args: {}", joinPoint.getSignature().toShortString(), url, argsDefined);
-
+        Object[] arguments = joinPoint.getArgs();
+        logAPIInvoked(joinPoint.getSignature().toShortString(), url, annotationsParams, arguments);
         for (Object v : arguments) {
             if (v instanceof Mono<?> mono) {
-                Mono<?> tempMono = mono.map(value ->{
+                Mono<?> tempMono = mono.map(value -> {
                     log.debug("MonoLift value: {} ", value);
                     return value;
                 });
@@ -68,22 +66,25 @@ public class ServerAspectLogging {
 
     }
 
-    private ArrayList<Object> getEvaluableArguments(List<Annotation[]> parametersAnnotation, Object[] parameterValue){
-        ArrayList<Object> result = new ArrayList<>();
-        for(int i = 0; i < parametersAnnotation.size(); i++){
+    private void logAPIInvoked(String operationId, String url, List<Annotation[]> parametersAnnotation, Object[] parameterValue) {
+        ArrayList<Object> args = new ArrayList<>();
+        for (int i = 0; i < parametersAnnotation.size(); i++) {
             List<Annotation> ann = Arrays.stream(parametersAnnotation.get(i)).toList();
-            if (!ann.isEmpty()) {
-                for (Annotation value : ann) {
-                    if (!(value instanceof RequestHeader || value instanceof RequestParam)) {
-                        result.add(parameterValue[i]);
-                        break;
-                    }
+            boolean toAdd = true;
+            for (Annotation value : ann) {
+                if (value instanceof RequestHeader || value instanceof RequestParam) {
+                    toAdd = false;
+                }
+                else if (value instanceof PathVariable v) {
+                    toAdd = false;
+                    url = url.replace("{" + v.value() + "}", String.valueOf(parameterValue[i]));
                 }
             }
-            else if(!(parameterValue[i] instanceof ServerWebExchange))
-                result.add(parameterValue[i]);
+            if(toAdd && !(parameterValue[i] instanceof ServerWebExchange)){
+                args.add(parameterValue[i]);
+            }
         }
-        return result;
+        log.debug("Invoked operationId {} with path {} with args: {}", operationId, url, args);
     }
 
     private Object proceed(ProceedingJoinPoint joinPoint, Object result, String endingMessage, String process) throws Throwable {

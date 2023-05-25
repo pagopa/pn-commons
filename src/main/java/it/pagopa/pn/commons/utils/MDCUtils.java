@@ -6,8 +6,10 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class MDCUtils {
 
@@ -72,15 +74,28 @@ public class MDCUtils {
     }
 
     public static <T> Mono<T> addMDCToContextAndExecute(Mono<T> mono) {
-        final Map<String, String> mdc = MDC.getCopyOfContextMap();
-        return Mono.just(mdc).flatMap(x -> mono)
-                .contextWrite(context -> context.putAllMap(mdc));
+        final Map<String, String> fmdc = getMDCMap();
+
+        return Mono.just(fmdc).flatMap(x -> mono)
+                .contextWrite(context -> context.putAllMap(fmdc));
     }
 
     public static <T> Flux<T> addMDCToContextAndExecute(Flux<T> flux) {
+        final Map<String, String> fmdc = getMDCMap();
+
+        return Mono.just(fmdc).thenMany(flux)
+                .contextWrite(context -> context.putAllMap(fmdc));
+    }
+
+    private static Map<String, String> getMDCMap() {
         final Map<String, String> mdc = MDC.getCopyOfContextMap();
-        return Mono.just(mdc).thenMany(flux)
-                .contextWrite(context -> context.putAllMap(mdc));
+        if (mdc == null)
+            return new HashMap<>();
+        else {
+            return mdc.entrySet().stream()
+                    .filter(stringStringEntry -> stringStringEntry.getValue() != null)
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        }
     }
 
 }
