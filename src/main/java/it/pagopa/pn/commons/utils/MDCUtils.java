@@ -6,6 +6,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -73,14 +74,26 @@ public class MDCUtils {
 
     public static <T> Mono<T> addMDCToContextAndExecute(Mono<T> mono) {
         final Map<String, String> mdc = MDC.getCopyOfContextMap();
-        return Mono.just(mdc).flatMap(x -> mono)
-                .contextWrite(context -> context.putAllMap(mdc));
+        final Map<String, String> fmdc;
+        if (mdc == null)
+            fmdc = new HashMap<>();
+        else
+            fmdc = mdc;
+
+        return Mono.just(fmdc).flatMap(x -> mono)
+                .contextWrite(context -> context.putAllMap(fmdc));
     }
 
     public static <T> Flux<T> addMDCToContextAndExecute(Flux<T> flux) {
         final Map<String, String> mdc = MDC.getCopyOfContextMap();
-        return Mono.just(mdc).thenMany(flux)
-                .contextWrite(context -> context.putAllMap(mdc));
+        final Map<String, String> fmdc;
+        if (mdc == null)
+            fmdc = new HashMap<>();
+        else
+            fmdc = mdc;
+
+        return Mono.just(fmdc).thenMany(flux)
+                .contextWrite(context -> context.putAllMap(fmdc));
     }
 
 }
