@@ -3,13 +3,13 @@ package it.pagopa.pn.commons.configs.lollipop;
 
 import it.pagopa.pn.commons.lollipop.LollipopWebFilter;
 import it.pagopa.tech.lollipop.consumer.assertion.AssertionServiceFactory;
-import it.pagopa.tech.lollipop.consumer.assertion.client.simple.AssertionSimpleClientConfig;
 import it.pagopa.tech.lollipop.consumer.assertion.client.simple.AssertionSimpleClientProvider;
 import it.pagopa.tech.lollipop.consumer.assertion.impl.AssertionServiceFactoryImpl;
 import it.pagopa.tech.lollipop.consumer.assertion.storage.SimpleAssertionStorageProvider;
 import it.pagopa.tech.lollipop.consumer.assertion.storage.StorageConfig;
 import it.pagopa.tech.lollipop.consumer.command.LollipopConsumerCommandBuilder;
 import it.pagopa.tech.lollipop.consumer.command.impl.LollipopConsumerCommandBuilderImpl;
+import it.pagopa.tech.lollipop.consumer.exception.LollipopVerifierException;
 import it.pagopa.tech.lollipop.consumer.helper.LollipopConsumerFactoryHelper;
 import it.pagopa.tech.lollipop.consumer.http_verifier.HttpMessageVerifierFactory;
 import it.pagopa.tech.lollipop.consumer.http_verifier.visma.VismaHttpMessageVerifierFactory;
@@ -48,7 +48,7 @@ public class PNHttpVerifierConfiguration {
     }
 
     @Bean
-    public HttpMessageVerifierFactory httpMessageVerifierFactory() throws Exception {
+    public HttpMessageVerifierFactory httpMessageVerifierFactory() throws LollipopVerifierException {
         return new VismaHttpMessageVerifierFactory("UTF-8", verifierConfiguration());
     }
 
@@ -65,7 +65,7 @@ public class PNHttpVerifierConfiguration {
     public AssertionServiceFactory assertionServiceFactory() {
         return new AssertionServiceFactoryImpl(
                 new SimpleAssertionStorageProvider(),
-                new AssertionSimpleClientProvider(AssertionSimpleClientConfig.builder().build()),
+                new AssertionSimpleClientProvider(new SpringAssertionSimpleClientConfig()),
                 storageConfig());
     }
 
@@ -76,7 +76,7 @@ public class PNHttpVerifierConfiguration {
 
     @Bean
     public IdpCertSimpleClientConfig idpCertSimpleClientConfig() {
-        return IdpCertSimpleClientConfig.builder().build();
+        return new SpringIdpCertSimpleClientConfig();
     }
 
     @Bean
