@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#
+# See: https://docs.aws.amazon.com/codeartifact/latest/ug/maven-mvn.html
 # export CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain pn-codeartifact-domain --domain-owner 911845998067 --query authorizationToken --output text --profile cicd`
 #
 ARTIFACTS=(
