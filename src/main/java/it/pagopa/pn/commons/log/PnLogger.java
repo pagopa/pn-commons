@@ -34,6 +34,11 @@ public interface PnLogger extends Logger {
         public static final String PN_APIKEY_MANAGER = "pn-apikey-manager";
         public static final String PN_ADDRESS_MANAGER = "pn-address-manager";
         public static final String PN_SAFE_STORAGE = "pn-safe-storage";
+        public static final String CHECKOUT = "Checkout";
+        public static final String SELFCARE_PG = "Selfcare PG";
+        public static final String SELFCARE_PA = "Selfcare PA";
+        public static final String IO = "IO";
+        public static final String ONE_TRUST = "OneTrust";
     }
 
     /**
