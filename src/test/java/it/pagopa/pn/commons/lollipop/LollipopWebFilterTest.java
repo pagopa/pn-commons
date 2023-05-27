@@ -73,6 +73,50 @@ class LollipopWebFilterTest {
     }
 
     @Test
+    void testFilterWithValidPostRequest() {
+        MockServerHttpRequest request = MockServerHttpRequest.post("http://localhost")
+                .header(HEADER_FIELD, HEADER_VALUE).build();
+        ServerWebExchange exchange = MockServerWebExchange.from(request);
+
+        WebHandler webHandler = serverWebExchange -> {
+            Assertions.assertEquals("IO", HEADER_VALUE);
+            return Mono.empty();
+        };
+
+        CommandResult commandResult =
+                new CommandResult(VERIFICATION_SUCCESS_CODE, "request validation success");
+
+        Mockito.when(commandBuilder.createCommand(Mockito.any(LollipopConsumerRequest.class))).thenReturn(command);
+
+        Mockito.when(command.doExecute()).thenReturn( commandResult );
+
+        WebFilterChain filterChain = new DefaultWebFilterChain(webHandler, Collections.emptyList());
+
+        assertDoesNotThrow( () -> {
+            webFilter.filter(exchange, filterChain).block();
+        });
+
+    }
+
+    @Test
+    void testFilterWithoutIOHeaderRequest() {
+        MockServerHttpRequest request = MockServerHttpRequest.get("http://localhost").build();
+        ServerWebExchange exchange = MockServerWebExchange.from(request);
+
+        WebHandler webHandler = serverWebExchange -> {
+            Assertions.assertEquals("IO", HEADER_VALUE);
+            return Mono.empty();
+        };
+
+        WebFilterChain filterChain = new DefaultWebFilterChain(webHandler, Collections.emptyList());
+
+        assertDoesNotThrow( () -> {
+            webFilter.filter(exchange, filterChain).block();
+        });
+
+    }
+
+    @Test
     void testFilterWithInvalidRequest() {
         MockServerHttpRequest request = MockServerHttpRequest.get("http://localhost")
                 .header(HEADER_FIELD, HEADER_VALUE).build();
