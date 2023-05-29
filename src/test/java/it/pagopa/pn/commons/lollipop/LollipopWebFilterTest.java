@@ -1,7 +1,6 @@
 package it.pagopa.pn.commons.lollipop;
 
 
-import it.pagopa.pn.commons.exceptions.PnRuntimeException;
 import it.pagopa.tech.lollipop.consumer.command.LollipopConsumerCommand;
 import it.pagopa.tech.lollipop.consumer.command.LollipopConsumerCommandBuilder;
 import it.pagopa.tech.lollipop.consumer.model.CommandResult;
@@ -20,12 +19,12 @@ import org.springframework.web.server.WebFilterChain;
 import org.springframework.web.server.WebHandler;
 import org.springframework.web.server.handler.DefaultWebFilterChain;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 import java.util.Collections;
 
 import static it.pagopa.tech.lollipop.consumer.command.impl.LollipopConsumerCommandImpl.VERIFICATION_SUCCESS_CODE;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(SpringExtension.class)
 class LollipopWebFilterTest {
@@ -136,9 +135,9 @@ class LollipopWebFilterTest {
 
         WebFilterChain filterChain = new DefaultWebFilterChain(webHandler, Collections.emptyList());
 
-        assertThrows(PnRuntimeException.class,
-                 () -> webFilter.filter(exchange, filterChain).block()
-        );
+        StepVerifier.create(webFilter.filter(exchange,filterChain) )
+                        .expectError( RuntimeException.class )
+                                .verify();
 
     }
 }
