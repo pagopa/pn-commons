@@ -1,16 +1,21 @@
 package it.pagopa.pn.commons.lollipop;
 
-import it.pagopa.pn.commons.exceptions.PnRuntimeException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import it.pagopa.pn.common.rest.error.v1.dto.Problem;
 import it.pagopa.tech.lollipop.consumer.command.LollipopConsumerCommand;
 import it.pagopa.tech.lollipop.consumer.command.LollipopConsumerCommandBuilder;
 import it.pagopa.tech.lollipop.consumer.model.CommandResult;
 import it.pagopa.tech.lollipop.consumer.model.LollipopConsumerRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.MDC;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.server.ServerWebExchange;
@@ -20,15 +25,22 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import static it.pagopa.pn.commons.exceptions.PnExceptionsCodes.ERROR_CODE_LOLLIPOP_AUTH;
+import static it.pagopa.pn.commons.utils.MDCUtils.MDC_TRACE_ID_KEY;
 import static it.pagopa.tech.lollipop.consumer.command.impl.LollipopConsumerCommandImpl.VERIFICATION_SUCCESS_CODE;
 
 @Slf4j
 public class LollipopWebFilter implements WebFilter {
     private final LollipopConsumerCommandBuilder consumerCommandBuilder;
+
+    @Autowired
+    private ObjectMapper objectMapper;
     private static final String HEADER_FIELD = "x-pagopa-pn-src-ch";
     private static final String HEADER_VALUE = "IO";
 
@@ -50,21 +62,18 @@ public class LollipopWebFilter implements WebFilter {
                 return request.getBody()
                         .map(buffer -> buffer.toString(StandardCharsets.UTF_8))
                         .defaultIfEmpty("")
-                        .doOnNext(reqBody -> validateRequest(exchange, request, reqBody))
+                        .flatMap(reqBody -> validateRequest(exchange, request, reqBody))
                         .collectList()
                         .flatMap(requests -> chain.filter(exchange));
             } else {
-                return Mono.fromSupplier(() -> {
-                            validateRequest(exchange, request, null);
-                            return Mono.just("Ok");
-                        }
-                ).flatMap(stringMono -> chain.filter(exchange));
+                return validateRequest(exchange, request, null)
+                .flatMap(stringMono -> chain.filter(exchange));
             }
         }
         return chain.filter(exchange);
     }
 
-    private void validateRequest(@NotNull ServerWebExchange exchange, ServerHttpRequest request, String requestBody) {
+    private Mono validateRequest(@NotNull ServerWebExchange exchange, ServerHttpRequest request, String requestBody) {
         // Get request parameters as Map<String, String[]>
         MultiValueMap<String, String> queryParams = request.getQueryParams();
         Map<String, String[]> requestParams = new HashMap<>();
@@ -84,11 +93,22 @@ public class LollipopWebFilter implements WebFilter {
         CommandResult commandResult = command.doExecute();
 
         if (!commandResult.getResultCode().equals(VERIFICATION_SUCCESS_CODE)) {
-            exchange.getResponse().setStatusCode( HttpStatus.UNAUTHORIZED );
-            byte[] bytes = commandResult.getResultMessage().getBytes(StandardCharsets.UTF_8);
-            DataBuffer buffer = exchange.getResponse().bufferFactory().wrap(bytes);
-            exchange.getResponse().writeWith(Flux.just(buffer));
-            throw new PnRuntimeException("message", "description", 401, "errorcode", "element", "detail");
+            exchange.getResponse().setStatusCode( HttpStatus.NOT_FOUND );
+            // Non voglio restituire l'errore al client ma lo loggo a livello warning
+            log.warn("Lollipop auth response={}, detail={}", commandResult.getResultCode(), commandResult.getResultMessage());
+            Problem problem = new Problem()
+                    .timestamp(Instant.now().atOffset(ZoneOffset.UTC))
+                    .detail(commandResult.getResultCode())
+                    .traceId(MDC.get(MDC_TRACE_ID_KEY))
+                    .title(ERROR_CODE_LOLLIPOP_AUTH);
+            try {
+                DataBuffer buffer = exchange.getResponse().bufferFactory().wrap(objectMapper.writeValueAsBytes(problem));
+                exchange.getResponse().getHeaders().setContentType(MediaType.APPLICATION_JSON);
+                return exchange.getResponse().writeWith(Flux.just(buffer));
+            } catch (JsonProcessingException e) {
+                return Mono.error( e );
+            }
         }
+        return Mono.just("Ok");
     }
 }
