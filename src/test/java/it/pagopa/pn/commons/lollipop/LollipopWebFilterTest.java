@@ -11,22 +11,21 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
 import org.springframework.mock.web.server.MockServerWebExchange;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilterChain;
 import org.springframework.web.server.WebHandler;
 import org.springframework.web.server.handler.DefaultWebFilterChain;
 import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
 
 import java.util.Collections;
 
 import static it.pagopa.tech.lollipop.consumer.command.impl.LollipopConsumerCommandImpl.VERIFICATION_SUCCESS_CODE;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 class LollipopWebFilterTest {
 
     @Mock
@@ -135,9 +134,12 @@ class LollipopWebFilterTest {
 
         WebFilterChain filterChain = new DefaultWebFilterChain(webHandler, Collections.emptyList());
 
-        StepVerifier.create(webFilter.filter(exchange,filterChain) )
-                        .expectError( RuntimeException.class )
-                                .verify();
+        assertDoesNotThrow( () -> {
+            webFilter.filter(exchange, filterChain).block();
+        });
+
+        Assertions.assertNotNull( exchange.getResponse().getStatusCode() );
+        Assertions.assertEquals( 404, exchange.getResponse().getStatusCode().value() );
 
     }
 }
