@@ -1,7 +1,10 @@
 package it.pagopa.pn.commons.lollipop;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import it.pagopa.pn.common.rest.error.v1.dto.Problem;
 import it.pagopa.tech.lollipop.consumer.command.LollipopConsumerCommand;
 import it.pagopa.tech.lollipop.consumer.command.LollipopConsumerCommandBuilder;
@@ -10,7 +13,6 @@ import it.pagopa.tech.lollipop.consumer.model.LollipopConsumerRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.MDC;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -38,14 +40,16 @@ import static it.pagopa.tech.lollipop.consumer.command.impl.LollipopConsumerComm
 @Slf4j
 public class LollipopWebFilter implements WebFilter {
     private final LollipopConsumerCommandBuilder consumerCommandBuilder;
-
-    @Autowired
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
     private static final String HEADER_FIELD = "x-pagopa-pn-src-ch";
     private static final String HEADER_VALUE = "IO";
 
     public LollipopWebFilter(LollipopConsumerCommandBuilder consumerCommandBuilder) {
         this.consumerCommandBuilder = consumerCommandBuilder;
+        this.objectMapper = new ObjectMapper();
+        this.objectMapper.registerModule( new JavaTimeModule() );
+        this.objectMapper.setSerializationInclusion( JsonInclude.Include.NON_NULL );
+        this.objectMapper.configure( SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false );
     }
     @Override
     public @NotNull Mono<Void> filter(@NotNull ServerWebExchange exchange, @NotNull WebFilterChain chain) {
@@ -73,7 +77,7 @@ public class LollipopWebFilter implements WebFilter {
         return chain.filter(exchange);
     }
 
-    private Mono validateRequest(@NotNull ServerWebExchange exchange, ServerHttpRequest request, String requestBody) {
+    private Mono<Object> validateRequest(@NotNull ServerWebExchange exchange, ServerHttpRequest request, String requestBody) {
         // Get request parameters as Map<String, String[]>
         MultiValueMap<String, String> queryParams = request.getQueryParams();
         Map<String, String[]> requestParams = new HashMap<>();
@@ -96,19 +100,26 @@ public class LollipopWebFilter implements WebFilter {
             exchange.getResponse().setStatusCode( HttpStatus.NOT_FOUND );
             // Non voglio restituire l'errore al client ma lo loggo a livello warning
             log.warn("Lollipop auth response={}, detail={}", commandResult.getResultCode(), commandResult.getResultMessage());
-            Problem problem = new Problem()
-                    .timestamp(Instant.now().atOffset(ZoneOffset.UTC))
-                    .detail(commandResult.getResultCode())
-                    .traceId(MDC.get(MDC_TRACE_ID_KEY))
-                    .title(ERROR_CODE_LOLLIPOP_AUTH);
-            try {
-                DataBuffer buffer = exchange.getResponse().bufferFactory().wrap(objectMapper.writeValueAsBytes(problem));
-                exchange.getResponse().getHeaders().setContentType(MediaType.APPLICATION_JSON);
-                return exchange.getResponse().writeWith(Flux.just(buffer));
-            } catch (JsonProcessingException e) {
-                return Mono.error( e );
-            }
+            byte[] problemJsonBytes = getProblemJsonInBytes(commandResult.getResultCode());
+            DataBuffer buffer = exchange.getResponse().bufferFactory().wrap(problemJsonBytes);
+            exchange.getResponse().getHeaders().setContentType(MediaType.APPLICATION_JSON);
+            return Mono.from( exchange.getResponse().writeWith(Flux.just(buffer)) );
         }
         return Mono.just("Ok");
+    }
+
+    private byte[] getProblemJsonInBytes(String resultCode) {
+        Problem problem = new Problem()
+                .timestamp(Instant.now().atOffset(ZoneOffset.UTC))
+                .detail(resultCode)
+                .traceId(MDC.get(MDC_TRACE_ID_KEY))
+                .title(ERROR_CODE_LOLLIPOP_AUTH);
+        try {
+            return objectMapper.writeValueAsBytes(problem);
+        }
+        catch (JsonProcessingException e) {
+            log.warn("Error transform Problem to JSON");
+            return new byte[]{};
+        }
     }
 }
