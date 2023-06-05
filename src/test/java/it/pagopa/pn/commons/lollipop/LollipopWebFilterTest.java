@@ -22,6 +22,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 
+import static it.pagopa.pn.commons.lollipop.LollipopHeaders.LOLLIPOP_ASSERTION_TYPE;
 import static it.pagopa.tech.lollipop.consumer.command.impl.LollipopConsumerCommandImpl.VERIFICATION_SUCCESS_CODE;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
@@ -47,7 +48,8 @@ class LollipopWebFilterTest {
     @Test
     void testFilterWithValidRequest() {
         MockServerHttpRequest request = MockServerHttpRequest.get("http://localhost")
-                .header(HEADER_FIELD, HEADER_VALUE).build();
+                .header(HEADER_FIELD, HEADER_VALUE)
+                .header(LOLLIPOP_ASSERTION_TYPE, "SAML").build();
         ServerWebExchange exchange = MockServerWebExchange.from(request);
 
         WebHandler webHandler = serverWebExchange -> {
