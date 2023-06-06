@@ -61,6 +61,7 @@ public class LollipopWebFilter implements WebFilter {
 
         if (headers.containsKey(HEADER_FIELD)
                 && Objects.equals(headers.getFirst(HEADER_FIELD), HEADER_VALUE)) {
+
             HttpMethod method = request.getMethod();
 
             // Get request body as String
