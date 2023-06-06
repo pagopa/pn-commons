@@ -3,10 +3,10 @@
 # export CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain pn-codeartifact-domain --domain-owner 911845998067 --query authorizationToken --output text --profile cicd`
 #
 ARTIFACTS=(
-  it.pagopa.tech.lollipop-consumer-java-sdk:core:1.0.0-RC1
-  it.pagopa.tech.lollipop-consumer-java-sdk:http-verifier:1.0.0-RC1
-  it.pagopa.tech.lollipop-consumer-java-sdk:assertion-rest-client-native:1.0.0-RC1
-  it.pagopa.tech.lollipop-consumer-java-sdk:identity-service-rest-client-native:1.0.0-RC1
+  it.pagopa.tech.lollipop-consumer-java-sdk:core:1.0.0-RC2
+  it.pagopa.tech.lollipop-consumer-java-sdk:http-verifier:1.0.0-RC2
+  it.pagopa.tech.lollipop-consumer-java-sdk:assertion-rest-client-native:1.0.0-RC2
+  it.pagopa.tech.lollipop-consumer-java-sdk:identity-service-rest-client-native:1.0.0-RC2
   it.pagopa.tech:http-signatures:1.1.4
 )
 

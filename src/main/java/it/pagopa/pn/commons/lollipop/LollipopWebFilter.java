@@ -30,6 +30,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -43,6 +44,7 @@ public class LollipopWebFilter implements WebFilter {
     private final ObjectMapper objectMapper;
     private static final String HEADER_FIELD = "x-pagopa-pn-src-ch";
     private static final String HEADER_VALUE = "IO";
+    private static final List<String> LOLLIPOP_HEADER_AUDIT_KEYS = LollipopHeaders.getAllLollipopHeaderAuditKeys();
 
     public LollipopWebFilter(LollipopConsumerCommandBuilder consumerCommandBuilder) {
         this.consumerCommandBuilder = consumerCommandBuilder;
@@ -59,6 +61,7 @@ public class LollipopWebFilter implements WebFilter {
 
         if (headers.containsKey(HEADER_FIELD)
                 && Objects.equals(headers.getFirst(HEADER_FIELD), HEADER_VALUE)) {
+
             HttpMethod method = request.getMethod();
 
             // Get request body as String
@@ -85,6 +88,12 @@ public class LollipopWebFilter implements WebFilter {
 
         // Get header parameters as Map<String, String>
         Map<String, String> headerParams = request.getHeaders().toSingleValueMap();
+
+        // Add header to MDC for audit log
+        headerParams.forEach((key,value) -> {
+            if (LOLLIPOP_HEADER_AUDIT_KEYS.contains(key))
+                MDC.put(key, value);
+        });
 
         // Create LollipopConsumerRequest object
         LollipopConsumerRequest consumerRequest = LollipopConsumerRequest.builder()
