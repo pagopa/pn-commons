@@ -70,9 +70,7 @@ public class PnAuditLog {
             } finally {
                 MDC.remove(AUDIT_TYPE);
                 MDC.remove(AUDIT_UUID);
-                for (String key : mdcKeySet) {
-                    MDC.remove(key);
-                }
+                // Non vengono più rimosse le altre eventuali chiavi, dato che sono in comune con quelle normalmente presenti nei log
             }
         }
     }

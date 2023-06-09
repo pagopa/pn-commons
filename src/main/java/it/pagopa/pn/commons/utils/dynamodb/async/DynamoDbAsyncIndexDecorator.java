@@ -1,6 +1,7 @@
-package it.pagopa.pn.commons.utils;
+package it.pagopa.pn.commons.utils.dynamodb.async;
 
 
+import it.pagopa.pn.commons.utils.MDCUtils;
 import lombok.EqualsAndHashCode;
 import software.amazon.awssdk.core.async.SdkPublisher;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbAsyncIndex;

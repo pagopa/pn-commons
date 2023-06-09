@@ -5,19 +5,19 @@
 	<parent>
 		<groupId>it.pagopa.pn</groupId>
 		<artifactId>pn-parent</artifactId>
-		<version>2.0.0</version>
+		<version>2.1.0</version>
 		<relativePath>../pn-parent</relativePath>
 	</parent>
 
 	<artifactId>pn-commons</artifactId>
-	<version>2.0.0</version>
+	<version>2.1.0</version>
 	<name>pn-commons</name>
 	<description>Pn Common Utilities</description>
 	<scm>
 		<connection>${git.conn}</connection>
 		<developerConnection>${git.devConn}</developerConnection>
 		<url>${git.url}</url>
-	  <tag>v2.0.0</tag>
+	  <tag>v2.1.0</tag>
   </scm>
 	<dependencies>
 
@@ -57,6 +57,26 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.datatype</groupId>
 			<artifactId>jackson-datatype-jsr310</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>it.pagopa.tech.lollipop-consumer-java-sdk</groupId>
+			<artifactId>core</artifactId>
+			<version>1.0.0-RC2</version>
+		</dependency>
+		<dependency>
+			<groupId>it.pagopa.tech.lollipop-consumer-java-sdk</groupId>
+			<artifactId>http-verifier</artifactId>
+			<version>1.0.0-RC2</version>
+		</dependency>
+		<dependency>
+			<groupId>it.pagopa.tech.lollipop-consumer-java-sdk</groupId>
+			<artifactId>assertion-rest-client-native</artifactId>
+			<version>1.0.0-RC2</version>
+		</dependency>
+		<dependency>
+			<groupId>it.pagopa.tech.lollipop-consumer-java-sdk</groupId>
+			<artifactId>identity-service-rest-client-native</artifactId>
+			<version>1.0.0-RC2</version>
 		</dependency>
 
 
@@ -108,6 +128,10 @@
 		<dependency>
 			<groupId>software.amazon.awssdk</groupId>
 			<artifactId>cloudwatch</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-aop</artifactId>
 		</dependency>
 	</dependencies>
 	<build>
