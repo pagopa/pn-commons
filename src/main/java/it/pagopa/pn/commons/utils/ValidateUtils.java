@@ -13,6 +13,29 @@ public class ValidateUtils {
     }
 
     /**
+     * Verifica la presenza di un taxId come PF (ovvero deve essere un CF 16 cifre)
+     * o come PG (che può essere sia CF sia P.IVA) in white list
+     *
+     * @param taxId da validare
+     * @return true se il taxId è presente in white list
+     */
+    public boolean taxIdIsInWhiteList(String taxId) {
+        return taxIdInWhiteListParameterConsumer.isInWhiteList( taxId );
+    }
+
+    /**
+     * Valida un taxId come PF (ovvero deve essere un CF 16 cifre)
+     * o come PG (che può essere sia CF sia P.IVA)
+     *
+     * @param taxId da validare
+     * @param skipCheckWhiteList true se si vuole evitare il check della presenza del taxId in white list
+     * @return true se il taxId è valido
+     */
+    public boolean validate(String taxId, boolean skipCheckWhiteList) {
+        return validate( taxId, false, skipCheckWhiteList );
+    }
+
+    /**
      * Valida un taxId come PF (ovvero deve essere un CF 16 cifre)
      * o come PG (che può essere sia CF sia P.IVA)
      *
@@ -20,13 +43,14 @@ public class ValidateUtils {
      * @param isPf true se si vuole validare espressamente SOLO un CF a 16 cifre
      * @return true se il taxId è valido
      */
-    public boolean validate(String taxId, boolean isPf){
+    public boolean validate(String taxId, boolean isPf, boolean skipCheckWhiteList){
         taxId = normalize(taxId);
         if( taxId.length() == 0 ){
             return false;
         }
-        if (Boolean.TRUE.equals(taxIdInWhiteListParameterConsumer.isInWhiteList(taxId))) {
-            return true;
+        if (!skipCheckWhiteList &&
+                (Boolean.TRUE.equals(taxIdInWhiteListParameterConsumer.isInWhiteList(taxId)))) {
+                return true;
         }
 
         if(!isPf && taxId.length() == 11 ){
@@ -40,7 +64,7 @@ public class ValidateUtils {
 
     public boolean validate(String taxId){
         // non passare isPF sottointende validare sia PF che PG
-        return validate(taxId, false);
+        return validate(taxId, false, false);
     }
 
     private static String normalize(String cf) {
