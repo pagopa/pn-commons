@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ServerWebExchange;
-import org.springframework.web.server.adapter.DefaultServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -86,20 +85,20 @@ public class ServerAspectLogging {
         log.debug("Invoked operationId {} with path {} with args: {}", operationId, url, args);
     }
 
-    private void logEndingMessage(String endingMessage, String method, Object response) {
+    private void logDebugMessage(String endingMessage, String method, Object response) {
         if (response == null) {
-            log.info(endingMessage, method, "<Null>");
+            log.debug(endingMessage, method, "<Null>");
         } else if (response instanceof ResponseEntity<?> res) {
-            log.info(endingMessage, method, res.getBody() instanceof String ? SENSITIVE_DATA : res);
+            log.debug(endingMessage, method, res.getBody() instanceof String ? SENSITIVE_DATA : res);
         } else {
-            log.info(endingMessage, method, "<unsupported return type>");
+            log.debug(endingMessage, method, "<unsupported return type>");
         }
     }
 
     private Object proceed(ProceedingJoinPoint joinPoint, Object result, String endingMessage, String process) throws Throwable {
         if (result instanceof Mono<?> monoResult) {
             return monoResult.doOnSuccess(o -> {
-                        this.logEndingMessage(endingMessage, joinPoint.getSignature().toShortString(), o);
+                        this.logDebugMessage(endingMessage, joinPoint.getSignature().toShortString(), o);
                         log.logEndingProcess(process);
                     })
                     .doOnError(o ->
@@ -107,13 +106,13 @@ public class ServerAspectLogging {
                     );
         } else if (result instanceof Flux<?> fluxResult) {
             return fluxResult.doOnNext(o -> {
-                this.logEndingMessage(endingMessage, joinPoint.getSignature().toShortString(), o);
+                this.logDebugMessage(endingMessage, joinPoint.getSignature().toShortString(), o);
                 log.logEndingProcess(process);
             }).doOnError(o ->
                     log.logEndingProcess(process, false, o.getMessage())
             );
         } else {
-            this.logEndingMessage(endingMessage, joinPoint.getSignature().toShortString(), result);
+            this.logDebugMessage(endingMessage, joinPoint.getSignature().toShortString(), result);
             log.logEndingProcess(process);
             return result;
         }
