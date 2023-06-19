@@ -3,6 +3,7 @@ package it.pagopa.pn.commons.configs.lollipop;
 
 import it.pagopa.pn.commons.lollipop.LollipopWebFilter;
 import it.pagopa.tech.lollipop.consumer.assertion.AssertionServiceFactory;
+import it.pagopa.tech.lollipop.consumer.assertion.client.simple.AssertionSimpleClientConfig;
 import it.pagopa.tech.lollipop.consumer.assertion.client.simple.AssertionSimpleClientProvider;
 import it.pagopa.tech.lollipop.consumer.assertion.impl.AssertionServiceFactoryImpl;
 import it.pagopa.tech.lollipop.consumer.assertion.storage.SimpleAssertionStorageProvider;
@@ -62,10 +63,10 @@ public class PNHttpVerifierConfiguration {
     }
 
     @Bean
-    public AssertionServiceFactory assertionServiceFactory() {
+    public AssertionServiceFactory assertionServiceFactory( AssertionSimpleClientConfig assertionSimpleClientConfig ) {
         return new AssertionServiceFactoryImpl(
                 new SimpleAssertionStorageProvider(),
-                new AssertionSimpleClientProvider(new SpringAssertionSimpleClientConfig()),
+                new AssertionSimpleClientProvider( assertionSimpleClientConfig ),
                 storageConfig());
     }
 
