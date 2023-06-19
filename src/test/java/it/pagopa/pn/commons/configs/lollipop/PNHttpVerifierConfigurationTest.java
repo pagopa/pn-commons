@@ -2,6 +2,7 @@ package it.pagopa.pn.commons.configs.lollipop;
 
 import it.pagopa.pn.commons.lollipop.LollipopWebFilter;
 import it.pagopa.tech.lollipop.consumer.assertion.AssertionServiceFactory;
+import it.pagopa.tech.lollipop.consumer.assertion.client.simple.AssertionSimpleClientConfig;
 import it.pagopa.tech.lollipop.consumer.assertion.storage.StorageConfig;
 import it.pagopa.tech.lollipop.consumer.command.LollipopConsumerCommandBuilder;
 import it.pagopa.tech.lollipop.consumer.exception.LollipopVerifierException;
@@ -81,7 +82,7 @@ class PNHttpVerifierConfigurationTest {
 
     @Test
     void assertionServiceFactory() {
-        AssertionServiceFactory assertionServiceFactory = pnHttpVerifierConfiguration.assertionServiceFactory();
+        AssertionServiceFactory assertionServiceFactory = pnHttpVerifierConfiguration.assertionServiceFactory(new AssertionSimpleClientConfig());
         Assertions.assertNotNull(assertionServiceFactory);
     }
 
