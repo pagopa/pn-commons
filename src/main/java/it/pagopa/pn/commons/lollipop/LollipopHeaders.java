@@ -21,5 +21,4 @@ public class LollipopHeaders {
                 LOLLIPOP_PUBLIC_KEY, LOLLIPOP_SIGNATURE_INPUT, LOLLIPOP_SIGNATURE);
     }
 
-
 }

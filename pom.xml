@@ -10,14 +10,15 @@
 	</parent>
 
 	<artifactId>pn-commons</artifactId>
-	<version>2.1.1</version>
+
+	<version>2.1.2</version>
 	<name>pn-commons</name>
 	<description>Pn Common Utilities</description>
 	<scm>
 		<connection>${git.conn}</connection>
 		<developerConnection>${git.devConn}</developerConnection>
 		<url>${git.url}</url>
-	  <tag>v2.1.1</tag>
+	  <tag>v2.1.2</tag>
   </scm>
 	<dependencies>
 
@@ -61,22 +62,22 @@
 		<dependency>
 			<groupId>it.pagopa.tech.lollipop-consumer-java-sdk</groupId>
 			<artifactId>core</artifactId>
-			<version>1.0.0-RC2</version>
+			<version>1.0.0-RC3</version>
 		</dependency>
 		<dependency>
 			<groupId>it.pagopa.tech.lollipop-consumer-java-sdk</groupId>
 			<artifactId>http-verifier</artifactId>
-			<version>1.0.0-RC2</version>
+			<version>1.0.0-RC3</version>
 		</dependency>
 		<dependency>
 			<groupId>it.pagopa.tech.lollipop-consumer-java-sdk</groupId>
 			<artifactId>assertion-rest-client-native</artifactId>
-			<version>1.0.0-RC2</version>
+			<version>1.0.0-RC3</version>
 		</dependency>
 		<dependency>
 			<groupId>it.pagopa.tech.lollipop-consumer-java-sdk</groupId>
 			<artifactId>identity-service-rest-client-native</artifactId>
-			<version>1.0.0-RC2</version>
+			<version>1.0.0-RC3</version>
 		</dependency>
 
 
