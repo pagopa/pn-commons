@@ -34,6 +34,7 @@ public enum PnAuditLogEventType {
     AUD_NT_VIEW_DEL(PnAuditLogMarker.AUDIT10Y),
     AUD_NT_DOCOPEN_DEL(PnAuditLogMarker.AUDIT10Y),
     AUD_NT_LEGALOPEN_DEL(PnAuditLogMarker.AUDIT10Y),
+    AUD_NT_IO_DISCLAIM(PnAuditLogMarker.AUDIT10Y),
     AUD_AB_DD_INSUP(PnAuditLogMarker.AUDIT10Y),
     AUD_AB_DD_DEL(PnAuditLogMarker.AUDIT10Y),
     AUD_AB_DA_INSUP(PnAuditLogMarker.AUDIT10Y),
