@@ -10,14 +10,14 @@
 	</parent>
 
 	<artifactId>pn-commons</artifactId>
-	<version>2.1.9-SNAPSHOT</version>
+	<version>2.1.10-SNAPSHOT</version>
 	<name>pn-commons</name>
 	<description>Pn Common Utilities</description>
 	<scm>
 		<connection>${git.conn}</connection>
 		<developerConnection>${git.devConn}</developerConnection>
 		<url>${git.url}</url>
-	  <tag>v2.1.2</tag>
+	  <tag>v2.1.8</tag>
   </scm>
 	<dependencies>
 
