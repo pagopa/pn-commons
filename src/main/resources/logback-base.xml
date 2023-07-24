@@ -6,6 +6,21 @@
     </appender>
     <logger name="it.pagopa.pn.commons.pnclients.RestTemplateRetryable" level="INFO" />
     <logger name="it.pagopa.pn" level="INFO" />
+    <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>./logs/http_log.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>
+                ./logs/http_.%d{yyyy-MM-dd-mm}.%i.log.zip
+            </fileNamePattern>
+            <totalSizeCap>40MB</totalSizeCap>
+            <maxFileSize>10MB</maxFileSize>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>
+                %d{dd-MM-yyyy HH:mm:ss.SSS} [%thread] %-5level %logger{36}.%M - %msg%n
+            </Pattern>
+        </encoder>
+    </appender>
     <logger name="org.apache.http" additivity="false" level="TRACE">
         <appender-ref ref="file"/>
     </logger>
@@ -15,14 +30,6 @@
     <logger name="httpclient.wire" additivity="false" level="TRACE">
         <appender-ref ref="file"/>
     </logger>
-    <appender name="file" class="ch.qos.logback.core.FileAppender">
-        <file>$(PWD)/log.log</file>
-        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <Pattern>
-                %d{dd-MM-yyyy HH:mm:ss.SSS} [%thread] %-5level %logger{36}.%M - %msg%n
-            </Pattern>
-        </encoder>
-    </appender>
     <root level="INFO">
         <appender-ref ref="STDOUT" />
     </root>
