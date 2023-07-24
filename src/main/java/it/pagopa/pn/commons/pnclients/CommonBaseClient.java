@@ -1,9 +1,11 @@
 package it.pagopa.pn.commons.pnclients;
 
 import io.netty.channel.ChannelOption;
+import io.netty.handler.logging.LogLevel;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.TimeoutException;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,6 +18,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.resources.ConnectionProvider;
+import reactor.netty.transport.logging.AdvancedByteBufFormat;
 import reactor.util.retry.Retry;
 
 import javax.net.ssl.SSLHandshakeException;
@@ -52,6 +55,9 @@ public abstract class CommonBaseClient {
     private int retryMaxAttempts;
 
     private int connectionTimeoutMillis;
+
+    @Value("${pn.commons.wire-tap-activation}")
+    private Boolean wireTapActivation;
 
     protected CommonBaseClient() {}
 
@@ -110,16 +116,27 @@ public abstract class CommonBaseClient {
     }
 
     protected HttpClient buildHttpClient() {
-        ConnectionProvider provider = ConnectionProvider.builder("fixed")
-        .maxConnections(500)
-        .maxIdleTime(Duration.ofSeconds(20))
-        .maxLifeTime(Duration.ofSeconds(60))
-        .pendingAcquireTimeout(Duration.ofSeconds(60))
-        .evictInBackground(Duration.ofSeconds(120)).build();
+        ConnectionProvider provider = buildConnectionProvider();
 
-        return HttpClient.create(provider)
+        HttpClient httpClient = HttpClient.create(provider)
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectionTimeoutMillis)
                 .doOnConnected(connection -> connection.addHandlerLast(new ReadTimeoutHandler(connectionTimeoutMillis, TimeUnit.MILLISECONDS)));
+
+        if(wireTapActivation){
+            httpClient = httpClient.wiretap("reactor.netty.http.client.HttpClient", LogLevel.TRACE, AdvancedByteBufFormat.TEXTUAL);
+        }
+        return httpClient;
+    }
+
+    @NotNull
+    protected ConnectionProvider buildConnectionProvider() {
+        ConnectionProvider provider = ConnectionProvider.builder("fixed")
+            .maxConnections(500)
+            .maxIdleTime(Duration.ofSeconds(20))
+            .maxLifeTime(Duration.ofSeconds(60))
+            .pendingAcquireTimeout(Duration.ofSeconds(60))
+            .evictInBackground(Duration.ofSeconds(120)).build();
+        return provider;
     }
 
     protected ExchangeFilterFunction buildRetryExchangeFilterFunction() {
