@@ -1,10 +1,12 @@
 package it.pagopa.pn.commons.pnclients;
 
 import it.pagopa.pn.commons.exceptions.PnHttpResponseException;
+import java.net.SocketTimeoutException;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.classify.Classifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.retry.RetryPolicy;
 import org.springframework.retry.backoff.ExponentialRandomBackOffPolicy;
 import org.springframework.retry.policy.ExceptionClassifierRetryPolicy;
@@ -12,6 +14,7 @@ import org.springframework.retry.policy.NeverRetryPolicy;
 import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -28,8 +31,10 @@ public class RestTemplateRetryable extends RestTemplate {
     public RestTemplateRetryable(int retryMaxAttempts) {
         this.retryTemplate = createRetryTemplate(retryMaxAttempts);
     }
-
-
+    public RestTemplateRetryable(int retryMaxAttempts, ClientHttpRequestFactory clientHttpRequestFactory) {
+        super(clientHttpRequestFactory);
+        this.retryTemplate = createRetryTemplate(retryMaxAttempts);
+    }
     @Override
     public <T> T getForObject(URI url, @NotNull Class<T> responseType) throws RestClientException {
         return retryTemplate.execute(context ->  super.getForObject(url, responseType));
@@ -90,6 +95,7 @@ public class RestTemplateRetryable extends RestTemplate {
         return retryTemplate.execute(context -> super.postForObject(url, request, responseType, uriVariables));
     }
 
+
     private RetryTemplate createRetryTemplate(int retryMaxAttempts) {
         RetryTemplate retry = new RetryTemplate();
         ExceptionClassifierRetryPolicy policy = new ExceptionClassifierRetryPolicy();
@@ -115,9 +121,15 @@ public class RestTemplateRetryable extends RestTemplate {
             if(throwable instanceof PnHttpResponseException pnHttpResponseException && pnHttpResponseException.getStatusCode() > 0) {
                 return getRetryPolicyForStatus(HttpStatus.valueOf(pnHttpResponseException.getStatusCode()), simpleRetryPolicy, neverRetryPolicy);
             }
+            if(throwable instanceof ResourceAccessException && throwable.getCause() instanceof  SocketTimeoutException){
+                return simpleRetryPolicy;
+            }
             if(throwable instanceof ConnectException ||
                     throwable instanceof SSLHandshakeException ||
-                    throwable instanceof UnknownHostException) {
+                    throwable instanceof UnknownHostException ||
+                    throwable instanceof ResourceAccessException
+                //        throwable instanceof SocketTimeoutException
+            ) {
                 return simpleRetryPolicy;
             }
             return neverRetryPolicy;
