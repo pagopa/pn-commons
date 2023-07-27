@@ -142,6 +142,7 @@ public abstract class CommonBaseClient {
 
     private boolean isRetryableException(Throwable throwable) {
         return throwable instanceof TimeoutException ||
+                throwable instanceof ConnectException ||
                 throwable instanceof SocketTimeoutException ||
                 throwable instanceof SSLHandshakeException ||
                 throwable instanceof UnknownHostException ||
