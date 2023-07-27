@@ -133,15 +133,12 @@ public class RestTemplateRetryable extends RestTemplate {
     }
 
     private boolean isIOExceptionRetryable(Throwable throwable){
-        if(throwable instanceof SocketTimeoutException ||
+        return (throwable instanceof SocketTimeoutException ||
             throwable instanceof SSLHandshakeException ||
             throwable instanceof UnknownHostException ||
             throwable instanceof SocketException ||
             throwable instanceof ConnectException
-        ) {
-            return true;
-        }
-        return false;
+        );
     }
     private RetryPolicy getRetryPolicyForStatus(HttpStatus httpStatus, SimpleRetryPolicy simpleRetryPolicy,
                                                 NeverRetryPolicy neverRetryPolicy) {
