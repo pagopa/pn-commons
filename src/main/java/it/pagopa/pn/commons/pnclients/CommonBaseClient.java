@@ -53,6 +53,8 @@ public abstract class CommonBaseClient {
 
     private int connectionTimeoutMillis;
 
+    private int readTimeoutMillis;
+
     protected CommonBaseClient() {}
 
 
@@ -119,7 +121,7 @@ public abstract class CommonBaseClient {
 
         return HttpClient.create(provider)
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectionTimeoutMillis)
-                .doOnConnected(connection -> connection.addHandlerLast(new ReadTimeoutHandler(connectionTimeoutMillis, TimeUnit.MILLISECONDS)));
+                .doOnConnected(connection -> connection.addHandlerLast(new ReadTimeoutHandler(readTimeoutMillis, TimeUnit.MILLISECONDS)));
     }
 
     protected ExchangeFilterFunction buildRetryExchangeFilterFunction() {
@@ -164,6 +166,11 @@ public abstract class CommonBaseClient {
     @Autowired
     public void setConnectionTimeoutMillis(@Value("${pn.commons.connection-timeout-millis}") int connectionTimeoutMillis) {
         this.connectionTimeoutMillis = connectionTimeoutMillis;
+    }
+
+    @Autowired
+    public void setReadTimeoutMillis(@Value("${pn.commons.read-timeout-millis}") int readTimeoutMillis) {
+        this.readTimeoutMillis = readTimeoutMillis;
     }
 
 

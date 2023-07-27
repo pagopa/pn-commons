@@ -23,7 +23,8 @@ class CommonBaseClientTest {
     public void init(){
         commonBaseClient = new CommonBaseClient(){};
         commonBaseClient.setTraceIdHeader("trace");
-        commonBaseClient.setConnectionTimeoutMillis(10000);
+        commonBaseClient.setConnectionTimeoutMillis(3000);
+        commonBaseClient.setReadTimeoutMillis(8000);
         commonBaseClient.setRetryMaxAttempts(3);
     }
 

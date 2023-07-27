@@ -31,13 +31,13 @@ class RestTemplateFactoryTest {
 
     @Test
     void restTemplateWithTracing() {
-        RestTemplate res = restTemplateFactory.restTemplateWithTracing(3, 10000);
+        RestTemplate res = restTemplateFactory.restTemplateWithTracing(3, 3000,8000);
         assertNotNull(res);
     }
 
     @Test
     void enrichWithTracing() {
-        RestTemplate res = restTemplateFactory.restTemplateWithTracing(3, 10000);
+        RestTemplate res = restTemplateFactory.restTemplateWithTracing(3, 3000,8000);
 
         restTemplateFactory
                 .enrichWithTracing(res);
@@ -47,7 +47,7 @@ class RestTemplateFactoryTest {
 
     @Test
     void testRetryWithTreeFails() throws IOException {
-        RestTemplate restTemplate = restTemplateFactory.restTemplateWithTracing(3, 10000);
+        RestTemplate restTemplate = restTemplateFactory.restTemplateWithTracing(3, 3000,8000);
 
         MockWebServer mockWebServer = new MockWebServer();
 
@@ -71,7 +71,7 @@ class RestTemplateFactoryTest {
 
     @Test
     void testRetryWithTwoFails() throws IOException {
-        RestTemplate restTemplate = restTemplateFactory.restTemplateWithTracing(3, 10000);
+        RestTemplate restTemplate = restTemplateFactory.restTemplateWithTracing(3, 3000,8000);
 
         MockWebServer mockWebServer = new MockWebServer();
 
@@ -94,7 +94,7 @@ class RestTemplateFactoryTest {
 
     @Test
     void testRetryWithOneFail() throws IOException {
-        RestTemplate restTemplate = restTemplateFactory.restTemplateWithTracing(3, 10000);
+        RestTemplate restTemplate = restTemplateFactory.restTemplateWithTracing(3, 3000,8000);
 
         MockWebServer mockWebServer = new MockWebServer();
 
@@ -116,7 +116,7 @@ class RestTemplateFactoryTest {
 
     @Test
     void testRetryFourTimesButParameterIsSetToThree() throws IOException {
-        RestTemplate restTemplate = restTemplateFactory.restTemplateWithTracing(3, 10000);
+        RestTemplate restTemplate = restTemplateFactory.restTemplateWithTracing(3, 3000,8000);
 
         MockWebServer mockWebServer = new MockWebServer();
 
@@ -140,7 +140,7 @@ class RestTemplateFactoryTest {
 
     @Test
     void testExceptionNotRetryable() throws IOException {
-        RestTemplate restTemplate = restTemplateFactory.restTemplateWithTracing(3, 10000);
+        RestTemplate restTemplate = restTemplateFactory.restTemplateWithTracing(3, 3000,8000);
 
         MockWebServer mockWebServer = new MockWebServer();
 
@@ -169,7 +169,7 @@ class RestTemplateFactoryTest {
     void pathVariableWithSemicolonTest() throws IOException {
         String contextPath = "/test/";
         String pathVariable = "path;withsemicolon";
-        RestTemplate restTemplate = restTemplateFactory.restTemplateWithTracing(3, 10000);
+        RestTemplate restTemplate = restTemplateFactory.restTemplateWithTracing(3, 3000,8000);
 
         MockWebServer mockWebServer = new MockWebServer();
 
@@ -201,7 +201,7 @@ class RestTemplateFactoryTest {
     void pathVariableWithSpaceTest() throws IOException {
         String contextPath = "/test/";
         String pathVariable = "path with space";
-        RestTemplate restTemplate = restTemplateFactory.restTemplateWithTracing(3, 10000);
+        RestTemplate restTemplate = restTemplateFactory.restTemplateWithTracing(3, 3000,8000);
 
         MockWebServer mockWebServer = new MockWebServer();
 

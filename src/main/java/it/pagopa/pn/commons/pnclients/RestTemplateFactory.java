@@ -19,17 +19,18 @@ public class RestTemplateFactory {
     @Bean
     @Qualifier("withTracing")
     public RestTemplate restTemplateWithTracing(@Value("${pn.commons.retry.max-attempts}") int retryMaxAttempts,
-                                                @Value("${pn.commons.connection-timeout-millis}") int connectionTimeout) {
+                                                @Value("${pn.commons.connection-timeout-millis}") int connectionTimeout,
+                                                @Value("${pn.commons.read-timeout-millis}") int readTimeout) {
         //RetryTemplate nel parametro retryMaxAttempts vuole le invocazioni totali (compresa la prima che non è fallita)
         RestTemplate template = new RestTemplateRetryable(retryMaxAttempts + 1);
-        configureRestTemplate(connectionTimeout, template);
+        configureRestTemplate(connectionTimeout,readTimeout, template);
         return template;
     }
 
-    protected void configureRestTemplate(int connectionTimeout, RestTemplate template) {
+    protected void configureRestTemplate(int connectionTimeout,int readTimeout, RestTemplate template) {
         SimpleClientHttpRequestFactory clientHttpRequestFactory = new SimpleClientHttpRequestFactory();
         clientHttpRequestFactory.setConnectTimeout(connectionTimeout);
-        clientHttpRequestFactory.setReadTimeout(connectionTimeout);
+        clientHttpRequestFactory.setReadTimeout(readTimeout);
         template.setRequestFactory(clientHttpRequestFactory);
         enrichWithTracing(template);
 //        enrichURIEncoding(template);
