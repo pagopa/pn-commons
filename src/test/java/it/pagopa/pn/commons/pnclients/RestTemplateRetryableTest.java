@@ -1,6 +1,5 @@
 package it.pagopa.pn.commons.pnclients;
 
-import it.pagopa.pn.commons.configs.HttpClientConfig;
 import java.net.SocketTimeoutException;
 import java.time.Duration;
 import java.time.Instant;
@@ -12,26 +11,20 @@ import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.SocketPolicy;
 import org.junit.Assert;
-import org.junit.function.ThrowingRunnable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
-import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.ResourceAccessException;
 
 import static org.assertj.core.api.Assertions.assertThat;
-/*
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = { HttpClientConfig.class })*/
+
+
 class RestTemplateRetryableTest {
 
     private RestTemplateRetryable restTemplateRetryable;
