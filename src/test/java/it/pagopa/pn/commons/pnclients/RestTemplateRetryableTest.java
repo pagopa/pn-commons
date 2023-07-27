@@ -10,11 +10,13 @@ import javax.validation.constraints.AssertTrue;
 import okhttp3.HttpUrl;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
+import okhttp3.mockwebserver.SocketPolicy;
 import org.junit.Assert;
 import org.junit.function.ThrowingRunnable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.io.IOException;
@@ -249,6 +251,20 @@ class RestTemplateRetryableTest {
         try{
             mockWebServer.shutdown();
         } catch(Exception quiet){}
+    }
+
+    @Test
+    void testRetryWithSocketTimeoutException() throws IOException {
+        MockWebServer mockWebServer = new MockWebServer();
+        String expectedResponse = "expect that it works";
+        mockWebServer.enqueue(new MockResponse().setSocketPolicy(SocketPolicy.DISCONNECT_AT_START));
+        mockWebServer.enqueue(new MockResponse().setSocketPolicy(SocketPolicy.DISCONNECT_AT_START));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(200));
+        mockWebServer.start();
+        HttpUrl url = mockWebServer.url("/test");
+        ResponseEntity<String> response = restTemplateRetryable.postForEntity(url.uri(), "myRequest", String.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        mockWebServer.shutdown();
     }
 
 }

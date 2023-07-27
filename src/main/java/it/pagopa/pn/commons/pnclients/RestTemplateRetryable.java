@@ -1,6 +1,7 @@
 package it.pagopa.pn.commons.pnclients;
 
 import it.pagopa.pn.commons.exceptions.PnHttpResponseException;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.classify.Classifier;
@@ -121,21 +122,27 @@ public class RestTemplateRetryable extends RestTemplate {
             if(throwable instanceof PnHttpResponseException pnHttpResponseException && pnHttpResponseException.getStatusCode() > 0) {
                 return getRetryPolicyForStatus(HttpStatus.valueOf(pnHttpResponseException.getStatusCode()), simpleRetryPolicy, neverRetryPolicy);
             }
-            if(throwable instanceof ResourceAccessException && throwable.getCause() instanceof  SocketTimeoutException){
+            if(throwable instanceof ResourceAccessException && isIOExceptionRetryable(throwable.getCause())){
                 return simpleRetryPolicy;
             }
-            if(throwable instanceof ConnectException ||
-                    throwable instanceof SSLHandshakeException ||
-                    throwable instanceof UnknownHostException ||
-                    throwable instanceof ResourceAccessException
-                //        throwable instanceof SocketTimeoutException
-            ) {
+            if (isIOExceptionRetryable(throwable)) {
                 return simpleRetryPolicy;
             }
             return neverRetryPolicy;
         };
     }
 
+    private boolean isIOExceptionRetryable(Throwable throwable){
+        if(throwable instanceof SocketTimeoutException ||
+            throwable instanceof SSLHandshakeException ||
+            throwable instanceof UnknownHostException ||
+            throwable instanceof SocketException ||
+            throwable instanceof ConnectException
+        ) {
+            return true;
+        }
+        return false;
+    }
     private RetryPolicy getRetryPolicyForStatus(HttpStatus httpStatus, SimpleRetryPolicy simpleRetryPolicy,
                                                 NeverRetryPolicy neverRetryPolicy) {
         return switch (httpStatus) {

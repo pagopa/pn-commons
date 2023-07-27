@@ -4,6 +4,7 @@ import it.pagopa.pn.commons.exceptions.PnHttpResponseException;
 import okhttp3.HttpUrl;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
+import okhttp3.mockwebserver.SocketPolicy;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -222,5 +223,17 @@ class RestTemplateFactoryTest {
 
         mockWebServer.shutdown();
     }
-
+    @Test
+    void testRetryWithConnectionException() throws IOException {
+        RestTemplate restTemplate = restTemplateFactory.restTemplateWithTracing(3, 10000);
+        MockWebServer mockWebServer = new MockWebServer();
+        String expectedResponse = "expect that it works";
+        mockWebServer.enqueue(new MockResponse().setSocketPolicy(SocketPolicy.DISCONNECT_AT_START));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(200));
+        mockWebServer.start();
+        HttpUrl url = mockWebServer.url("/test");
+        ResponseEntity<String> response = restTemplate.postForEntity(url.uri(), "myRequest", String.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        mockWebServer.shutdown();
+    }
 }
