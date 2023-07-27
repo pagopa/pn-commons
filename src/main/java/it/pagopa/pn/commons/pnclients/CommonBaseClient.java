@@ -1,6 +1,7 @@
 package it.pagopa.pn.commons.pnclients;
 
 import io.netty.channel.ChannelOption;
+import io.netty.handler.timeout.ReadTimeoutException;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.TimeoutException;
 import lombok.extern.slf4j.Slf4j;
@@ -9,10 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.util.StringUtils;
-import org.springframework.web.reactive.function.client.ClientRequest;
-import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
+import org.springframework.web.reactive.function.client.*;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.resources.ConnectionProvider;
@@ -20,6 +18,7 @@ import reactor.util.retry.Retry;
 
 import javax.net.ssl.SSLHandshakeException;
 import java.net.ConnectException;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
@@ -143,9 +142,10 @@ public abstract class CommonBaseClient {
 
     private boolean isRetryableException(Throwable throwable) {
         return throwable instanceof TimeoutException ||
-                throwable instanceof ConnectException ||
+                throwable instanceof SocketTimeoutException ||
                 throwable instanceof SSLHandshakeException ||
                 throwable instanceof UnknownHostException ||
+                throwable instanceof WebClientRequestException ||
                 throwable instanceof WebClientResponseException.TooManyRequests ||
                 throwable instanceof WebClientResponseException.GatewayTimeout ||
                 throwable instanceof WebClientResponseException.BadGateway ||
