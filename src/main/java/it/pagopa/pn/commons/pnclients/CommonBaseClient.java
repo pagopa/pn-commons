@@ -18,6 +18,7 @@ import reactor.util.retry.Retry;
 
 import javax.net.ssl.SSLHandshakeException;
 import java.net.ConnectException;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.time.Duration;
@@ -142,7 +143,7 @@ public abstract class CommonBaseClient {
 
     private boolean isRetryableException(Throwable throwable) {
         return throwable instanceof TimeoutException ||
-                throwable instanceof ConnectException ||
+                throwable instanceof SocketException ||
                 throwable instanceof SocketTimeoutException ||
                 throwable instanceof SSLHandshakeException ||
                 throwable instanceof UnknownHostException ||
