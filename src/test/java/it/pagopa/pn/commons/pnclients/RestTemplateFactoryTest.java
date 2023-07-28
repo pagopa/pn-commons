@@ -233,7 +233,7 @@ class RestTemplateFactoryTest {
     }
     @Test
     void testRetryWithConnectionException() throws IOException {
-        RestTemplate restTemplate = restTemplateFactory.restTemplateWithTracing(3, 10000);
+        RestTemplate restTemplate = restTemplateFactory.restTemplateWithTracing(3, 10000,10000);
         MockWebServer mockWebServer = new MockWebServer();
         String expectedResponse = "expect that it works";
         mockWebServer.enqueue(new MockResponse().setSocketPolicy(SocketPolicy.DISCONNECT_AT_START));
@@ -247,7 +247,7 @@ class RestTemplateFactoryTest {
 
     @Test
     void testSocketTimeoutException() throws IOException {
-        RestTemplate restTemplate = restTemplateFactory.restTemplateWithTracing(3, 1000);
+        RestTemplate restTemplate = restTemplateFactory.restTemplateWithTracing(3, 1000, 1000);
 
         MockWebServer mockWebServer = new MockWebServer();
         String expectedResponse = "expect that it works";
@@ -283,7 +283,7 @@ class RestTemplateFactoryTest {
         mockWebServer.enqueue(new MockResponse().setResponseCode(200));
         mockWebServer.start();
         HttpUrl url = mockWebServer.url("/test");
-        RestTemplate restTemplate = restTemplateFactory.restTemplateWithTracing(3, 10000);
+        RestTemplate restTemplate = restTemplateFactory.restTemplateWithTracing(3, 10000, 10000);
 
         ResponseEntity<String> response = restTemplate.postForEntity(url.uri(), "myRequest", String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
