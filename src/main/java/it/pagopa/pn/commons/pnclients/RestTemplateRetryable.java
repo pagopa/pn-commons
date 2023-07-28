@@ -7,7 +7,6 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.classify.Classifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.retry.RetryPolicy;
 import org.springframework.retry.backoff.ExponentialRandomBackOffPolicy;
 import org.springframework.retry.policy.ExceptionClassifierRetryPolicy;
@@ -20,7 +19,6 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.net.ssl.SSLHandshakeException;
-import java.net.ConnectException;
 import java.net.URI;
 import java.net.UnknownHostException;
 import java.util.Map;
@@ -32,10 +30,7 @@ public class RestTemplateRetryable extends RestTemplate {
     public RestTemplateRetryable(int retryMaxAttempts) {
         this.retryTemplate = createRetryTemplate(retryMaxAttempts);
     }
-    public RestTemplateRetryable(int retryMaxAttempts, ClientHttpRequestFactory clientHttpRequestFactory) {
-        super(clientHttpRequestFactory);
-        this.retryTemplate = createRetryTemplate(retryMaxAttempts);
-    }
+
     @Override
     public <T> T getForObject(URI url, @NotNull Class<T> responseType) throws RestClientException {
         return retryTemplate.execute(context ->  super.getForObject(url, responseType));
@@ -136,8 +131,7 @@ public class RestTemplateRetryable extends RestTemplate {
         return (throwable instanceof SocketTimeoutException ||
             throwable instanceof SSLHandshakeException ||
             throwable instanceof UnknownHostException ||
-            throwable instanceof SocketException ||
-            throwable instanceof ConnectException
+            throwable instanceof SocketException
         );
     }
     private RetryPolicy getRetryPolicyForStatus(HttpStatus httpStatus, SimpleRetryPolicy simpleRetryPolicy,
