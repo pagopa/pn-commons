@@ -1,22 +1,33 @@
 package it.pagopa.pn.commons.pnclients;
 
+import java.net.SocketTimeoutException;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
+import javax.validation.constraints.AssertTrue;
 import okhttp3.HttpUrl;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
+import okhttp3.mockwebserver.SocketPolicy;
+import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.web.client.ResourceAccessException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 
 class RestTemplateRetryableTest {
 
     private RestTemplateRetryable restTemplateRetryable;
-
     @BeforeEach
     public void init() {
         restTemplateRetryable = new RestTemplateRetryable(3);
@@ -184,7 +195,6 @@ class RestTemplateRetryableTest {
     @Test
     void postForEntityThreeTest() throws IOException {
         MockWebServer mockWebServer = new MockWebServer();
-
         String expectedResponse = "expect that it works";
         mockWebServer.enqueue(new MockResponse().setResponseCode(200).setBody(expectedResponse));
         mockWebServer.start();
