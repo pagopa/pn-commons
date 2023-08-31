@@ -88,5 +88,20 @@ class ValidateUtilsTest {
         assertTrue(validateUtils.validate(fakeTaxId, true));
         Mockito.verifyNoInteractions( taxIdInWhiteListParameterConsumer );
     }
+
+
+    @Test
+    void validateWithCheckInWhiteList() {
+        String fakeTaxId = "MRNLCC00A01H50MJ";
+        Mockito.when( taxIdInWhiteListParameterConsumer.isInWhiteList( Mockito.anyString() ) ).thenReturn( false );
+        assertTrue(validateUtils.validate(fakeTaxId, true, false));
+    }
+
+    @Test
+    void validateWithCheckInWhiteList2() {
+        String fakeTaxId = "MRNLCC00A01H50MA";
+        Mockito.when( taxIdInWhiteListParameterConsumer.isInWhiteList( Mockito.anyString() ) ).thenReturn( false );
+        assertFalse(validateUtils.validate(fakeTaxId, true, false));
+    }
 }
 
