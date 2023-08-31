@@ -88,7 +88,7 @@ public class RestTemplateResponseErrorHandler
         Problem problem = null;
         try {
             problem = objectMapper.readValue(body, Problem.class);
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
             log.info("cannot parse body as problem", e);
         }
 
