@@ -40,7 +40,7 @@ public class SpringAnalyzer {
     }
 
     @Scheduled(cron = "${pn.analyzer.cloudwatch-metric-cron}")
-    private void scheduledSendMetrics() throws IOException, InterruptedException {
+    private void scheduledSendMetrics() {
         metrics.forEach(this::createMetricAndSendCloudwatch);
     }
 
@@ -63,26 +63,24 @@ public class SpringAnalyzer {
     }
 
     protected Dimension customizedDimension(Dimension dimension, String metricName){
+        //"metricName" used to customize dimension
         return dimension;
     }
 
-    protected void metricSuccessfullSendListener(String metricName){}
+    protected void metricSuccessfullSendListener(String metricName){
+        //Used to reset metric in successfull listener
+    }
 
     static class ShutdownHook extends Thread {
-        final private SpringAnalyzer analyzer;
+        private final SpringAnalyzer analyzer;
 
         public ShutdownHook(SpringAnalyzer analyzer) {
             this.analyzer = analyzer;
         }
         @Override
         public void run() {
-            try {
-                log.trace("Closing application. Sending last metrics.");
-                this.analyzer.scheduledSendMetrics();
-            } catch (IOException | InterruptedException e) {
-                log.trace("Error sending last metrics");
-                throw new RuntimeException(e);
-            }
+            log.trace("Closing application. Sending last metrics.");
+            this.analyzer.scheduledSendMetrics();
         }
     }
 }
