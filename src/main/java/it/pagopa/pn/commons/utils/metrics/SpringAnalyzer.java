@@ -32,6 +32,9 @@ public class SpringAnalyzer {
         this.metricEndpoint = metricsEndpoint;
         this.cloudWatchMetricHandler = cloudWatchMetricHandler;
         Runtime.getRuntime().addShutdownHook(new ShutdownHook(this));
+        if(this.metrics == null) {
+            this.metrics = new ArrayList<>();
+        }
     }
 
     @PostConstruct
@@ -44,22 +47,26 @@ public class SpringAnalyzer {
         metrics.forEach(this::createMetricAndSendCloudwatch);
     }
 
-    private void createMetricAndSendCloudwatch(String metricName) {
+    public void createMetricAndSendCloudwatch(String metricName) {
         List<String> tag = new ArrayList<>();
         String namespace = "SpringAnalyzer" + "-" + applicationName;
         MetricResponse response = this.metricEndpoint.metric(metricName, tag);
-        Dimension dimension = Dimension.builder()
-                .name("ApplicationName_TaskId")
-                .value(applicationName + "_" + taskId)
-                .build();
-        dimension = customizedDimension(dimension, metricName);
-        log.trace("Sending Cloudwatch information {}= {}", metricName, response.getMeasurements().get(0).getValue());
-        cloudWatchMetricHandler.sendMetric(namespace, dimension, metricName, response.getMeasurements().get(0).getValue()).
-                subscribe(putMetricDataResponse -> {
-                            metricSuccessfullSendListener(metricName);
-                            log.trace("[{}] PutMetricDataResponse: {}", namespace, putMetricDataResponse);
-                        },
-                throwable -> log.warn(String.format("[%s] Error sending metric", namespace), throwable));
+        if (response == null) {
+            log.warn(String.format("[%s] Metric not available", namespace));
+        } else {
+            Dimension dimension = Dimension.builder()
+                    .name("ApplicationName_TaskId")
+                    .value(applicationName + "_" + taskId)
+                    .build();
+            dimension = customizedDimension(dimension, metricName);
+            log.trace("Sending Cloudwatch information {}= {}", metricName, response.getMeasurements().get(0).getValue());
+            cloudWatchMetricHandler.sendMetric(namespace, dimension, metricName, response.getMeasurements().get(0).getValue()).
+                    subscribe(putMetricDataResponse -> {
+                                metricSuccessfullSendListener(metricName);
+                                log.trace("[{}] PutMetricDataResponse: {}", namespace, putMetricDataResponse);
+                            },
+                            throwable -> log.warn(String.format("[%s] Error sending metric", namespace), throwable));
+        }
     }
 
     protected Dimension customizedDimension(Dimension dimension, String metricName){
