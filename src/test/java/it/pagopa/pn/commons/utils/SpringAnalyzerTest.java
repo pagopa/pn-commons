@@ -1,4 +1,4 @@
-package it.pagopa.pn.commons.utils.dynamodb;
+package it.pagopa.pn.commons.utils;
 
 import io.micrometer.core.instrument.Clock;
 import io.micrometer.core.instrument.MeterRegistry;
