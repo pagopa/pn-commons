@@ -43,11 +43,11 @@ public class SpringAnalyzer {
     }
 
     @Scheduled(cron = "${pn.analyzer.cloudwatch-metric-cron}")
-    private void scheduledSendMetrics() {
+    public void scheduledSendMetrics() {
         metrics.forEach(this::createMetricAndSendCloudwatch);
     }
 
-    public void createMetricAndSendCloudwatch(String metricName) {
+    private void createMetricAndSendCloudwatch(String metricName) {
         List<String> tag = new ArrayList<>();
         String namespace = "SpringAnalyzer" + "-" + applicationName;
         MetricResponse response = this.metricEndpoint.metric(metricName, tag);
