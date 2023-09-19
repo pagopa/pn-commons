@@ -1,9 +1,5 @@
 package it.pagopa.pn.commons.utils;
 
-import io.micrometer.core.instrument.Clock;
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Statistic;
-import it.pagopa.pn.commons.pnclients.RestTemplateFactory;
 import it.pagopa.pn.commons.utils.cloudwatch.CloudWatchMetricHandler;
 import it.pagopa.pn.commons.utils.metrics.SpringAnalyzer;
 import org.junit.jupiter.api.Assertions;
@@ -13,16 +9,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.actuate.metrics.MetricsEndpoint;
-import org.springframework.boot.actuate.metrics.MetricsEndpoint.MetricResponse;
-import org.springframework.context.annotation.Import;
-import org.springframework.scheduling.annotation.Scheduled;
 
-import java.io.IOException;
-import java.util.*;
-
-import static org.mockito.Mockito.*;
-
-public class SpringAnalyzerTest {
+class SpringAnalyzerTest {
 
     @Mock
     private CloudWatchMetricHandler cloudWatchMetricHandler;
@@ -31,15 +19,25 @@ public class SpringAnalyzerTest {
     @InjectMocks
     private SpringAnalyzer springAnalyzer;
 
+    private Analyzer analyzer;
+
     @BeforeEach
     public void init(){
+        MockitoAnnotations.openMocks(this);
         this.springAnalyzer = new SpringAnalyzer(cloudWatchMetricHandler, metricsEndpoint);
+        this.analyzer = new Analyzer(cloudWatchMetricHandler, metricsEndpoint);
     }
-    @Test
-    public void testScheduledSendMetrics() {
-        String metricName = "customMetric";
 
-        metricsEndpoint.metric(metricName, new ArrayList<>());
-        Assertions.assertDoesNotThrow(() -> springAnalyzer.scheduledSendMetrics());
+    @Test
+    void testScheduledSendMetrics() {
+        Assertions.assertDoesNotThrow(() -> analyzer.scheduledSendMetrics());
+    }
+
+    static class Analyzer extends SpringAnalyzer{
+
+        public Analyzer(CloudWatchMetricHandler cloudWatchMetricHandler, MetricsEndpoint metricsEndpoint) {
+            super(cloudWatchMetricHandler, metricsEndpoint);
+            this.getMetrics().add("customMetric");
+        }
     }
 }
