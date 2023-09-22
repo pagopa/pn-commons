@@ -3,6 +3,7 @@ package it.pagopa.pn.commons.pnclients;
 import okhttp3.HttpUrl;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
+import okhttp3.mockwebserver.SocketPolicy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -12,6 +13,9 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
+import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -23,7 +27,8 @@ class CommonBaseClientTest {
     public void init(){
         commonBaseClient = new CommonBaseClient(){};
         commonBaseClient.setTraceIdHeader("trace");
-        commonBaseClient.setConnectionTimeoutMillis(10000);
+        commonBaseClient.setConnectionTimeoutMillis(3000);
+        commonBaseClient.setReadTimeoutMillis(8000);
         commonBaseClient.setRetryMaxAttempts(3);
     }
 
@@ -267,6 +272,63 @@ class CommonBaseClientTest {
 
         //dai log:
         //DEBUG org.springframework.web.reactive.function.client.ExchangeFunctions - [4ef27d66] HTTP GET http://localhost:53252/test/path%20with%20space
+
+    }
+
+
+    @Test
+    void testRetryWithSocketNoResponse() throws IOException {
+        MockWebServer mockWebServer = new MockWebServer();
+
+        String expectedResponse = "expect that it works";
+
+        mockWebServer.enqueue(new MockResponse().setSocketPolicy(SocketPolicy.NO_RESPONSE));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(200).setBody(expectedResponse));
+
+        mockWebServer.start();
+
+        HttpUrl url = mockWebServer.url("/test");
+
+        WebClient webClient = commonBaseClient.initWebClient(WebClient.builder());
+        Mono<String> responseMono = webClient.post()
+                .uri(url.uri())
+                .body(BodyInserters.fromObject("myRequest"))
+                .retrieve()
+                .bodyToMono(String.class);
+
+        StepVerifier.create(responseMono)
+                .expectNext(expectedResponse)
+                .expectComplete().verify();
+
+        mockWebServer.shutdown();
+
+    }
+
+    @Test
+    void testRetryWithSocketTimeoutException() throws IOException {
+        MockWebServer mockWebServer = new MockWebServer();
+
+        String expectedResponse = "expect that it works";
+
+        mockWebServer.enqueue(new MockResponse().setResponseCode(200).setHeadersDelay(12,TimeUnit.SECONDS));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(200).setBody(expectedResponse));
+
+        mockWebServer.start();
+
+        HttpUrl url = mockWebServer.url("/test");
+
+        WebClient webClient = commonBaseClient.initWebClient(WebClient.builder());
+        Mono<String> responseMono = webClient.post()
+                .uri(url.uri())
+                .body(BodyInserters.fromObject("myRequest"))
+                .retrieve()
+                .bodyToMono(String.class);
+
+        StepVerifier.create(responseMono)
+                .expectNext(expectedResponse)
+                .expectComplete().verify();
+
+        mockWebServer.shutdown();
 
     }
 
