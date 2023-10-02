@@ -26,7 +26,6 @@ public interface PnLogger extends Logger {
         public static final String PN_MANDATE = "pn-mandate";
         public static final String PN_DELIVERY = "pn-delivery";
         public static final String PN_DELIVERY_PUSH = "pn-delivery-push";
-
         public static final String PN_F24 = "pn-f24";
         public static final String PN_EXTERNAL_REGISTRIES = "pn-external-registries";
         public static final String PN_EXTERNAL_CHANNELS = "pn-external-channels";
