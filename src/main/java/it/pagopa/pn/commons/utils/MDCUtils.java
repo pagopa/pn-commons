@@ -30,6 +30,7 @@ public class MDCUtils {
     public static final String MDC_PN_CTX_SAFESTORAGE_FILEKEY = "ctx_safestorage_filekey";
     public static final String MDC_PN_CTX_TOPIC = "ctx_topic";
     public static final String MDC_PN_CTX_MESSAGE_ID = "ctx_awsMessageId";
+    public static final String MDC_PN_SET_ID = "set_id";
 
     private MDCUtils() {}
 
@@ -48,7 +49,7 @@ public class MDCUtils {
         return List.of(MDC_TRACE_ID_KEY, MDC_JTI_KEY, MDC_PN_UID_KEY, MDC_CX_ID_KEY
                 , MDC_PN_CX_TYPE_KEY, MDC_PN_CX_GROUPS_KEY, MDC_PN_CX_ROLE_KEY, MDC_PN_IUN_KEY
                 , MDC_PN_MANDATEID_KEY, MDC_PN_CTX_RECIPIENT_INDEX, MDC_PN_CTX_REQUEST_ID, MDC_PN_CTX_SAFESTORAGE_FILEKEY
-                , MDC_PN_CTX_TOPIC, MDC_PN_CTX_MESSAGE_ID);
+                , MDC_PN_CTX_TOPIC, MDC_PN_CTX_MESSAGE_ID, MDC_PN_SET_ID);
     }
 
     /**
