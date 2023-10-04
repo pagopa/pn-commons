@@ -79,7 +79,8 @@ public enum PnAuditLogEventType {
     AUD_PD_EXECUTE_RECEIVE(PnAuditLogMarker.AUDIT10Y),
     AUD_DT_CREATE(PnAuditLogMarker.AUDIT5Y),
     AUD_DT_UPDATE(PnAuditLogMarker.AUDIT5Y),
-    AUD_DT_DELETE(PnAuditLogMarker.AUDIT5Y);
+    AUD_DT_DELETE(PnAuditLogMarker.AUDIT5Y),
+    AUD_F24_CREATE(PnAuditLogMarker.AUDIT10Y);
 
     
     final org.slf4j.Marker marker;
