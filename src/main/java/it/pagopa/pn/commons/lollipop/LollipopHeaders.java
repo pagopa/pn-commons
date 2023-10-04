@@ -1,7 +1,5 @@
 package it.pagopa.pn.commons.lollipop;
 
-import java.util.List;
-
 public class LollipopHeaders {
 
     public static final String LOLLIPOP_ORIGINAL_URL = "x-pagopa-lollipop-original-url";
@@ -15,10 +13,5 @@ public class LollipopHeaders {
     public static final String LOLLIPOP_SIGNATURE = "signature";
 
     private LollipopHeaders() {}
-
-    public static List<String> getAllLollipopHeaderAuditKeys() {
-        return List.of(LOLLIPOP_ORIGINAL_URL, LOLLIPOP_ORIGINAL_METHOD, LOLLIPOP_ASSERTION_REF, LOLLIPOP_ASSERTION_TYPE,
-                LOLLIPOP_PUBLIC_KEY, LOLLIPOP_SIGNATURE_INPUT, LOLLIPOP_SIGNATURE);
-    }
 
 }
