@@ -51,6 +51,10 @@
 			<artifactId>ssm</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>software.amazon.awssdk</groupId>
+			<artifactId>eventbridge</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>net.logstash.logback</groupId>
 			<artifactId>logstash-logback-encoder</artifactId>
 		</dependency>
