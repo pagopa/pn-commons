@@ -176,7 +176,7 @@ class PnLoggerImplTest {
 
 
         //When
-        fooLogger.logInvokingExternalService(service, str, false);
+        fooLogger.logInvokingExternalService(service, str);
 
         //Then
         // JUnit assertions
@@ -195,7 +195,7 @@ class PnLoggerImplTest {
 
 
         //When
-        fooLogger.logInvokingExternalService(service, str, true);
+        fooLogger.logInvokingExternalDownstreamService(service, str);
 
         //Then
         // JUnit assertions
@@ -207,29 +207,12 @@ class PnLoggerImplTest {
     }
 
     @Test
-    void logEndingDownstreamProcess() {
-        //Given
-        String str = "processo";
-
-        //When
-        fooLogger.logInvokationResultDownstream(str, true, null);
-
-        //Then
-        // JUnit assertions
-        List<ILoggingEvent> logsList = listAppender.list;
-        Assertions.assertEquals("[DOWNSTREAM] Service " + str + " invoked successfully", logsList.get(0)
-                .getFormattedMessage());
-        Assertions.assertEquals(Level.INFO, logsList.get(0)
-                .getLevel());
-    }
-
-    @Test
     void logEndingDownstreamProcessFail() {
         //Given
         String str = "processo";
 
         //When
-        fooLogger.logInvokationResultDownstream(str, false, null);
+        fooLogger.logInvokationResultDownstreamFailed(str, null);
 
         //Then
         // JUnit assertions
@@ -250,7 +233,7 @@ class PnLoggerImplTest {
 
 
         //When
-        fooLogger.logInvokingAsyncExternalService(service, str, false, correlationid);
+        fooLogger.logInvokingAsyncExternalService(service, str, correlationid);
 
         //Then
         // JUnit assertions
@@ -271,7 +254,7 @@ class PnLoggerImplTest {
 
 
         //When
-        fooLogger.logInvokingAsyncExternalService(service, str, true, correlationid);
+        fooLogger.logInvokingAsyncExternalDownstreamService(service, str, correlationid);
 
         //Then
         // JUnit assertions

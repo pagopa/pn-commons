@@ -44,6 +44,13 @@ public interface PnLogger extends Logger {
         public static final String AMAZON = "Amazon";
         public static final String INTEROP = "Interoperabilita";
         public static final String PDV = "PersonalDataVault";
+        public static final String ADE = "AdE";
+        public static final String INAD = "INAD";
+        public static final String ANPR = "ANPR";
+        public static final String INFO_CAMERE = "InfoCamere";
+        public static final String IPA = "IPA";
+        public static final String PDND = "PDND";
+
     }
 
     /**
@@ -117,28 +124,42 @@ public interface PnLogger extends Logger {
      *
      * @param service nome servizio, possibilmente usare quelli definiti in PnLogger.EXTERNAL_SERVICES
      * @param process descrizione
-     * @param isDownstream servizio downstream
      */
-    void logInvokingExternalService(String service, String process, boolean isDownstream);
+    void logInvokingExternalService(String service, String process);
+
+    /**
+     * metodo per loggare l'invocazione a un servizio esterno di downstream
+     *
+     * @param service nome servizio, possibilmente usare quelli definiti in PnLogger.EXTERNAL_SERVICES
+     * @param process descrizione
+     */
+    void logInvokingExternalDownstreamService(String service, String process);
 
     /**
      * metodo per loggare l'invocazione a un servizio esterno
      *
      * @param service nome servizio, possibilmente usare quelli definiti in PnLogger.EXTERNAL_SERVICES
      * @param process descrizione
-     * @param isDownstream servizio downstream
      * @param correlationId correlationId
      */
-    void logInvokingAsyncExternalService(String service, String process, boolean isDownstream, String correlationId);
+    void logInvokingAsyncExternalService(String service, String process, String correlationId);
 
     /**
-     * metodo per loggare il risultato di un invocazione ad un servizio di downstream
+     * metodo per loggare l'invocazione a un servizio esterno di downstream
      *
      * @param service nome servizio, possibilmente usare quelli definiti in PnLogger.EXTERNAL_SERVICES
-     * @param success indica l'esito del processo
-     * @param description eventuale descrizione nel caso di success negativo
+     * @param process descrizione
+     * @param correlationId correlationId
      */
-    void logInvokationResultDownstream(String service, boolean success, String description);
+    void logInvokingAsyncExternalDownstreamService(String service, String process, String correlationId);
+
+    /**
+     * metodo per loggare l'errore di un invocazione ad un servizio di downstream
+     *
+     * @param service     nome servizio, possibilmente usare quelli definiti in PnLogger.EXTERNAL_SERVICES
+     * @param description eventuale descrizione dell'errore
+     */
+    void logInvokationResultDownstreamFailed(String service, String description);
 
     /**
      * metodo per loggare la PUT item su dynamoDB. Indica quale record e su quale tabella si effettuerà la PUT
