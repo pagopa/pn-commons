@@ -30,6 +30,15 @@ public class MDCUtils {
     public static final String MDC_PN_CTX_SAFESTORAGE_FILEKEY = "ctx_safestorage_filekey";
     public static final String MDC_PN_CTX_TOPIC = "ctx_topic";
     public static final String MDC_PN_CTX_MESSAGE_ID = "ctx_awsMessageId";
+    public static final String MDC_PN_SET_ID = "set_id";
+
+    public static final String MDC_PN_LP_ORIGINAL_URL = "lollipop_original_url";
+    public static final String MDC_PN_LP_ORIGINAL_METHOD = "lollipop_original_method";
+    public static final String MDC_PN_LP_PUBLIC_KEY = "lollipop_public_key";
+    public static final String MDC_PN_LP_ASSERTION_REF = "lollipop_assertion_ref";
+    public static final String MDC_PN_LP_ASSERTION_TYPE = "lollipop_assertion_type";
+    public static final String MDC_PN_LP_SIGNATURE_INPUT = "lollipop_signature_input";
+    public static final String MDC_PN_LP_SIGNATURE = "lollipop_signature";
 
     private MDCUtils() {}
 
@@ -48,7 +57,10 @@ public class MDCUtils {
         return List.of(MDC_TRACE_ID_KEY, MDC_JTI_KEY, MDC_PN_UID_KEY, MDC_CX_ID_KEY
                 , MDC_PN_CX_TYPE_KEY, MDC_PN_CX_GROUPS_KEY, MDC_PN_CX_ROLE_KEY, MDC_PN_IUN_KEY
                 , MDC_PN_MANDATEID_KEY, MDC_PN_CTX_RECIPIENT_INDEX, MDC_PN_CTX_REQUEST_ID, MDC_PN_CTX_SAFESTORAGE_FILEKEY
-                , MDC_PN_CTX_TOPIC, MDC_PN_CTX_MESSAGE_ID);
+                , MDC_PN_CTX_TOPIC, MDC_PN_CTX_MESSAGE_ID, MDC_PN_SET_ID
+                , MDC_PN_LP_ORIGINAL_URL, MDC_PN_LP_ORIGINAL_METHOD, MDC_PN_LP_PUBLIC_KEY
+                , MDC_PN_LP_ASSERTION_REF, MDC_PN_LP_ASSERTION_TYPE
+                , MDC_PN_LP_SIGNATURE_INPUT, MDC_PN_LP_SIGNATURE);
     }
 
     /**

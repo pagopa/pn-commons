@@ -10,7 +10,7 @@
 	</parent>
 
 	<artifactId>pn-commons</artifactId>
-	<version>2.1.13-SNAPSHOT</version>
+	<version>2.1.14-SNAPSHOT</version>
 	<name>pn-commons</name>
 	<description>Pn Common Utilities</description>
 	<scm>
@@ -53,6 +53,10 @@
 		<dependency>
 			<groupId>software.amazon.awssdk</groupId>
 			<artifactId>ssm</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>software.amazon.awssdk</groupId>
+			<artifactId>eventbridge</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>net.logstash.logback</groupId>
