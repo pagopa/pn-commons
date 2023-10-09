@@ -1,4 +1,4 @@
-package it.pagopa.pn.commons.utils.cloudwatch;
+package it.pagopa.pn.commons.utils.metrics.cloudwatch;
 
 import lombok.CustomLog;
 import lombok.RequiredArgsConstructor;

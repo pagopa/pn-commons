@@ -1,6 +1,6 @@
 package it.pagopa.pn.commons.utils.metrics;
 
-import it.pagopa.pn.commons.utils.cloudwatch.CloudWatchMetricHandler;
+import it.pagopa.pn.commons.utils.metrics.cloudwatch.CloudWatchMetricHandler;
 import lombok.CustomLog;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.metrics.MetricsEndpoint;
@@ -9,7 +9,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import software.amazon.awssdk.services.cloudwatch.model.Dimension;
 
 import javax.annotation.PostConstruct;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,9 +18,9 @@ public class SpringAnalyzer {
     private final MetricsEndpoint metricEndpoint;
     @Value("${spring.application.name}")
     private String applicationName;
-    @Value("${pn.ecs.task.id}")
+    @Value("${pn.ecs.uri}.split('[/]')[4].split('[-]')[0]}")
     private String taskId;
-    @Value("${pn.analyzer.params}")
+    @Value("#{'${pn.analyzer.params}'.split(',')}:#{null}")
     protected List<String> metrics;
 
     protected List<String> getMetrics() {
@@ -44,7 +43,11 @@ public class SpringAnalyzer {
 
     @Scheduled(cron = "${pn.analyzer.cloudwatch-metric-cron}")
     public void scheduledSendMetrics() {
-        metrics.forEach(this::createMetricAndSendCloudwatch);
+        metrics.forEach(value -> {
+            if(value.equals("")) {
+                this.createMetricAndSendCloudwatch(value);
+            }
+        });
     }
 
     private void createMetricAndSendCloudwatch(String metricName) {

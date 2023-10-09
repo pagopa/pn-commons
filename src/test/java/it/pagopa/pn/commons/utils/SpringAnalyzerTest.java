@@ -1,6 +1,6 @@
 package it.pagopa.pn.commons.utils;
 
-import it.pagopa.pn.commons.utils.cloudwatch.CloudWatchMetricHandler;
+import it.pagopa.pn.commons.utils.metrics.cloudwatch.CloudWatchMetricHandler;
 import it.pagopa.pn.commons.utils.metrics.SpringAnalyzer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
