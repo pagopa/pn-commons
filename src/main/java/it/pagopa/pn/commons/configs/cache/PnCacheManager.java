@@ -1,6 +1,7 @@
 package it.pagopa.pn.commons.configs.cache;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -13,19 +14,16 @@ import org.springframework.cache.CacheManager;
 public class PnCacheManager implements CacheManager{
 	private static final int DEFAULT_SIZE = 100;
 
-	private final ConcurrentMap<String, Cache> cacheMap = new ConcurrentHashMap<String, Cache>(16);
+	private final ConcurrentMap<String, Cache> cacheMap = new ConcurrentHashMap<>(16);
 	private boolean dynamic;
 	
-	public PnCacheManager() {
-	}
-
 	public void initialize(Map<String, Integer> values) {
-		log.info("Initializing PnCacheManager with cache names: {}", values.keySet());
 		if (values != null) {
-			for (String name : values.keySet()) {
-				int size = values.get(name) > 0 ? values.get(name) : DEFAULT_SIZE;
-				this.cacheMap.put(name, createCache(name, size));
-			}
+			log.info("Initializing PnCacheManager with cache names: {}", values.keySet());
+            for (var entry : values.entrySet()) {
+                int size = entry.getValue() > 0 ? entry.getValue() : DEFAULT_SIZE;
+                this.cacheMap.put(entry.getKey(), createCache(entry.getKey(), size));
+            }
 			this.dynamic = false;
 		}
 		else {
@@ -49,9 +47,9 @@ public class PnCacheManager implements CacheManager{
 	}
 
 	private Cache createCache(String name) {
-		return new PnLRUCache(name, DEFAULT_SIZE);
+		return new PnLRUCache<>(name, DEFAULT_SIZE);
 	}
 	private Cache createCache(String name, Integer size) {
-		return new PnLRUCache(name, size);
+		return new PnLRUCache<>(name, size);
 	}
 }
