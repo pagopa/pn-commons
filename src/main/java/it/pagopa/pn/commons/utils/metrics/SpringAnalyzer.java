@@ -40,7 +40,7 @@ public class SpringAnalyzer {
         log.info("Metric Instance for SpringAnalyzer Activation: {}", applicationName + "-" + taskId);
     }
 
-    @Scheduled(cron = "${pn.analyzer.cloudwatch-metric-cron}")
+    @Scheduled(cron = "${pn.analyzer.cloudwatch-metric-cron}", initialDelay = 1000*60)
     public void scheduledSendMetrics() {
         metrics.forEach(value -> {
             if(!value.equals("")) {
@@ -61,13 +61,18 @@ public class SpringAnalyzer {
                     .value(applicationName + "_" + taskId)
                     .build();
             dimension = customizedDimension(dimension, metricName);
-            log.trace("Sending Cloudwatch information {}= {}", metricName, response.getMeasurements().get(0).getValue());
-            cloudWatchMetricHandler.sendMetric(namespace, dimension, metricName, response.getMeasurements().get(0).getValue()).
-                    subscribe(putMetricDataResponse -> {
-                                metricSuccessfullSendListener(metricName);
-                                log.trace("[{}] PutMetricDataResponse: {}", namespace, putMetricDataResponse);
-                            },
-                            throwable -> log.warn(String.format("[%s] Error sending metric", namespace), throwable));
+            if (!response.getMeasurements().isEmpty()) {
+                log.trace("Sending Cloudwatch information {}= {}", metricName, response.getMeasurements().get(0).getValue());
+                cloudWatchMetricHandler.sendMetric(namespace, dimension, metricName, response.getMeasurements().get(0).getValue()).
+                        subscribe(putMetricDataResponse -> {
+                                    metricSuccessfullSendListener(metricName);
+                                    log.trace("[{}] PutMetricDataResponse: {}", namespace, putMetricDataResponse);
+                                },
+                                throwable -> log.warn(String.format("[%s] Error sending metric", namespace), throwable));
+            }
+            else {
+                log.trace("Measurement {} not available", metricName);
+            }
         }
     }
 
