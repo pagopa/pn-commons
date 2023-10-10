@@ -40,7 +40,7 @@ public class SpringAnalyzer {
         log.info("Metric Instance for SpringAnalyzer Activation: {}", applicationName + "-" + taskId);
     }
 
-    @Scheduled(cron = "${pn.analyzer.cloudwatch-metric-cron}", initialDelay = 1000*60)
+    @Scheduled(cron = "${pn.analyzer.cloudwatch-metric-cron}")
     public void scheduledSendMetrics() {
         metrics.forEach(value -> {
             if(!value.equals("")) {
