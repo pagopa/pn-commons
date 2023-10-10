@@ -1,13 +1,17 @@
 package it.pagopa.pn.commons.configs.cache;
 
+import it.pagopa.pn.commons.exceptions.PnInternalException;
+import it.pagopa.pn.commons.exceptions.PnRuntimeException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.cache.Cache;
 import org.springframework.cache.support.SimpleValueWrapper;
 
+@Slf4j
 public class PnLRUCache<K,V> implements Cache{
 	
 	private final Map<K,V> cache;
@@ -46,7 +50,8 @@ public class PnLRUCache<K,V> implements Cache{
 			this.put(key, value);
 			return value;
 		}catch(Exception err){
-			return null;
+			log.error ("error getting object with callable valueLoader", err);
+			throw new PnInternalException("error getting object with callable valueLoader");
 		}
 	}
 
