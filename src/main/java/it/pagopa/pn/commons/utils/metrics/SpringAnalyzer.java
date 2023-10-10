@@ -4,7 +4,6 @@ import it.pagopa.pn.commons.utils.metrics.cloudwatch.CloudWatchMetricHandler;
 import lombok.CustomLog;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.metrics.MetricsEndpoint;
-import org.springframework.boot.actuate.metrics.MetricsEndpoint.MetricResponse;
 import org.springframework.scheduling.annotation.Scheduled;
 import software.amazon.awssdk.services.cloudwatch.model.Dimension;
 
@@ -18,9 +17,9 @@ public class SpringAnalyzer {
     private final MetricsEndpoint metricEndpoint;
     @Value("${spring.application.name}")
     private String applicationName;
-    @Value("${pn.ecs.uri}.split('[/]')[4].split('[-]')[0]}")
+    @Value("#{'${pn.ecs.uri}'.split('[/]')[4].split('[-]')[0]}")
     private String taskId;
-    @Value("#{'${pn.analyzer.params}'.split(',')}:#{null}")
+    @Value("#{'${pn.analyzer.params}.split(',')}")
     protected List<String> metrics;
 
     protected List<String> getMetrics() {
@@ -53,7 +52,7 @@ public class SpringAnalyzer {
     private void createMetricAndSendCloudwatch(String metricName) {
         List<String> tag = new ArrayList<>();
         String namespace = "SpringAnalyzer" + "-" + applicationName;
-        MetricResponse response = this.metricEndpoint.metric(metricName, tag);
+        MetricsEndpoint.MetricResponse response = this.metricEndpoint.metric(metricName, tag);
         if (response == null) {
             log.warn(String.format("[%s] Metric not available", namespace));
         } else {
