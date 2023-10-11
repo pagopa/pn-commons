@@ -1,15 +1,15 @@
 package it.pagopa.pn.commons.configs.cache;
 
+import it.pagopa.pn.commons.exceptions.PnExceptionsCodes;
 import it.pagopa.pn.commons.exceptions.PnInternalException;
-import it.pagopa.pn.commons.exceptions.PnRuntimeException;
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.Callable;
-
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.cache.Cache;
 import org.springframework.cache.support.SimpleValueWrapper;
+
+import java.util.Collections;
+import java.util.Map;
+import java.util.concurrent.Callable;
 
 @Slf4j
 public class PnLRUCache<K,V> implements Cache{
@@ -39,11 +39,11 @@ public class PnLRUCache<K,V> implements Cache{
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T get(Object key, Callable<T> valueLoader) {
+	public <T> T get(@NotNull Object key, Callable<T> valueLoader) {
 		try {
 			synchronized (this.cache) {
 				if (this.cache.containsKey(key)) {
-					return (T) this.get(key);
+					return (T) this.get(key).get();
 				}
 			}
 			T value = valueLoader.call();
@@ -51,7 +51,7 @@ public class PnLRUCache<K,V> implements Cache{
 			return value;
 		}catch(Exception err){
 			log.error ("error getting object with callable valueLoader", err);
-			throw new PnInternalException("error getting object with callable valueLoader");
+			throw new PnInternalException("error getting object with callable valueLoader", PnExceptionsCodes.ERROR_CODE_PN_GENERIC_ERROR, err);
 		}
 	}
 
