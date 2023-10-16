@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE xml>
-<configuration scan="true" scanPeriod="30 seconds" >
+<configuration>
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+        <encoder>
+            <pattern>%d [%X{trace_id}] %highlight(%-5level) - %-4relative - [%thread] - %cyan(%logger{20}) - %msg %n</pattern>
+        </encoder>
     </appender>
-    <logger name="it.pagopa.pn.commons.pnclients.RestTemplateRetryable" level="INFO" />
-    <logger name="it.pagopa.pn" level="INFO" />
     <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>./logs/http_log.log</file>
-        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>
-                ./logs/http_.%d{yyyy-MM-dd-mm}.%i.log.zip
-            </fileNamePattern>
-            <totalSizeCap>40MB</totalSizeCap>
-            <maxFileSize>10MB</maxFileSize>
+        <file>/efs/${MICROSERVICE_NAME:-msservicename}/${TASK_ID:-local}/logs/http.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>/efs/${MICROSERVICE_NAME:-msservicename}/${TASK_ID:-local}/logs/http.%d{yyyy-MM-dd_HH}.%i.log.zip</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>200MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>${MAX_HISTORY_LOGBACK:-30}</maxHistory>
         </rollingPolicy>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <Pattern>
@@ -30,7 +31,8 @@
     <logger name="httpclient.wire" additivity="false" level="TRACE">
         <appender-ref ref="file"/>
     </logger>
-    <root level="INFO">
+    <root level="info">
         <appender-ref ref="STDOUT" />
     </root>
+    <logger name="it.pagopa.pn" level="DEBUG" />
 </configuration>
