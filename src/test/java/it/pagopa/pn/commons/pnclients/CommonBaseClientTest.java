@@ -6,6 +6,7 @@ import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.SocketPolicy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -13,8 +14,6 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.io.IOException;
-import java.net.SocketTimeoutException;
-import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -30,6 +29,7 @@ class CommonBaseClientTest {
         commonBaseClient.setConnectionTimeoutMillis(3000);
         commonBaseClient.setReadTimeoutMillis(8000);
         commonBaseClient.setRetryMaxAttempts(3);
+        commonBaseClient.setWireTapActivation(false);
     }
 
 

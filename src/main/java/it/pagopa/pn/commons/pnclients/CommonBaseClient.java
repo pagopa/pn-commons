@@ -57,7 +57,6 @@ public abstract class CommonBaseClient {
 
     private int readTimeoutMillis;
 
-    @Value("${pn.commons.wire-tap-activation}")
     private Boolean wireTapActivation;
 
     protected CommonBaseClient() {}
@@ -189,6 +188,11 @@ public abstract class CommonBaseClient {
     @Autowired
     public void setReadTimeoutMillis(@Value("${pn.commons.read-timeout-millis}") int readTimeoutMillis) {
         this.readTimeoutMillis = readTimeoutMillis;
+    }
+
+    @Autowired
+    public void setWireTapActivation(@Value("${pn.commons.wire-tap-activation}") boolean wireTapActivation) {
+        this.wireTapActivation = wireTapActivation;
     }
 
 
