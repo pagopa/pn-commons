@@ -3,7 +3,6 @@ package it.pagopa.pn.commons.configs.listeners;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.boot.context.event.ApplicationStartingEvent;
 import org.springframework.context.ApplicationListener;
-import org.springframework.context.annotation.Bean;
 
 import java.util.Objects;
 

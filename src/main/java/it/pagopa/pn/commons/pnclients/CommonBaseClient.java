@@ -19,7 +19,6 @@ import reactor.netty.transport.logging.AdvancedByteBufFormat;
 import reactor.util.retry.Retry;
 
 import javax.net.ssl.SSLHandshakeException;
-import java.net.ConnectException;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
@@ -122,7 +121,7 @@ public abstract class CommonBaseClient {
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectionTimeoutMillis)
                 .doOnConnected(connection -> connection.addHandlerLast(new ReadTimeoutHandler(readTimeoutMillis, TimeUnit.MILLISECONDS)));
 
-        if(wireTapActivation){
+        if(Boolean.TRUE.equals(wireTapActivation)){
             httpClient = httpClient.wiretap("reactor.netty.http.client.HttpClient", LogLevel.TRACE, AdvancedByteBufFormat.TEXTUAL);
         }
         return httpClient;
@@ -130,13 +129,12 @@ public abstract class CommonBaseClient {
 
     @NotNull
     protected ConnectionProvider buildConnectionProvider() {
-        ConnectionProvider provider = ConnectionProvider.builder("fixed")
+        return ConnectionProvider.builder("fixed")
         .maxConnections(500)
         .maxIdleTime(Duration.ofSeconds(20))
         .maxLifeTime(Duration.ofSeconds(60))
         .pendingAcquireTimeout(Duration.ofSeconds(60))
         .evictInBackground(Duration.ofSeconds(120)).build();
-        return provider;
     }
 
     protected ExchangeFilterFunction buildRetryExchangeFilterFunction() {
