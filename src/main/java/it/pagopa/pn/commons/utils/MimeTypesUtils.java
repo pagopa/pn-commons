@@ -122,6 +122,7 @@ public class MimeTypesUtils {
     public static final String MIME_VIDEO_X_MS_WMV = "video/x-ms-wmv";
     public static final String MIME_VIDEO_X_SGI_MOVIE = "video/x-sgi-movie";
     public static final String MIME_X_CONFERENCE_X_COOLTALK = "x-conference/x-cooltalk";
+    public static final String MIME_MESSAGE_RFC822 = "message/rfc822";
 
     private static final HashMap<String, String> mimeTypeMapping =new HashMap<>(200);
     private static final HashMap<String, String> extMapping = new HashMap<>(200);
@@ -299,6 +300,7 @@ public class MimeTypesUtils {
             mimeTypeMapping.put("dll", MIME_APPLICATION_OCTET_STREAM);
             mimeTypeMapping.put("class", MIME_APPLICATION_OCTET_STREAM);
             mimeTypeMapping.put("jar", MIME_APPLICATION_JAVA_ARCHIVE);
+            mimeTypeMapping.put("eml", MIME_MESSAGE_RFC822);
     }
 
     static {
@@ -413,6 +415,7 @@ public class MimeTypesUtils {
         extMapping.put(MIME_APPLICATION_PDF, "pdf");
         extMapping.put(MIME_APPLICATION_OCTET_STREAM, "exe");
         extMapping.put(MIME_APPLICATION_JAVA_ARCHIVE, "jar");
+        extMapping.put(MIME_MESSAGE_RFC822, "eml");
     }
 
     /**

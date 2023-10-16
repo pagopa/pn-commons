@@ -6,9 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.reactive.filter.OrderedWebFilter;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.server.ServerWebExchange;
-import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Hooks;
 import reactor.core.publisher.Mono;
@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+import static it.pagopa.pn.commons.lollipop.LollipopHeaders.*;
 import static it.pagopa.pn.commons.utils.MDCUtils.*;
 
 /**
@@ -29,7 +30,7 @@ import static it.pagopa.pn.commons.utils.MDCUtils.*;
  * and put in the MDC log map to use to correlate log between micro-services calls.
  */
 @Slf4j
-public class MDCWebFilter implements WebFilter {
+public class MDCWebFilter implements OrderedWebFilter {
 
 
     @Value("${pn.log.trace-id-header}")
@@ -83,6 +84,13 @@ public class MDCWebFilter implements WebFilter {
             addToMDC(requestHeaders.get(pnCxTypeHeader), MDC_PN_CX_TYPE_KEY);
             addToMDC(requestHeaders.get(pnCxGroupsHeader), MDC_PN_CX_GROUPS_KEY);
             addToMDC(requestHeaders.get(pnCxRoleHeader), MDC_PN_CX_ROLE_KEY);
+            addToMDC(requestHeaders.get(LOLLIPOP_ORIGINAL_URL), MDC_PN_LP_ORIGINAL_URL);
+            addToMDC(requestHeaders.get(LOLLIPOP_ORIGINAL_METHOD), MDC_PN_LP_ORIGINAL_METHOD);
+            addToMDC(requestHeaders.get(LOLLIPOP_PUBLIC_KEY), MDC_PN_LP_PUBLIC_KEY);
+            addToMDC(requestHeaders.get(LOLLIPOP_ASSERTION_REF), MDC_PN_LP_ASSERTION_REF);
+            addToMDC(requestHeaders.get(LOLLIPOP_ASSERTION_TYPE), MDC_PN_LP_ASSERTION_TYPE);
+            addToMDC(requestHeaders.get(LOLLIPOP_SIGNATURE_INPUT), MDC_PN_LP_SIGNATURE_INPUT);
+            addToMDC(requestHeaders.get(LOLLIPOP_SIGNATURE), MDC_PN_LP_SIGNATURE);
         };
 
         Consumer<SignalType> mdcCleaner = ignored -> MDCUtils.clearMDCKeys();
@@ -111,6 +119,13 @@ public class MDCWebFilter implements WebFilter {
         ctx = addToWebFluxContext(ctx, requestHeaders.get(pnCxTypeHeader), MDC_PN_CX_TYPE_KEY);
         ctx = addToWebFluxContext(ctx, requestHeaders.get(pnCxGroupsHeader), MDC_PN_CX_GROUPS_KEY);
         ctx = addToWebFluxContext(ctx, requestHeaders.get(pnCxRoleHeader), MDC_PN_CX_ROLE_KEY);
+        ctx = addToWebFluxContext(ctx, requestHeaders.get(LOLLIPOP_ORIGINAL_URL), MDC_PN_LP_ORIGINAL_URL);
+        ctx = addToWebFluxContext(ctx, requestHeaders.get(LOLLIPOP_ORIGINAL_METHOD), MDC_PN_LP_ORIGINAL_METHOD);
+        ctx = addToWebFluxContext(ctx, requestHeaders.get(LOLLIPOP_PUBLIC_KEY), MDC_PN_LP_PUBLIC_KEY);
+        ctx = addToWebFluxContext(ctx, requestHeaders.get(LOLLIPOP_ASSERTION_REF), MDC_PN_LP_ASSERTION_REF);
+        ctx = addToWebFluxContext(ctx, requestHeaders.get(LOLLIPOP_ASSERTION_TYPE), MDC_PN_LP_ASSERTION_TYPE);
+        ctx = addToWebFluxContext(ctx, requestHeaders.get(LOLLIPOP_SIGNATURE_INPUT), MDC_PN_LP_SIGNATURE_INPUT);
+        ctx = addToWebFluxContext(ctx, requestHeaders.get(LOLLIPOP_SIGNATURE), MDC_PN_LP_SIGNATURE);
         return ctx;
     }
 
@@ -121,4 +136,8 @@ public class MDCWebFilter implements WebFilter {
         return ctx;
     }
 
+    @Override
+    public int getOrder() {
+        return 0;
+    }
 }
