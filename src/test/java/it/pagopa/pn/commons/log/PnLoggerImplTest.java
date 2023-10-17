@@ -219,7 +219,7 @@ class PnLoggerImplTest {
         List<ILoggingEvent> logsList = listAppender.list;
         Assertions.assertEquals("[DOWNSTREAM] Service " + str + " returned errors=<not specified>", logsList.get(0)
                 .getFormattedMessage());
-        Assertions.assertEquals(Level.WARN, logsList.get(0)
+        Assertions.assertEquals(Level.ERROR, logsList.get(0)
                 .getLevel());
     }
 
