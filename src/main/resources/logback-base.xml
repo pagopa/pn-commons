@@ -5,10 +5,10 @@
         <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
     </appender>
     <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>/mnt/efs/${MICROSERVICE_NAME:-msservicename}/${TASK_ID:-local}/logs/http.log</file>
+        <file>/mnt/efs/${TASK_ID:-local}/logs/http.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>
-                /mnt/efs/${MICROSERVICE_NAME:-msservicename}/${TASK_ID:-local}/logs/http.%d{yyyy-MM-dd_HH}.%i.log.zip
+                /mnt/efs/${TASK_ID:-local}/logs/http.%d{yyyy-MM-dd_HH}.%i.log.zip
             </fileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy
                     class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
