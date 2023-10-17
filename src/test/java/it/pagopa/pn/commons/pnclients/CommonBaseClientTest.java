@@ -32,6 +32,16 @@ class CommonBaseClientTest {
         commonBaseClient.setWireTapActivation(false);
     }
 
+    @Test
+    void setCommonBaseClientWireTapTrue(){
+        commonBaseClient.setWireTapActivation(true);
+        assertDoesNotThrow(() -> {
+            WebClient.Builder builder = WebClient.builder();
+            builder = commonBaseClient.enrichBuilder(builder);
+
+            WebClient webClient = builder.build();
+        });
+    }
 
     @Test
     void enrichBuilder() {

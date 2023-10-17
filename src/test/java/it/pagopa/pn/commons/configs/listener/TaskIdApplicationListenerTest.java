@@ -28,16 +28,6 @@ import java.util.Optional;
 @SpringBootTest
 class TaskIdApplicationListenerTest {
 
-    private static final String PA_TAX_ID_MVP = "01199250158";
-    private static final String PA_TAX_ID_NO_MVP = "02438750586";
-    private static final Boolean DEFAULT_VALUE_PA_IS_MVP = true;
-
-    @MockBean
-    private ValidateUtils validateUtils;
-
-    @MockBean
-    private AbstractCachedSsmParameterConsumer abstractCachedSsmParameterConsumer;
-
     @Autowired
     private MVPParameterConsumerTestActivator isMVPParameterConsumer;
 
