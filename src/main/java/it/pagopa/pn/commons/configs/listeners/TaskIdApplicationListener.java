@@ -6,13 +6,16 @@ import org.springframework.context.ApplicationListener;
 
 import java.util.Objects;
 
-public class ApplicationConfigurationListener implements ApplicationListener<ApplicationStartingEvent> {
+public class TaskIdApplicationListener implements ApplicationListener<ApplicationStartingEvent> {
 
     @Override
     public void onApplicationEvent(@NotNull ApplicationStartingEvent event) {
         String taskId = System.getenv("ECS_AGENT_URI");
         if(taskId != null) {
             System.setProperty("TASK_ID", Objects.requireNonNullElse(taskId.split("/")[4].split("-")[0], "local"));
+        }
+        else {
+            System.setProperty("TASK_ID", "local");
         }
     }
 

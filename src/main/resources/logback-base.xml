@@ -2,14 +2,14 @@
 <!DOCTYPE xml>
 <configuration>
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <pattern>%d [%X{trace_id}] %highlight(%-5level) - %-4relative - [%thread] - %cyan(%logger{20}) - %msg %n</pattern>
-        </encoder>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
     </appender>
     <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>/efs/${MICROSERVICE_NAME:-msservicename}/${TASK_ID:-local}/logs/http.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>/efs/${MICROSERVICE_NAME:-msservicename}/${TASK_ID:-local}/logs/http.%d{yyyy-MM-dd_HH}.%i.log.zip</fileNamePattern>
+            <fileNamePattern>
+                /efs/${MICROSERVICE_NAME:-msservicename}/${TASK_ID:-local}/logs/http.%d{yyyy-MM-dd_HH}.%i.log.zip
+            </fileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy
                     class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>200MB</maxFileSize>
@@ -31,8 +31,9 @@
     <logger name="httpclient.wire" additivity="false" level="TRACE">
         <appender-ref ref="file"/>
     </logger>
-    <root level="info">
-        <appender-ref ref="STDOUT" />
+    <logger name="it.pagopa.pn.commons.pnclients.RestTemplateRetryable" level="INFO"/>
+    <logger name="it.pagopa.pn" level="DEBUG"/>
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
     </root>
-    <logger name="it.pagopa.pn" level="DEBUG" />
 </configuration>
