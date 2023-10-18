@@ -74,8 +74,23 @@ class PnLoggerImpl implements PnLogger {
     }
 
     @Override
+    public void logInvokingExternalDownstreamService(String service, String process) {
+        log.info("[DOWNSTREAM] Invoking external service {} {}. Waiting Sync response.", service, process);
+    }
+
+    @Override
     public void logInvokingAsyncExternalService(String service, String process, String correlationId) {
         log.info("Invoking external service {} {}. {} for Async response.", service, process, correlationId);
+    }
+
+    @Override
+    public void logInvokingAsyncExternalDownstreamService(String service, String process, String correlationId) {
+        log.info("[DOWNSTREAM] Invoking external service {} {}. {} for Async response.", service, process, correlationId);
+    }
+
+    @Override
+    public void logInvokationResultDownstreamFailed(String service, String description) {
+        log.error("[DOWNSTREAM] Service {} returned errors={}", service, description==null?"<not specified>":description);
     }
 
     @Override
