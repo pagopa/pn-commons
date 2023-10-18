@@ -7,6 +7,6 @@
     <logger name="it.pagopa.pn.commons.pnclients.RestTemplateRetryable" level="INFO" />
     <logger name="it.pagopa.pn" level="TRACE" />
     <root level="TRACE">
-        <appender-ref ref="STDOUT" />
+        <appender-ref ref="STDOUT"/>
     </root>
 </configuration>
