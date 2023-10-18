@@ -1,39 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE xml>
-<configuration>
+<configuration scan="true" scanPeriod="30 seconds" >
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
     </appender>
-    <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>/mnt/efs/${TASK_ID:-local}/logs/http.log</file>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>
-                /mnt/efs/${TASK_ID:-local}/logs/http.%d{yyyy-MM-dd_HH}.%i.log.zip
-            </fileNamePattern>
-            <timeBasedFileNamingAndTriggeringPolicy
-                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <maxFileSize>200MB</maxFileSize>
-            </timeBasedFileNamingAndTriggeringPolicy>
-            <maxHistory>${MAX_HISTORY_LOGBACK:-30}</maxHistory>
-        </rollingPolicy>
-        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <Pattern>
-                %d{dd-MM-yyyy HH:mm:ss.SSS} [%thread] %-5level %logger{36}.%M - %msg%n
-            </Pattern>
-        </encoder>
-    </appender>
-    <logger name="org.apache.http" additivity="false" level="TRACE">
-        <appender-ref ref="file"/>
-    </logger>
-    <logger name="reactor.netty.http.client.HttpClient" additivity="false" level="TRACE">
-        <appender-ref ref="file"/>
-    </logger>
-    <logger name="httpclient.wire" additivity="false" level="TRACE">
-        <appender-ref ref="file"/>
-    </logger>
-    <logger name="it.pagopa.pn.commons.pnclients.RestTemplateRetryable" level="INFO"/>
-    <logger name="it.pagopa.pn" level="DEBUG"/>
+    <logger name="it.pagopa.pn.commons.pnclients.RestTemplateRetryable" level="INFO" />
+    <logger name="it.pagopa.pn" level="DEBUG" />
     <root level="INFO">
-        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="STDOUT" />
     </root>
 </configuration>
