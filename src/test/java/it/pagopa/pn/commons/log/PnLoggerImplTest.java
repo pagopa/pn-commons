@@ -188,6 +188,43 @@ class PnLoggerImplTest {
     }
 
     @Test
+    void infoInvokingDownstreamExternalServiceD() {
+        //Given
+        String str = "processo";
+        String service = PnLogger.EXTERNAL_SERVICES.PN_EXTERNAL_CHANNELS;
+
+
+        //When
+        fooLogger.logInvokingExternalDownstreamService(service, str);
+
+        //Then
+        // JUnit assertions
+        List<ILoggingEvent> logsList = listAppender.list;
+        Assertions.assertEquals("[DOWNSTREAM] Invoking external service " + service + " " + str + ". Waiting Sync response.", logsList.get(0)
+                .getFormattedMessage());
+        Assertions.assertEquals(Level.INFO, logsList.get(0)
+                .getLevel());
+    }
+
+    @Test
+    void logEndingDownstreamProcessFail() {
+        //Given
+        String str = "processo";
+
+        //When
+        fooLogger.logInvokationResultDownstreamFailed(str, null);
+
+        //Then
+        // JUnit assertions
+        List<ILoggingEvent> logsList = listAppender.list;
+        Assertions.assertEquals("[DOWNSTREAM] Service " + str + " returned errors=<not specified>", logsList.get(0)
+                .getFormattedMessage());
+        Assertions.assertEquals(Level.ERROR, logsList.get(0)
+                .getLevel());
+    }
+
+
+    @Test
     void infoInvokingAsyncExternalService() {
         //Given
         String str = "processo";
@@ -202,6 +239,27 @@ class PnLoggerImplTest {
         // JUnit assertions
         List<ILoggingEvent> logsList = listAppender.list;
         Assertions.assertEquals("Invoking external service " + service + " " + str + ". " + correlationid + " for Async response.", logsList.get(0)
+                .getFormattedMessage());
+        Assertions.assertEquals(Level.INFO, logsList.get(0)
+                .getLevel());
+
+    }
+
+    @Test
+    void infoInvokingDownstreamAsyncExternalService() {
+        //Given
+        String str = "processo";
+        String service = PnLogger.EXTERNAL_SERVICES.PN_EXTERNAL_CHANNELS;
+        String correlationid = "1234";
+
+
+        //When
+        fooLogger.logInvokingAsyncExternalDownstreamService(service, str, correlationid);
+
+        //Then
+        // JUnit assertions
+        List<ILoggingEvent> logsList = listAppender.list;
+        Assertions.assertEquals("[DOWNSTREAM] Invoking external service " + service + " " + str + ". " + correlationid + " for Async response.", logsList.get(0)
                 .getFormattedMessage());
         Assertions.assertEquals(Level.INFO, logsList.get(0)
                 .getLevel());
