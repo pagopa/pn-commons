@@ -13,6 +13,7 @@ import it.pagopa.tech.lollipop.consumer.model.LollipopConsumerRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.MDC;
+import org.springframework.boot.web.reactive.filter.OrderedWebFilter;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -21,7 +22,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.server.ServerWebExchange;
-import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -30,7 +30,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -39,12 +38,11 @@ import static it.pagopa.pn.commons.utils.MDCUtils.MDC_TRACE_ID_KEY;
 import static it.pagopa.tech.lollipop.consumer.command.impl.LollipopConsumerCommandImpl.VERIFICATION_SUCCESS_CODE;
 
 @Slf4j
-public class LollipopWebFilter implements WebFilter {
+public class LollipopWebFilter implements OrderedWebFilter {
     private final LollipopConsumerCommandBuilder consumerCommandBuilder;
     private final ObjectMapper objectMapper;
     private static final String HEADER_FIELD = "x-pagopa-pn-src-ch";
     private static final String HEADER_VALUE = "IO";
-    private static final List<String> LOLLIPOP_HEADER_AUDIT_KEYS = LollipopHeaders.getAllLollipopHeaderAuditKeys();
 
     public LollipopWebFilter(LollipopConsumerCommandBuilder consumerCommandBuilder) {
         this.consumerCommandBuilder = consumerCommandBuilder;
@@ -89,12 +87,6 @@ public class LollipopWebFilter implements WebFilter {
         // Get header parameters as Map<String, String>
         Map<String, String> headerParams = request.getHeaders().toSingleValueMap();
 
-        // Add header to MDC for audit log
-        headerParams.forEach((key,value) -> {
-            if (LOLLIPOP_HEADER_AUDIT_KEYS.contains(key))
-                MDC.put(key, value);
-        });
-
         // Create LollipopConsumerRequest object
         LollipopConsumerRequest consumerRequest = LollipopConsumerRequest.builder()
                 .requestBody( requestBody )
@@ -130,5 +122,10 @@ public class LollipopWebFilter implements WebFilter {
             log.warn("Error transform Problem to JSON");
             return new byte[]{};
         }
+    }
+
+    @Override
+    public int getOrder() {
+        return 1;
     }
 }

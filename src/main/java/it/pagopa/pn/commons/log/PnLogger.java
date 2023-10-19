@@ -17,7 +17,7 @@ public interface PnLogger extends Logger {
     public static final String ALARM_LOG = "ALLARM!";
 
 
-    public static final class EXTERNAL_SERVICES {
+    public final class EXTERNAL_SERVICES {
 
         private EXTERNAL_SERVICES(){}
 
@@ -26,6 +26,7 @@ public interface PnLogger extends Logger {
         public static final String PN_MANDATE = "pn-mandate";
         public static final String PN_DELIVERY = "pn-delivery";
         public static final String PN_DELIVERY_PUSH = "pn-delivery-push";
+        public static final String PN_F24 = "pn-f24";
         public static final String PN_EXTERNAL_REGISTRIES = "pn-external-registries";
         public static final String PN_EXTERNAL_CHANNELS = "pn-external-channels";
         public static final String PN_PAPER_CHANNEL = "pn-paper-channel";
@@ -35,10 +36,22 @@ public interface PnLogger extends Logger {
         public static final String PN_ADDRESS_MANAGER = "pn-address-manager";
         public static final String PN_SAFE_STORAGE = "pn-safe-storage";
         public static final String CHECKOUT = "Checkout";
-        public static final String SELFCARE_PG = "Selfcare PG";
-        public static final String SELFCARE_PA = "Selfcare PA";
+        public static final String SELFCARE_PG = "SelfcarePG";
+        public static final String SELFCARE_PA = "SelfcarePA";
         public static final String IO = "IO";
         public static final String ONE_TRUST = "OneTrust";
+        public static final String ARUBA = "Aruba";
+        public static final String CONSOLIDATORE = "Consolidatore";
+        public static final String AMAZON = "Amazon";
+        public static final String INTEROP = "Interoperabilita";
+        public static final String PDV = "PersonalDataVault";
+        public static final String ADE = "AdE";
+        public static final String INAD = "INAD";
+        public static final String ANPR = "ANPR";
+        public static final String INFO_CAMERE = "InfoCamere";
+        public static final String IPA = "IPA";
+        public static final String PDND = "PDND";
+
     }
 
     /**
@@ -116,6 +129,14 @@ public interface PnLogger extends Logger {
     void logInvokingExternalService(String service, String process);
 
     /**
+     * metodo per loggare l'invocazione a un servizio esterno di downstream
+     *
+     * @param service nome servizio, possibilmente usare quelli definiti in PnLogger.EXTERNAL_SERVICES
+     * @param process descrizione
+     */
+    void logInvokingExternalDownstreamService(String service, String process);
+
+    /**
      * metodo per loggare l'invocazione a un servizio esterno
      *
      * @param service nome servizio, possibilmente usare quelli definiti in PnLogger.EXTERNAL_SERVICES
@@ -123,6 +144,23 @@ public interface PnLogger extends Logger {
      * @param correlationId correlationId
      */
     void logInvokingAsyncExternalService(String service, String process, String correlationId);
+
+    /**
+     * metodo per loggare l'invocazione a un servizio esterno di downstream
+     *
+     * @param service nome servizio, possibilmente usare quelli definiti in PnLogger.EXTERNAL_SERVICES
+     * @param process descrizione
+     * @param correlationId correlationId
+     */
+    void logInvokingAsyncExternalDownstreamService(String service, String process, String correlationId);
+
+    /**
+     * metodo per loggare l'errore di un invocazione ad un servizio di downstream
+     *
+     * @param service     nome servizio, possibilmente usare quelli definiti in PnLogger.EXTERNAL_SERVICES
+     * @param description eventuale descrizione dell'errore
+     */
+    void logInvokationResultDownstreamFailed(String service, String description);
 
     /**
      * metodo per loggare la PUT item su dynamoDB. Indica quale record e su quale tabella si effettuerà la PUT

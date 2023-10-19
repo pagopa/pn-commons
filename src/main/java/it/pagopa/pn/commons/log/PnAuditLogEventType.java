@@ -35,6 +35,7 @@ public enum PnAuditLogEventType {
     AUD_NT_DOCOPEN_DEL(PnAuditLogMarker.AUDIT10Y),
     AUD_NT_LEGALOPEN_DEL(PnAuditLogMarker.AUDIT10Y),
     AUD_NT_IO_DISCLAIM(PnAuditLogMarker.AUDIT10Y),
+    AUD_NT_CANCELLED(PnAuditLogMarker.AUDIT10Y),
     AUD_AB_DD_INSUP(PnAuditLogMarker.AUDIT10Y),
     AUD_AB_DD_DEL(PnAuditLogMarker.AUDIT10Y),
     AUD_AB_DA_INSUP(PnAuditLogMarker.AUDIT10Y),
@@ -79,7 +80,8 @@ public enum PnAuditLogEventType {
     AUD_DT_CREATE(PnAuditLogMarker.AUDIT5Y),
     AUD_DT_UPDATE(PnAuditLogMarker.AUDIT5Y),
     AUD_DT_DELETE(PnAuditLogMarker.AUDIT5Y),
-    AUD_NT_CANCELLED(PnAuditLogMarker.AUDIT10Y);
+    AUD_F24_CREATE(PnAuditLogMarker.AUDIT10Y);
+
     
     final org.slf4j.Marker marker;
 

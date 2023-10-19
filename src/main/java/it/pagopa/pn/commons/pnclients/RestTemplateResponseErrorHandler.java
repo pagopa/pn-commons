@@ -1,6 +1,10 @@
 package it.pagopa.pn.commons.pnclients;
 
+import it.pagopa.pn.common.rest.error.v1.dto.Problem;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.commons.exceptions.PnHttpResponseException;
+import it.pagopa.pn.commons.exceptions.mapper.DtoProblemToProblemErrorMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpMethod;
@@ -19,6 +23,12 @@ import static org.springframework.http.HttpStatus.Series.SERVER_ERROR;
 @Slf4j
 public class RestTemplateResponseErrorHandler
         implements ResponseErrorHandler {
+
+    private final ObjectMapper objectMapper;
+
+    public RestTemplateResponseErrorHandler() {
+        this.objectMapper = new ObjectMapper();
+    }
 
     @Override
     public boolean hasError(ClientHttpResponse httpResponse)
@@ -45,7 +55,8 @@ public class RestTemplateResponseErrorHandler
         );
         
         log.error(errorMsg);
-        throw new PnHttpResponseException(errorMsg, response.getRawStatusCode());
+
+        proceedWithThrowPnHttpResponseException(body, response.getRawStatusCode(), errorMsg);
     }
 
     @Override
@@ -70,7 +81,21 @@ public class RestTemplateResponseErrorHandler
         
         log.error(errorMsg);
 
-        throw new PnHttpResponseException(errorMsg, response.getRawStatusCode());
+        proceedWithThrowPnHttpResponseException(body, response.getRawStatusCode(), errorMsg);
+    }
+
+    private void proceedWithThrowPnHttpResponseException(String body, int rawStatusCode, String errorMsg){
+        Problem problem = null;
+        try {
+            problem = objectMapper.readValue(body, Problem.class);
+        } catch (Exception e) {
+            log.info("cannot parse body as problem", e);
+        }
+
+        if (problem != null && problem.getErrors() != null)
+            throw new PnHttpResponseException(problem.getTitle(), problem.getDetail(), rawStatusCode, problem.getErrors().stream().map(DtoProblemToProblemErrorMapper::toProblemError).toList(), null);
+        else
+            throw new PnHttpResponseException(errorMsg, rawStatusCode);
     }
 
     @NotNull
