@@ -51,7 +51,7 @@ public interface PnLogger extends Logger {
         public static final String INFO_CAMERE = "InfoCamere";
         public static final String IPA = "IPA";
         public static final String PDND = "PDND";
-
+        public static final String GPD = "GPD";
     }
 
     /**
