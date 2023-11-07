@@ -1,27 +1,22 @@
 package it.pagopa.pn.commons.pnclients;
 
 import it.pagopa.pn.commons.exceptions.PnHttpResponseException;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.classify.Classifier;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.retry.RetryPolicy;
 import org.springframework.retry.backoff.ExponentialRandomBackOffPolicy;
 import org.springframework.retry.policy.ExceptionClassifierRetryPolicy;
 import org.springframework.retry.policy.NeverRetryPolicy;
 import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.retry.support.RetryTemplate;
-import org.springframework.web.client.HttpStatusCodeException;
-import org.springframework.web.client.ResourceAccessException;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.*;
 
 import javax.net.ssl.SSLHandshakeException;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.UnknownHostException;
-import java.util.Map;
 
 public class RestTemplateRetryable extends RestTemplate {
 
@@ -32,65 +27,9 @@ public class RestTemplateRetryable extends RestTemplate {
     }
 
     @Override
-    public <T> T getForObject(URI url, @NotNull Class<T> responseType) throws RestClientException {
-        return retryTemplate.execute(context ->  super.getForObject(url, responseType));
+    protected <T> T doExecute(URI url, HttpMethod method, RequestCallback requestCallback, ResponseExtractor<T> responseExtractor) throws RestClientException {
+        return retryTemplate.execute(context -> super.doExecute(url, method, requestCallback, responseExtractor));
     }
-
-    @Override
-    public <T> T getForObject(String url, @NotNull Class<T> responseType, Object @NotNull ... uriVariables) throws RestClientException {
-        return retryTemplate.execute(context -> super.getForObject(url, responseType, uriVariables));
-    }
-
-    @Override
-    public <T> T getForObject(String url, @NotNull Class<T> responseType, @NotNull Map<String, ?> uriVariables) throws RestClientException {
-        return retryTemplate.execute(context -> super.getForObject(url, responseType, uriVariables));
-    }
-
-    @Override
-    public <T> ResponseEntity<T> getForEntity(@NotNull URI url, @NotNull Class<T> responseType) throws RestClientException {
-        return retryTemplate.execute(context -> super.getForEntity(url, responseType));
-    }
-
-    @Override
-    public <T> ResponseEntity<T> getForEntity(@NotNull String url, @NotNull Class<T> responseType, Object @NotNull ... uriVariables) throws RestClientException {
-        return retryTemplate.execute(context -> super.getForEntity(url, responseType, uriVariables));
-    }
-
-    @Override
-    public <T> ResponseEntity<T> getForEntity(@NotNull String url, @NotNull Class<T> responseType, @NotNull Map<String, ?> uriVariables) throws RestClientException {
-        return retryTemplate.execute(context -> super.getForEntity(url, responseType, uriVariables));
-    }
-
-    @Override
-    public <T> ResponseEntity<T> postForEntity(@NotNull URI url, Object request, Class<T> responseType) throws RestClientException {
-        return retryTemplate.execute(context -> super.postForEntity(url, request, responseType));
-    }
-
-    @Override
-    public <T> ResponseEntity<T> postForEntity(@NotNull String url, Object request, @NotNull Class<T> responseType, Object @NotNull ... uriVariables) throws RestClientException {
-        return retryTemplate.execute(context -> super.postForEntity(url, request, responseType, uriVariables));
-    }
-
-    @Override
-    public <T> ResponseEntity<T> postForEntity(@NotNull String url, Object request, @NotNull Class<T> responseType, @NotNull Map<String, ?> uriVariables) throws RestClientException {
-        return retryTemplate.execute(context -> super.postForEntity(url, request, responseType, uriVariables));
-    }
-
-    @Override
-    public <T> T postForObject(@NotNull URI url, Object request, @NotNull Class<T> responseType) throws RestClientException {
-        return retryTemplate.execute(context -> super.postForObject(url, request, responseType));
-    }
-
-    @Override
-    public <T> T postForObject(@NotNull String url, Object request, @NotNull Class<T> responseType, Object @NotNull ... uriVariables) throws RestClientException {
-        return retryTemplate.execute(context -> super.postForObject(url, request, responseType, uriVariables));
-    }
-
-    @Override
-    public <T> T postForObject(@NotNull String url, Object request, @NotNull Class<T> responseType, @NotNull Map<String, ?> uriVariables) throws RestClientException {
-        return retryTemplate.execute(context -> super.postForObject(url, request, responseType, uriVariables));
-    }
-
 
     private RetryTemplate createRetryTemplate(int retryMaxAttempts) {
         RetryTemplate retry = new RetryTemplate();
