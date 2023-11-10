@@ -198,4 +198,27 @@ class DynamoDbAsyncTableDecoratorTest {
         assertThat(dynamoDbAsyncTableDecorator.updateItem(request).get()).isEqualTo(expectedValue);
     }
 
+    @Test
+    void scanTest() {
+        PagePublisher<String> publisher = Subscriber::onComplete;
+        Mockito.when(delegate.scan()).thenReturn(publisher);
+        Assertions.assertDoesNotThrow(() -> dynamoDbAsyncTableDecorator.scan());
+    }
+
+    @Test
+    void scanWithRequestTest() {
+        ScanEnhancedRequest request = ScanEnhancedRequest.builder().limit(10).build();
+        PagePublisher<String> publisher = Subscriber::onComplete;
+        Mockito.when(delegate.scan(request)).thenReturn(publisher);
+        Assertions.assertDoesNotThrow(() -> dynamoDbAsyncTableDecorator.scan(request));
+    }
+
+    @Test
+    void scanWitConsumerRequestTest() {
+        Consumer<ScanEnhancedRequest.Builder> requestConsumer = builder -> builder.limit(10);
+        PagePublisher<String> publisher = Subscriber::onComplete;
+        Mockito.when(delegate.scan(requestConsumer)).thenReturn(publisher);
+        Assertions.assertDoesNotThrow(() -> dynamoDbAsyncTableDecorator.scan(requestConsumer));
+    }
+
 }
