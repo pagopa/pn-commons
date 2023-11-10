@@ -192,4 +192,27 @@ class DynamoDbATableDecoratorTest {
         assertThat(dynamoDbTableDecorator.updateItem(request)).isEqualTo(expectedValue);
     }
 
+    @Test
+    void scanTest() {
+        PageIterable<String> pageIterable = Mockito.mock(PageIterable.class);
+        Mockito.when(delegate.scan()).thenReturn(pageIterable);
+        assertThat(dynamoDbTableDecorator.scan()).isEqualTo(pageIterable);
+    }
+
+    @Test
+    void scanWithRequestTest() {
+        ScanEnhancedRequest request = ScanEnhancedRequest.builder().limit(10).build();
+        PageIterable<String> pageIterable = Mockito.mock(PageIterable.class);
+        Mockito.when(delegate.scan(request)).thenReturn(pageIterable);
+        assertThat(dynamoDbTableDecorator.scan(request)).isEqualTo(pageIterable);
+    }
+
+    @Test
+    void scanWithConsumerRequestTest() {
+        Consumer<ScanEnhancedRequest.Builder> requestConsumer = builder -> builder.limit(10);
+        PageIterable<String> pageIterable = Mockito.mock(PageIterable.class);
+        Mockito.when(delegate.scan(requestConsumer)).thenReturn(pageIterable);
+        assertThat(dynamoDbTableDecorator.scan(requestConsumer)).isEqualTo(pageIterable);
+    }
+
 }

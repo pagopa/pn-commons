@@ -219,4 +219,30 @@ public class DynamoDbAsyncTableDecorator<T> implements DynamoDbAsyncTable<T> {
                 });
     }
 
+    @Override
+    public PagePublisher<T> scan(ScanEnhancedRequest request) {
+        Map<String, String> copyOfContextMap = MDCUtils.retrieveMDCContextMap();
+        SdkPublisher<Page<T>> map = this.dynamoDbAsyncTable.scan(request)
+                .map(tPage -> MDCUtils.enrichWithMDC(tPage, copyOfContextMap));
+
+        return PagePublisher.create(map);
+    }
+
+    @Override
+    public PagePublisher<T> scan(Consumer<ScanEnhancedRequest.Builder> requestConsumer) {
+        Map<String, String> copyOfContextMap = MDCUtils.retrieveMDCContextMap();
+        SdkPublisher<Page<T>> map = this.dynamoDbAsyncTable.scan(requestConsumer)
+                .map(tPage -> MDCUtils.enrichWithMDC(tPage, copyOfContextMap));
+
+        return PagePublisher.create(map);
+    }
+
+    @Override
+    public PagePublisher<T> scan() {
+        Map<String, String> copyOfContextMap = MDCUtils.retrieveMDCContextMap();
+        SdkPublisher<Page<T>> map = this.dynamoDbAsyncTable.scan()
+                .map(tPage -> MDCUtils.enrichWithMDC(tPage, copyOfContextMap));
+        return PagePublisher.create(map);
+    }
+
 }
