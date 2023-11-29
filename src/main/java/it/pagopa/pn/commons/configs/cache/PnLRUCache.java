@@ -1,12 +1,17 @@
 package it.pagopa.pn.commons.configs.cache;
 
+import it.pagopa.pn.commons.exceptions.PnExceptionsCodes;
+import it.pagopa.pn.commons.exceptions.PnInternalException;
+import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.cache.Cache;
+import org.springframework.cache.support.SimpleValueWrapper;
+
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-import org.springframework.cache.Cache;
-import org.springframework.cache.support.SimpleValueWrapper;
-
+@Slf4j
 public class PnLRUCache<K,V> implements Cache{
 	
 	private final Map<K,V> cache;
@@ -28,22 +33,25 @@ public class PnLRUCache<K,V> implements Cache{
 	}
 
 	@Override
-	public ValueWrapper get(Object key) {
+	public ValueWrapper get(@NotNull Object key) {
 		return toValueWrapper(this.cache.get(key));
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T get(Object key, Callable<T> valueLoader) {
+	public <T> T get(@NotNull Object key, Callable<T> valueLoader) {
 		try {
-			if (this.cache.containsKey(key)){
-				return (T) this.get(key);
+			synchronized (this.cache) {
+				if (this.cache.containsKey(key)) {
+					return (T) this.get(key).get();
+				}
 			}
 			T value = valueLoader.call();
 			this.put(key, value);
 			return value;
 		}catch(Exception err){
-			return null;
+			log.error ("error getting object with callable valueLoader", err);
+			throw new PnInternalException("error getting object with callable valueLoader", PnExceptionsCodes.ERROR_CODE_PN_GENERIC_ERROR, err);
 		}
 	}
 
@@ -64,11 +72,13 @@ public class PnLRUCache<K,V> implements Cache{
 
 	@Override
 	public ValueWrapper putIfAbsent(Object key, Object value) {
-		Object existingElement = this.cache.get(key);
-		if (existingElement == null) {
-			this.put(key, value);
+		synchronized (this.cache) {
+			Object existingElement = this.cache.get(key);
+			if (existingElement == null) {
+				this.put(key, value);
+			}
+			return toValueWrapper(existingElement);
 		}
-		return toValueWrapper(existingElement);
 	}
 
 	@Override

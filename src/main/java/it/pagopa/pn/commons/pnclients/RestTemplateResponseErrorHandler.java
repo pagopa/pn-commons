@@ -1,7 +1,7 @@
 package it.pagopa.pn.commons.pnclients;
 
 import it.pagopa.pn.common.rest.error.v1.dto.Problem;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.commons.exceptions.PnHttpResponseException;
 import it.pagopa.pn.commons.exceptions.mapper.DtoProblemToProblemErrorMapper;
@@ -27,7 +27,7 @@ public class RestTemplateResponseErrorHandler
     private final ObjectMapper objectMapper;
 
     public RestTemplateResponseErrorHandler() {
-        this.objectMapper = new ObjectMapper();
+        this.objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
     }
 
     @Override

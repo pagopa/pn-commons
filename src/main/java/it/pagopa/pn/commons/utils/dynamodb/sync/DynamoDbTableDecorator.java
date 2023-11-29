@@ -151,4 +151,19 @@ public class DynamoDbTableDecorator<T> implements DynamoDbTable<T> {
         return updateItem;
     }
 
+    @Override
+    public PageIterable<T> scan(ScanEnhancedRequest request) {
+        return this.dynamoDbTable.scan(request);
+    }
+
+    @Override
+    public PageIterable<T> scan(Consumer<ScanEnhancedRequest.Builder> requestConsumer) {
+        return this.dynamoDbTable.scan(requestConsumer);
+    }
+
+    @Override
+    public PageIterable<T> scan() {
+        return this.dynamoDbTable.scan();
+    }
+
 }
