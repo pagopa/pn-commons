@@ -7,7 +7,7 @@ import org.slf4j.MarkerFactory;
  */
 public class PnAuditMarkerFactory {
     enum Marker {
-        AUDIT10Y, AUDIT5Y;
+        AUDIT10Y, AUDIT5Y, AUDIT2Y;
 
         private final org.slf4j.Marker mark;
 
@@ -31,4 +31,13 @@ public class PnAuditMarkerFactory {
     public static org.slf4j.Marker get5yMarker() {
         return  Marker.AUDIT5Y.mark;
     }
+
+    /**
+     * Five years retention audit logs
+     * @return 2 years log marker
+     */
+    public static org.slf4j.Marker get2yMarker() {
+        return  Marker.AUDIT2Y.mark;
+    }
+
 }
