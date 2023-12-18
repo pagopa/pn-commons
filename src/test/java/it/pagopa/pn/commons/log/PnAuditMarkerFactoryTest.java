@@ -1,6 +1,5 @@
 package it.pagopa.pn.commons.log;
 
-import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import ch.qos.logback.classic.Logger;
@@ -25,11 +24,13 @@ class PnAuditMarkerFactoryTest {
         logger.addAppender(listAppender);
 
         // call method under test
+        logger.info(PnAuditMarkerFactory.get2yMarker(), "Test 2 year marker");
         logger.info(PnAuditMarkerFactory.get5yMarker(), "Test 5 year marker");
         logger.info(PnAuditMarkerFactory.get10yMarker(), "Test 10 year marker");
         // JUnit assertions
         List<ILoggingEvent> logsList = listAppender.list;
-        assertEquals("AUDIT5Y", logsList.get(0).getMarker().getName());
-        assertEquals("AUDIT10Y", logsList.get(1).getMarker().getName());
+        assertEquals("AUDIT2Y", logsList.get(0).getMarker().getName());
+        assertEquals("AUDIT5Y", logsList.get(1).getMarker().getName());
+        assertEquals("AUDIT10Y", logsList.get(2).getMarker().getName());
     }
 }
