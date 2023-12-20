@@ -84,7 +84,9 @@ public enum PnAuditLogEventType {
     AUD_CA_SEARCH_NOTIFICATION(PnAuditLogMarker.AUDIT2Y),
     AUD_CA_VIEW_USERPROFILE(PnAuditLogMarker.AUDIT2Y),
     AUD_CA_VIEW_NOTIFICATION(PnAuditLogMarker.AUDIT2Y),
-    AUD_CA_AK_VIEW(PnAuditLogMarker.AUDIT2Y);
+    AUD_CA_VIEW_AK(PnAuditLogMarker.AUDIT2Y),
+    AUD_CA_VIEW_ONBOARDING(PnAuditLogMarker.AUDIT2Y),
+    AUD_CA_DOC_AVAILABLE(PnAuditLogMarker.AUDIT2Y);
 
     
     final org.slf4j.Marker marker;
