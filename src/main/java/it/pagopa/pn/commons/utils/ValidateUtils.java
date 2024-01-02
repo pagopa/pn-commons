@@ -1,10 +1,15 @@
 package it.pagopa.pn.commons.utils;
 
+import org.apache.commons.lang3.StringUtils;
+
 import it.pagopa.pn.commons.configs.TaxIdInWhiteListParameterConsumer;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class ValidateUtils {
+
+    // Regular Expression by RFC 5322 for Email Validation
+    private static final String EMAIL_VALIDATION_REGEX = "^[a-zA-Z0-9_!#$%&’*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
 
     private final TaxIdInWhiteListParameterConsumer taxIdInWhiteListParameterConsumer;
 
@@ -65,6 +70,20 @@ public class ValidateUtils {
     public boolean validate(String taxId){
         // non passare isPF sottointende validare sia PF che PG
         return validate(taxId, false, false);
+    }
+
+    /**
+     * This method validate the input string against the RFC 5322 email regex 
+     * to understend if input string complies with email standard representation.
+     * 
+     * If input string is blank or null false is returned.
+     * 
+     * @param email string email that must be validated against RFC 5322 email regex
+     * 
+     * @return      boolean that indicates if email is valid or not
+     */
+    public static boolean validateEmail(String email) {
+        return StringUtils.isBlank(email) ? Boolean.FALSE : email.matches(EMAIL_VALIDATION_REGEX);
     }
 
     private static String normalize(String cf) {

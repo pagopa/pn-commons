@@ -11,10 +11,8 @@ public class LogUtils {
 
     private LogUtils(){}
 
-
     public static String maskEmailAddress(String strEmail) {
-        if (strEmail == null)
-            return "null";
+        if (!ValidateUtils.validateEmail(strEmail)) return "null";
 
         String[] parts = strEmail.split("@");
 
