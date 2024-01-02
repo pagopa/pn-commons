@@ -21,7 +21,7 @@ class LogUtilsTest {
 
     @ParameterizedTest
     @CsvSource(
-        value = { "email@email.it, e***l@email.it", "em@email.it, ***@email.it", "test.email@domain.com, t********l@domain.com", "notValidEmail, null", "not.valid.email.it, null", "@domain.com, null", "NULL, null" }, 
+        value = { "email@email.it, e***l@email.it", "em@email.it, ***@email.it", "test.email@domain.com, t********l@domain.com", "notValidEmail, n*********ail", "not.valid.email.it, n**************.it", "@domain.com, @*******com", "NULL, null" }, 
         nullValues={"NULL"}
     )
     void maskEmailAddress(String str, String expected) {

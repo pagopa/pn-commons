@@ -12,7 +12,7 @@ public class LogUtils {
     private LogUtils(){}
 
     public static String maskEmailAddress(String strEmail) {
-        if (!ValidateUtils.validateEmail(strEmail)) return "null";
+        if (!ValidateUtils.validateEmail(strEmail)) return maskGeneric(strEmail);
 
         String[] parts = strEmail.split("@");
 
