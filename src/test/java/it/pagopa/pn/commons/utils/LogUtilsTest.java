@@ -1,17 +1,19 @@
 package it.pagopa.pn.commons.utils;
 
 import lombok.extern.slf4j.Slf4j;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 @Slf4j
 class LogUtilsTest {
 
     @ParameterizedTest
     @CsvSource(
-        value = { "email@email.it, e***l@email.it", "em@email.it, ***@email.it", "test.email@domain.com, t********l@domain.com", "notValidEmail, n*********ail", "not.valid.email.it, n**************.it", "@domain.com, @*******com", "NULL, null" }, 
+        value = { "email@email.it, e***l@email.it", "em@email.it, ***@email.it", "test.email@domain.com, t********l@domain.com", "NULL, null" }, 
         nullValues={"NULL"}
     )
     void maskEmailAddress(String str, String expected) {
@@ -23,6 +25,15 @@ class LogUtilsTest {
         //Then
         Assertions.assertNotEquals( str, result);
         Assertions.assertEquals(expected, result);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "notValidEmail", "not.valid.email", "@domain.com", "2017-02-03T10:37:30.00Z", "123456789" })
+    void givenMalformedEmailShouldThrowIllegalArgumentException(String email) {
+        // Given (in ValueSource)
+
+        // When / Then
+        Assertions.assertThrows(IllegalArgumentException.class, () -> LogUtils.maskEmailAddress(email));
     }
 
 
@@ -68,7 +79,6 @@ class LogUtilsTest {
         Assertions.assertNotEquals( str, result);
         Assertions.assertEquals(expected, result);
     }
-
 
     @Test
     void maskString() {

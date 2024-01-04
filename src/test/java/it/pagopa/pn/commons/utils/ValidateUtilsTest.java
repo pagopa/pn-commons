@@ -1,5 +1,6 @@
 package it.pagopa.pn.commons.utils;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -7,6 +8,8 @@ import it.pagopa.pn.commons.configs.TaxIdInWhiteListParameterConsumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -102,6 +105,32 @@ class ValidateUtilsTest {
         String fakeTaxId = "MRNLCC00A01H50MA";
         Mockito.when( taxIdInWhiteListParameterConsumer.isInWhiteList( Mockito.anyString() ) ).thenReturn( false );
         assertFalse(validateUtils.validate(fakeTaxId, true, false));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"test.email@domain.com", "em@email.it", "test.email.123@domain.com"})
+    void givenValidEmailShouldValidationSuccess(String email) {
+        // Given (in ValueSource)
+
+        // When
+        Boolean isValid = ValidateUtils.validateEmail(email);
+
+        // Then
+        assertNotNull(isValid);
+        assertTrue(isValid);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"test.email", "@email.it", "12456789", "2017-02-03T10:37:30.00Z"})
+    void givenInvalidEmailShouldValidationFail(String email) {
+        // Given (in ValueSource)
+
+        // When
+        Boolean isValid = ValidateUtils.validateEmail(email);
+
+        // Then
+        assertNotNull(isValid);
+        assertFalse(isValid);
     }
 }
 

@@ -12,7 +12,13 @@ public class LogUtils {
     private LogUtils(){}
 
     public static String maskEmailAddress(String strEmail) {
-        if (!ValidateUtils.validateEmail(strEmail)) return maskGeneric(strEmail);
+
+        // Backward compatibility
+        if (strEmail == null) {
+            return "null";
+        } else if (!ValidateUtils.validateEmail(strEmail)) {
+            throw new IllegalArgumentException("Cannot mask invalid email address");
+        }
 
         String[] parts = strEmail.split("@");
 
