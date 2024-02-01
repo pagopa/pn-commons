@@ -171,7 +171,7 @@ public abstract class BaseDAO<T> {
         return Mono.fromFuture(batchWriteResultCompletableFuture).then();
     }
 
-    private Flux<T> batchGetItem(List<Tuple2<String, String>> keys) {
+    protected Flux<T> batchGetItem(List<Tuple2<String, String>> keys) {
         return Flux.fromIterable(keys)
                 .window(MAX_DYNAMODB_BATCH_SIZE)
                 .flatMap(chunk -> {
