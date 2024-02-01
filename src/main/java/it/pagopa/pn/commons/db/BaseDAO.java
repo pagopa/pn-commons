@@ -171,7 +171,7 @@ public abstract class BaseDAO<T> {
         return Mono.fromFuture(batchWriteResultCompletableFuture).then();
     }
 
-    private Flux<T> batchGetItem(List<Tuple2<String, String>> keys) {
+    protected Flux<T> batchGetItem(List<Tuple2<String, String>> keys) {
         return Flux.fromIterable(keys)
                 .window(MAX_DYNAMODB_BATCH_SIZE)
                 .flatMap(chunk -> {
@@ -193,7 +193,7 @@ public abstract class BaseDAO<T> {
                     log.debug("request size: {}, query result size: {}", keys.size(), results.size());
                     if (!page.unprocessedKeysForTable(dynamoTable).isEmpty()) {
                         List<Key> unprocessedKeys = page.unprocessedKeysForTable(dynamoTable);
-                        List<Tuple2<String, String>> unprocessedEntities = filterMandateAlreadyProcessed(keys, unprocessedKeys);
+                        List<Tuple2<String, String>> unprocessedEntities = filterItemAlreadyProcessed(keys, unprocessedKeys);
                         log.info("unprocessed entities {} over total entities {}", unprocessedEntities.size(), keys.size());
                         return Flux.fromIterable(results)
                                 .concatWith(batchGetItem(unprocessedEntities));
@@ -202,14 +202,21 @@ public abstract class BaseDAO<T> {
                 });
     }
 
-    private List<Tuple2<String, String>> filterMandateAlreadyProcessed(List<Tuple2<String, String>> keys, List<Key> unprocessedKeys) {
+    private List<Tuple2<String, String>> filterItemAlreadyProcessed(List<Tuple2<String, String>> keys, List<Key> unprocessedKeys) {
         Set<Key> setKeys = new HashSet<>(unprocessedKeys);
         return keys.stream()
                 .filter(entity -> {
-                    Key key = Key.builder().partitionValue(entity.getT1()).sortValue(entity.getT2()).build();
+                    Key key =  getKeyBuild(entity.getT1(), entity.getT2());
                     return setKeys.contains(key);
                 })
                 .toList();
+    }
+
+    private Key getKeyBuild(String pk, String sk) {
+        if (sk == null)
+            return Key.builder().partitionValue(pk).build();
+        else
+            return Key.builder().partitionValue(pk).sortValue(sk).build();
     }
 
 }
