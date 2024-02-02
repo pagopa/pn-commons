@@ -13,7 +13,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.annotation.JsonAppend;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -35,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestPropertySource(properties = { "pn.commons.features.is-mvp-default-value=true",
         "pn.env.runtime=DEVELOPMENT"})
 @Import(LocalStackTestConfig.class)
-class BaseDaoTest {
+class BaseDaoTestIT {
     @SpyBean
     @Autowired
     private TestIngrationDAOActivator testIngrationDAOActivator;
@@ -261,7 +260,7 @@ class BaseDaoTest {
 
     @Test
     void whenBatchGetItemTest() {
-        List<Tuple2<String, String>> keys = createTestKeys(3, "");
+        List<Tuple2<String, String>> keys = createTestKeys(3, "id", "Descrizione ");
         Flux< TestIngrationDAOActivator.FirstEntity> result = this.testIngrationDAOActivator.batchGetItem(keys);
 
         StepVerifier.create(result)
@@ -269,10 +268,10 @@ class BaseDaoTest {
                 .verifyComplete();
     }
 
-    private List<Tuple2<String, String>> createTestKeys(int size, String id) {
+    private List<Tuple2<String, String>> createTestKeys(int size, String id, String sort) {
         List<Tuple2<String, String>> keys = new ArrayList<>();
         for (int i = 1; i <= size; i++) {
-            keys.add(Tuples.of("id"+i, "Descrizione "+i));
+            keys.add(Tuples.of(id+i, sort+i));
 
         }
         return keys;
