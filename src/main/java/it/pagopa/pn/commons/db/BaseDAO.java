@@ -99,7 +99,7 @@ public abstract class BaseDAO<T> {
         });
     }
 
-    protected Flux<T> getBySecondaryIndex(String index, String partitionKey, String sortKey){
+    public Flux<T> getBySecondaryIndex(String index, String partitionKey, String sortKey){
 
         Key.Builder keyBuilder = Key.builder().partitionValue(partitionKey);
         if (!StringUtils.isBlank(sortKey)){
@@ -109,7 +109,7 @@ public abstract class BaseDAO<T> {
         return Flux.from(dynamoTable.index(index).query(QueryConditional.keyEqualTo(keyBuilder.build())).flatMapIterable(Page::items));
     }
 
-    protected Flux<T> getByFilter(QueryConditional conditional, String index, Map<String, AttributeValue> values, String filterExpression, Integer maxElements){
+    public Flux<T> getByFilter(QueryConditional conditional, String index, Map<String, AttributeValue> values, String filterExpression, Integer maxElements){
         QueryEnhancedRequest.Builder qeRequest = QueryEnhancedRequest
                 .builder()
                 .queryConditional(conditional);
@@ -125,11 +125,11 @@ public abstract class BaseDAO<T> {
         return Flux.from(dynamoTable.query(qeRequest.build()).flatMapIterable(Page::items));
     }
 
-    protected Flux<T> getByFilter(QueryConditional conditional, String index, Map<String, AttributeValue> values, String filterExpression){
+    public Flux<T> getByFilter(QueryConditional conditional, String index, Map<String, AttributeValue> values, String filterExpression){
         return getByFilter(conditional, index, values, filterExpression, null);
     }
 
-    protected Key keyBuild(String partitionKey, String sortKey){
+    public Key keyBuild(String partitionKey, String sortKey){
         Key.Builder builder = Key.builder().partitionValue(partitionKey);
         if (StringUtils.isNotBlank(sortKey)){
             builder.sortValue(sortKey);
@@ -137,7 +137,7 @@ public abstract class BaseDAO<T> {
         return builder.build();
     }
 
-    protected Flux<T> findAllByKeys(String partitionKey, String... sortKeys) {
+    public Flux<T> findAllByKeys(String partitionKey, String... sortKeys) {
         ReadBatch.Builder<T> builder = ReadBatch.builder(tClass)
                 .mappedTableResource(this.dynamoTable);
 
@@ -154,7 +154,7 @@ public abstract class BaseDAO<T> {
                 .flatMapMany(Flux::fromIterable);
     }
 
-    protected Mono<Void> deleteBatch(String partitionKey, String... sortKeys) {
+    public Mono<Void> deleteBatch(String partitionKey, String... sortKeys) {
         WriteBatch.Builder<T> builder = WriteBatch.builder(tClass)
                 .mappedTableResource(this.dynamoTable);
 
@@ -171,7 +171,7 @@ public abstract class BaseDAO<T> {
         return Mono.fromFuture(batchWriteResultCompletableFuture).then();
     }
 
-    protected Flux<T> batchGetItem(List<Tuple2<String, String>> keys) {
+    public Flux<T> batchGetItem(List<Tuple2<String, String>> keys) {
         return Flux.fromIterable(keys)
                 .window(MAX_DYNAMODB_BATCH_SIZE)
                 .flatMap(chunk -> {
@@ -183,7 +183,7 @@ public abstract class BaseDAO<T> {
                                     .build())));
                     return chunk
                             .doOnNext(item -> {
-                                Key key = Key.builder().partitionValue(item.getT1()).sortValue(item.getT2()).build();
+                                Key key =keyBuild(item.getT1(), item.getT2());
                                 builder.addGetItem(key);
                             })
                             .then(deferred);
@@ -206,17 +206,10 @@ public abstract class BaseDAO<T> {
         Set<Key> setKeys = new HashSet<>(unprocessedKeys);
         return keys.stream()
                 .filter(entity -> {
-                    Key key =  getKeyBuild(entity.getT1(), entity.getT2());
+                    Key key =  keyBuild(entity.getT1(), entity.getT2());
                     return setKeys.contains(key);
                 })
                 .toList();
-    }
-
-    private Key getKeyBuild(String pk, String sk) {
-        if (sk == null)
-            return Key.builder().partitionValue(pk).build();
-        else
-            return Key.builder().partitionValue(pk).sortValue(sk).build();
     }
 
 }
