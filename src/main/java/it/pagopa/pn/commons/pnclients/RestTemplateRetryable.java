@@ -1,6 +1,7 @@
 package it.pagopa.pn.commons.pnclients;
 
 import it.pagopa.pn.commons.exceptions.PnHttpResponseException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.classify.Classifier;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,7 @@ import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.UnknownHostException;
 
+@Slf4j
 public class RestTemplateRetryable extends RestTemplate {
 
     private final RetryTemplate retryTemplate;
@@ -50,19 +52,25 @@ public class RestTemplateRetryable extends RestTemplate {
         NeverRetryPolicy neverRetryPolicy = new NeverRetryPolicy();
 
         return throwable -> {
+            RetryPolicy retryPolicy;
             if (throwable instanceof HttpStatusCodeException httpException) {
-                return getRetryPolicyForStatus(httpException.getStatusCode(), simpleRetryPolicy, neverRetryPolicy);
+                retryPolicy = getRetryPolicyForStatus(httpException.getStatusCode(), simpleRetryPolicy, neverRetryPolicy);
             }
-            if(throwable instanceof PnHttpResponseException pnHttpResponseException && pnHttpResponseException.getStatusCode() > 0) {
-                return getRetryPolicyForStatus(HttpStatus.valueOf(pnHttpResponseException.getStatusCode()), simpleRetryPolicy, neverRetryPolicy);
+            else if(throwable instanceof PnHttpResponseException pnHttpResponseException && pnHttpResponseException.getStatusCode() > 0) {
+                retryPolicy = getRetryPolicyForStatus(HttpStatus.valueOf(pnHttpResponseException.getStatusCode()), simpleRetryPolicy, neverRetryPolicy);
             }
-            if(throwable instanceof ResourceAccessException && isIOExceptionRetryable(throwable.getCause())){
-                return simpleRetryPolicy;
+            else if(throwable instanceof ResourceAccessException && isIOExceptionRetryable(throwable.getCause())){
+                retryPolicy = simpleRetryPolicy;
             }
-            if (isIOExceptionRetryable(throwable)) {
-                return simpleRetryPolicy;
+            else if (isIOExceptionRetryable(throwable)) {
+                retryPolicy = simpleRetryPolicy;
             }
-            return neverRetryPolicy;
+            else retryPolicy = neverRetryPolicy;
+
+            if(retryPolicy instanceof SimpleRetryPolicy) {
+                log.warn("Exception caught by retry", throwable);
+            }
+            return retryPolicy;
         };
     }
 
