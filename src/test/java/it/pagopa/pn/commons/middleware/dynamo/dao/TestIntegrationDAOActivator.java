@@ -19,38 +19,38 @@ import java.util.Objects;
 
 @Repository
 @Profile("test-it")
-public class TestIngrationDAOActivator extends BaseDAO<TestIngrationDAOActivator.FirstEntity> {
+public class TestIntegrationDAOActivator extends BaseDAO<TestIntegrationDAOActivator.FirstEntity> {
 
 
-    protected TestIngrationDAOActivator(DynamoDbEnhancedAsyncClient dynamoDbEnhancedAsyncClient, DynamoDbAsyncClient dynamoDbAsyncClient) {
+    protected TestIntegrationDAOActivator(DynamoDbEnhancedAsyncClient dynamoDbEnhancedAsyncClient, DynamoDbAsyncClient dynamoDbAsyncClient) {
         super(dynamoDbEnhancedAsyncClient, dynamoDbAsyncClient, "FirstTable", FirstEntity.class);
     }
 
     public Mono<FirstEntity> createEntity(FirstEntity entity){
-        return Mono.fromFuture(super.put(entity).thenApply(i -> i));
+        return super.put(entity);
     }
 
     public Mono<FirstEntity> updateEntity(FirstEntity entity) {
-        return Mono.fromFuture(super.update(entity).thenApply(i -> i));
+        return super.update(entity);
     }
 
     public Mono<FirstEntity> deleteEntity(String partitionKey, String sortKey){
-        return Mono.fromFuture(super.delete(partitionKey, sortKey).thenApply(i -> i));
+        return super.delete(partitionKey, sortKey);
     }
 
     public Mono<Void> creteWithTransaction(FirstEntity firstEntity) {
         TransactPutItemEnhancedRequest<FirstEntity> requestEntity =
-                TransactPutItemEnhancedRequest.builder(TestIngrationDAOActivator.FirstEntity.class)
+                TransactPutItemEnhancedRequest.builder(TestIntegrationDAOActivator.FirstEntity.class)
                         .item(firstEntity)
                         .build();
 
         TransactWriteItemsEnhancedRequest request = TransactWriteItemsEnhancedRequest.builder()
                 .addPutItem(super.dynamoTable, requestEntity).build();
-        return Mono.fromFuture(super.putWithTransact(request).thenApply(i->i));
+        return super.putWithTransact(request);
     }
 
     public Mono<FirstEntity> findBy(String partitionKey, String sortKey) {
-        return Mono.fromFuture(super.get(partitionKey, sortKey).thenApply(i->i));
+        return super.get(partitionKey, sortKey);
     }
 
     @DynamoDbBean

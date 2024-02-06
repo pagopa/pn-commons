@@ -37,21 +37,21 @@ import static org.junit.jupiter.api.Assertions.*;
 class BaseDaoTestIT {
     @SpyBean
     @Autowired
-    private TestIngrationDAOActivator testIngrationDAOActivator;
+    private TestIntegrationDAOActivator testIntegrationDAOActivator;
     @MockBean
     private AbstractCachedSsmParameterConsumer abstractCachedSsmParameterConsumer;
-    private TestIngrationDAOActivator.FirstEntity firstEntity;
+    private TestIntegrationDAOActivator.FirstEntity firstEntity;
 
     @BeforeEach
     void setUp() {
-        firstEntity = new TestIngrationDAOActivator.FirstEntity();
+        firstEntity = new TestIntegrationDAOActivator.FirstEntity();
         firstEntity.setFirstId("1rf3og4r32");
         firstEntity.setDescription("description");
     }
 
     @Test
     void whenPutEntityThenReturnEntitySaved() {
-        Mono<TestIngrationDAOActivator.FirstEntity> result = testIngrationDAOActivator.createEntity(firstEntity);
+        Mono<TestIntegrationDAOActivator.FirstEntity> result = testIntegrationDAOActivator.createEntity(firstEntity);
         StepVerifier.create(result)
                 .expectNextMatches(firstEntity::equals)
                 .verifyComplete();
@@ -61,7 +61,7 @@ class BaseDaoTestIT {
     @Test
     void whenEntityIsNullThrowNoSuchElementException() {
         assertThrows(NoSuchElementException.class, () -> {
-            testIngrationDAOActivator.createEntity(null).block();
+            testIntegrationDAOActivator.createEntity(null).block();
         });
     }
 
@@ -69,8 +69,8 @@ class BaseDaoTestIT {
     void  whenDeleteEntityThenReturnEntityDeleted() {
         firstEntity.setFirstId("123");
 
-        Mono<TestIngrationDAOActivator.FirstEntity> result = testIngrationDAOActivator.createEntity(firstEntity)
-                .flatMap(saved -> this.testIngrationDAOActivator
+        Mono<TestIntegrationDAOActivator.FirstEntity> result = testIntegrationDAOActivator.createEntity(firstEntity)
+                .flatMap(saved -> this.testIntegrationDAOActivator
                         .deleteEntity(this.firstEntity.getFirstId(), this.firstEntity.getDescription())
                 );
 
@@ -83,8 +83,8 @@ class BaseDaoTestIT {
     void  whenDeleteEntityThatNotExistThenReturnEntityDeleted() {
         firstEntity.setFirstId("NotExisted");
 
-        TestIngrationDAOActivator.FirstEntity result =
-                this.testIngrationDAOActivator.deleteEntity(this.firstEntity.getFirstId(), this.firstEntity.getDescription()).block();
+        TestIntegrationDAOActivator.FirstEntity result =
+                this.testIntegrationDAOActivator.deleteEntity(this.firstEntity.getFirstId(), this.firstEntity.getDescription()).block();
 
         assertNull(result);
 
@@ -94,8 +94,8 @@ class BaseDaoTestIT {
     void whenPutWithTransactFindElementThatSaved() {
         firstEntity.setFirstId("transact");
 
-        testIngrationDAOActivator.creteWithTransaction(firstEntity).block();
-        TestIngrationDAOActivator.FirstEntity result = testIngrationDAOActivator.findBy(firstEntity.getFirstId(), firstEntity.getDescription()).block();
+        testIntegrationDAOActivator.creteWithTransaction(firstEntity).block();
+        TestIntegrationDAOActivator.FirstEntity result = testIntegrationDAOActivator.findBy(firstEntity.getFirstId(), firstEntity.getDescription()).block();
 
         assertNotNull(result);
         assertEquals(firstEntity, result);
@@ -105,12 +105,12 @@ class BaseDaoTestIT {
     @Test
     void whenUpdateTest() {
         firstEntity.setFirstId("UpdateEntity");
-        Mono<TestIngrationDAOActivator.FirstEntity> result = testIngrationDAOActivator.createEntity(firstEntity)
+        Mono<TestIntegrationDAOActivator.FirstEntity> result = testIntegrationDAOActivator.createEntity(firstEntity)
                 .map(saved -> {
                     saved.setDescription("test-update");
                     return saved;
                 })
-                .flatMap(testIngrationDAOActivator::updateEntity);
+                .flatMap(testIntegrationDAOActivator::updateEntity);
 
         StepVerifier.create(result)
                 .expectNextMatches(entity -> entity.getDescription().equals("test-update"))
@@ -120,7 +120,7 @@ class BaseDaoTestIT {
 
     @Test
     void whenGetEntityNotExistedThenReturnNull() {
-        TestIngrationDAOActivator.FirstEntity result = this.testIngrationDAOActivator.findBy("not-existed", "not-sorting").block();
+        TestIntegrationDAOActivator.FirstEntity result = this.testIntegrationDAOActivator.findBy("not-existed", "not-sorting").block();
 
         assertNull(result);
     }
@@ -129,8 +129,8 @@ class BaseDaoTestIT {
     void whenGetEntityExistedThenReturnEntity() {
         firstEntity.setFirstId("find-ok-test");
 
-        Mono<TestIngrationDAOActivator.FirstEntity> result = testIngrationDAOActivator.createEntity(firstEntity)
-                .flatMap(saved -> this.testIngrationDAOActivator.findBy(saved.getFirstId(), saved.getDescription()));
+        Mono<TestIntegrationDAOActivator.FirstEntity> result = testIntegrationDAOActivator.createEntity(firstEntity)
+                .flatMap(saved -> this.testIntegrationDAOActivator.findBy(saved.getFirstId(), saved.getDescription()));
 
         StepVerifier.create(result)
                 .expectNextMatches(firstEntity::equals)
@@ -140,7 +140,7 @@ class BaseDaoTestIT {
     @Test
     void whenGetBySecondaryIndexWithoutSecondaryIndexTest() {
         assertThrows(IllegalArgumentException.class,
-                ()-> this.testIngrationDAOActivator
+                ()-> this.testIntegrationDAOActivator
                 .getBySecondaryIndex("No-secondary", "test-no-secondary", null)
                         .blockFirst()
         );
@@ -148,14 +148,14 @@ class BaseDaoTestIT {
 
     @Test
     void whenGetBySecondaryIndexWithSecondaryIndexTest() {
-        Flux< TestIngrationDAOActivator.FirstEntity> result = this.testIngrationDAOActivator
+        Flux< TestIntegrationDAOActivator.FirstEntity> result = this.testIntegrationDAOActivator
                         .getBySecondaryIndex("index-first", "Name 1", null);
 
         StepVerifier.create(result)
                 .expectNextCount(5)
                 .verifyComplete();
 
-        result = this.testIngrationDAOActivator
+        result = this.testIntegrationDAOActivator
                 .getBySecondaryIndex("index-first", "Name 1", "Code 1");
 
         StepVerifier.create(result)
@@ -165,7 +165,7 @@ class BaseDaoTestIT {
 
     @Test
     void whenGetByFilterTest() {
-        TestIngrationDAOActivator.FirstEntity test = new TestIngrationDAOActivator.FirstEntity();
+        TestIntegrationDAOActivator.FirstEntity test = new TestIntegrationDAOActivator.FirstEntity();
         test.setFirstId("id1");
         test.setDescription("Descrizione 1");
 
@@ -175,7 +175,7 @@ class BaseDaoTestIT {
 
 
 
-        Flux<TestIngrationDAOActivator.FirstEntity> result = this.testIngrationDAOActivator.getByFilter(conditional, null, null, null, 100);
+        Flux<TestIntegrationDAOActivator.FirstEntity> result = this.testIntegrationDAOActivator.getByFilter(conditional, null, null, null, 100);
 
         StepVerifier.create(result)
                 .expectNext(test)
@@ -189,7 +189,7 @@ class BaseDaoTestIT {
                 Key.builder().partitionValue("Name 1").build()
         );
 
-        Flux<TestIngrationDAOActivator.FirstEntity> result = this.testIngrationDAOActivator.getByFilter(conditional, "index-first", null, null, 100);
+        Flux<TestIntegrationDAOActivator.FirstEntity> result = this.testIntegrationDAOActivator.getByFilter(conditional, "index-first", null, null, 100);
 
         StepVerifier.create(result)
                 .expectNextCount(5)
@@ -199,7 +199,7 @@ class BaseDaoTestIT {
                 Key.builder().partitionValue("Name 1").sortValue("Code 1").build()
         );
 
-        result = this.testIngrationDAOActivator.getByFilter(conditional1, "index-first", null, null, 100);
+        result = this.testIntegrationDAOActivator.getByFilter(conditional1, "index-first", null, null, 100);
 
         StepVerifier.create(result)
                 .expectNextCount(1)
@@ -208,7 +208,7 @@ class BaseDaoTestIT {
         Map<String, AttributeValue> map = new HashMap<>();
         map.put(":value", AttributeValue.builder().n("30.00").build());
 
-        result = this.testIngrationDAOActivator.getByFilter(
+        result = this.testIntegrationDAOActivator.getByFilter(
                 conditional, "index-first", map, "price > :value", 100);
 
         StepVerifier.create(result)
@@ -219,12 +219,12 @@ class BaseDaoTestIT {
 
     @Test
     void whenKeyBuildTest() {
-        Key key = this.testIngrationDAOActivator.keyBuild("Abb", null);
+        Key key = this.testIntegrationDAOActivator.keyBuild("Abb", null);
         assertNotNull(key);
         assertEquals("Abb", key.partitionKeyValue().s());
         assertFalse(key.sortKeyValue().isPresent());
 
-        key = this.testIngrationDAOActivator.keyBuild("Abb", "sort");
+        key = this.testIntegrationDAOActivator.keyBuild("Abb", "sort");
         assertNotNull(key);
         assertEquals("Abb", key.partitionKeyValue().s());
         assertTrue(key.sortKeyValue().isPresent());
@@ -234,8 +234,8 @@ class BaseDaoTestIT {
     @Test
     void whenFindAllByKeysTest() {
 
-        Flux<TestIngrationDAOActivator.FirstEntity> result =
-                this.testIngrationDAOActivator.findAllByKeys("idDelete","Descrizione 4", "Descrizione 5", "Descrizione 6");
+        Flux<TestIntegrationDAOActivator.FirstEntity> result =
+                this.testIntegrationDAOActivator.findAllByKeys("idDelete","Descrizione 4", "Descrizione 5", "Descrizione 6");
 
         StepVerifier.create(result)
                 .expectNextCount(3)
@@ -244,14 +244,14 @@ class BaseDaoTestIT {
 
     @Test
     void whenDeleteBatchTest() {
-        this.testIngrationDAOActivator.deleteBatch("idDelete", "Descrizione 1", "Descrizione 2", "Descrizione 3").block();
+        this.testIntegrationDAOActivator.deleteBatch("idDelete", "Descrizione 1", "Descrizione 2", "Descrizione 3").block();
         List<Tuple2<String, String>> keys = List.of(
                 Tuples.of("idDelete", "Descrizione 1"),
                 Tuples.of("idDelete", "Descrizione 2"),
                 Tuples.of("idDelete", "Descrizione 3")
         );
 
-        Flux<TestIngrationDAOActivator.FirstEntity> result = this.testIngrationDAOActivator.batchGetItem(keys);
+        Flux<TestIntegrationDAOActivator.FirstEntity> result = this.testIntegrationDAOActivator.batchGetItem(keys);
 
         StepVerifier.create(result)
                 .expectNextCount(0)
@@ -261,7 +261,7 @@ class BaseDaoTestIT {
     @Test
     void whenBatchGetItemTest() {
         List<Tuple2<String, String>> keys = createTestKeys(3, "id", "Descrizione ");
-        Flux< TestIngrationDAOActivator.FirstEntity> result = this.testIngrationDAOActivator.batchGetItem(keys);
+        Flux< TestIntegrationDAOActivator.FirstEntity> result = this.testIntegrationDAOActivator.batchGetItem(keys);
 
         StepVerifier.create(result)
                 .expectNextCount(3)

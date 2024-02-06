@@ -49,54 +49,54 @@ public abstract class BaseDAO<T> {
         this.tClass = tClass;
     }
 
-    protected CompletableFuture<T> put(T entity){
+    protected Mono<T> put(T entity){
         log.logPuttingDynamoDBEntity(dynamoTable.tableName(), entity);
         PutItemEnhancedRequest<T> putRequest = PutItemEnhancedRequest.builder(tClass)
                 .item(entity)
                 .build();
-        return dynamoTable.putItem(putRequest).thenApply(x -> {
+        return Mono.fromFuture(dynamoTable.putItem(putRequest).thenApply(x -> {
             log.logPutDoneDynamoDBEntity(dynamoTable.tableName());
             return entity;
-        });
+        }));
     }
 
-    protected CompletableFuture<T> delete(String partitionKey, String sortKey){
+    protected Mono<T> delete(String partitionKey, String sortKey){
         Key.Builder keyBuilder = Key.builder().partitionValue(partitionKey);
         if (!StringUtils.isBlank(sortKey)){
             keyBuilder.sortValue(sortKey);
         }
-        return dynamoTable.deleteItem(keyBuilder.build()).thenApply(t -> {
+        return Mono.fromFuture(dynamoTable.deleteItem(keyBuilder.build()).thenApply(t -> {
             log.logDeleteDynamoDBEntity(dynamoTable.tableName(), keyBuild(partitionKey, sortKey), t);
             return t;
-        });
+        }));
     }
 
-    protected CompletableFuture<Void> putWithTransact(TransactWriteItemsEnhancedRequest transactRequest){
+    protected Mono<Void> putWithTransact(TransactWriteItemsEnhancedRequest transactRequest){
         transactRequest.transactWriteItems().forEach(log::logTransactionDynamoDBEntity);
         Map<String, String> copyOfContextMap = MDCUtils.retrieveMDCContextMap();
-        return this.dynamoDbEnhancedAsyncClient.transactWriteItems(transactRequest)
-                .thenApply(queryResponse -> MDCUtils.enrichWithMDC(queryResponse, copyOfContextMap));
+        return Mono.fromFuture(this.dynamoDbEnhancedAsyncClient.transactWriteItems(transactRequest)
+                .thenApply(queryResponse -> MDCUtils.enrichWithMDC(queryResponse, copyOfContextMap)));
     }
 
-    protected CompletableFuture<T> update(T entity){
+    protected Mono<T> update(T entity){
         UpdateItemEnhancedRequest<T> updateRequest = UpdateItemEnhancedRequest
                 .builder(tClass).item(entity).build();
-        return dynamoTable.updateItem(updateRequest).thenApply(t -> {
+        return Mono.fromFuture(dynamoTable.updateItem(updateRequest).thenApply(t -> {
             log.logUpdateDynamoDBEntity(dynamoTable.tableName(), t);
             return t;
-        });
+        }));
     }
 
-    protected CompletableFuture<T> get(String partitionKey, String sortKey){
+    protected Mono<T> get(String partitionKey, String sortKey){
         Key.Builder keyBuilder = Key.builder().partitionValue(partitionKey);
         if (!StringUtils.isBlank(sortKey)){
             keyBuilder.sortValue(sortKey);
         }
 
-        return dynamoTable.getItem(keyBuilder.build()).thenApply(data -> {
+        return Mono.fromFuture(dynamoTable.getItem(keyBuilder.build()).thenApply(data -> {
             log.logGetDynamoDBEntity(dynamoTable.tableName(), keyBuild(partitionKey, sortKey), data);
             return data;
-        });
+        }));
     }
 
     public Flux<T> getBySecondaryIndex(String index, String partitionKey, String sortKey){
