@@ -92,7 +92,12 @@ public enum PnAuditLogEventType {
     AUD_WH_UPDATE(PnAuditLogMarker.AUDIT10Y),
     AUD_WH_DELETE(PnAuditLogMarker.AUDIT10Y),
     AUD_WH_DISABLE(PnAuditLogMarker.AUDIT10Y),
-    AUD_WH_CONSUME(PnAuditLogMarker.AUDIT10Y);
+    AUD_WH_CONSUME(PnAuditLogMarker.AUDIT10Y),
+    AUD_RADD_ACTINQUIRY(PnAuditLogMarker.AUDIT10Y),
+    AUD_RADD_AORINQUIRY(PnAuditLogMarker.AUDIT10Y),
+    AUD_RADD_ACTTRAN(PnAuditLogMarker.AUDIT10Y),
+    AUD_RADD_AORTRAN(PnAuditLogMarker.AUDIT10Y),
+    AUD_NT_RADD_OPEN(PnAuditLogMarker.AUDIT10Y);
 
     
     final org.slf4j.Marker marker;
