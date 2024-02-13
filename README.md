@@ -3,3 +3,5 @@
 ```bash
     ./mvnw clean install
 ```
+
+test Jira Auto
