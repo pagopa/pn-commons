@@ -4,4 +4,3 @@
     ./mvnw clean install
 ```
 
-Test
