@@ -155,7 +155,7 @@ public abstract class CommonBaseClient {
     }
 
     private boolean isRetryableException(Throwable throwable) {
-        return throwable instanceof TimeoutException ||
+        boolean retryable = throwable instanceof TimeoutException ||
                 throwable instanceof SocketException ||
                 throwable instanceof SocketTimeoutException ||
                 throwable instanceof SSLHandshakeException ||
@@ -166,6 +166,10 @@ public abstract class CommonBaseClient {
                 throwable instanceof WebClientResponseException.BadGateway ||
                 throwable instanceof WebClientResponseException.ServiceUnavailable
                 ;
+        if(retryable) {
+            log.warn("Exception caught by retry", throwable);
+        }
+        return retryable;
     }
 
     @Autowired
