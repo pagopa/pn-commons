@@ -94,6 +94,11 @@ class PnLoggerImpl implements PnLogger {
     }
 
     @Override
+    public void logInvokationResultDownstreamNotFound(String service, String description) {
+        log.info("[DOWNSTREAM] Service {} returned errors={}", service, description==null?"<not specified>":description);
+    }
+
+    @Override
     public <T> void logPuttingDynamoDBEntity(String tableName, T entity) {
         log.debug("Putting data in DynamoDb table: {}, entity: {}", tableName, entity);
     }
