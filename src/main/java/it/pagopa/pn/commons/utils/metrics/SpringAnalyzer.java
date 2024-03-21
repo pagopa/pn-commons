@@ -62,7 +62,7 @@ public class SpringAnalyzer {
                     });
                     log.trace("[{}] PutMetricDataResponse: {}", namespace, putMetricDataResponse);
                 },
-                throwable -> log.warn(String.format("[%s] Error sending metric", namespace), throwable));
+                throwable -> log.warn(String.format("[%s] Error sending metrics", namespace), throwable));
     }
 
     private void createMetricAndSendCloudwatch(String metricName) {
