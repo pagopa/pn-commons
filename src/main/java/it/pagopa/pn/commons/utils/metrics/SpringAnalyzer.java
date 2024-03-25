@@ -22,7 +22,7 @@ public class SpringAnalyzer {
     private String applicationName;
     @Value("#{'${pn.ecs.uri}'.split('[/]')[4].split('[-]')[0]}")
     private String taskId;
-    @Value("#{'${pn.analyzer.params}.split(',')}")
+    @Value("#{'${pn.analyzer.params}'.split(',')}")
     protected List<String> metrics;
 
     protected List<String> getMetrics() {
@@ -55,14 +55,19 @@ public class SpringAnalyzer {
                 }
             }
         });
-        cloudWatchMetricHandler.sendMetricCollection(namespace, metricDatumCollection).
-        subscribe(putMetricDataResponse -> {
-                    metricDatumCollection.forEach(metricDatum -> {
-                        metricSuccessfullSendListener(metricDatum.metricName());
-                    });
-                    log.trace("[{}] PutMetricDataResponse: {}", namespace, putMetricDataResponse);
-                },
-                throwable -> log.warn(String.format("[%s] Error sending metrics", namespace), throwable));
+        if(!metricDatumCollection.isEmpty()) {
+            cloudWatchMetricHandler.sendMetricCollection(namespace, metricDatumCollection).
+                    subscribe(putMetricDataResponse -> {
+                                metricDatumCollection.forEach(metricDatum -> {
+                                    metricSuccessfullSendListener(metricDatum.metricName());
+                                });
+                                log.trace("[{}] PutMetricDataResponse: {}", namespace, putMetricDataResponse);
+                            },
+                            throwable -> log.warn(String.format("[%s] Error sending metrics", namespace), throwable));
+        }
+        else {
+            log.trace("No metrics to send");
+        }
     }
 
     private void createMetricAndSendCloudwatch(String metricName) {
