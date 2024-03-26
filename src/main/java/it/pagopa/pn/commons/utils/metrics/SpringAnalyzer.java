@@ -7,11 +7,9 @@ import org.springframework.boot.actuate.metrics.MetricsEndpoint;
 import org.springframework.scheduling.annotation.Scheduled;
 import software.amazon.awssdk.services.cloudwatch.model.Dimension;
 import software.amazon.awssdk.services.cloudwatch.model.MetricDatum;
-import software.amazon.awssdk.services.cloudwatch.model.PutMetricDataRequest;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -23,9 +21,8 @@ public class SpringAnalyzer {
     private String applicationName;
     @Value("#{'${pn.ecs.uri}'.split('[/]')[4].split('[-]')[0]}")
     private String taskId;
+    @Value("#{'${pn.analyzer.params}'.split(',')}")
     protected List<String> metrics;
-    @Value("${pn.analyzer.params}")
-    private String pnAnalyzerParams;
 
     protected List<String> getMetrics() {
         return this.metrics;
@@ -35,14 +32,13 @@ public class SpringAnalyzer {
         this.metricEndpoint = metricsEndpoint;
         this.cloudWatchMetricHandler = cloudWatchMetricHandler;
         Runtime.getRuntime().addShutdownHook(new ShutdownHook(this));
-        this.metrics = new ArrayList<>();
+        if(this.metrics == null) {
+            this.metrics = new ArrayList<>();
+        }
     }
 
     @PostConstruct
     public void init() {
-        if(this.pnAnalyzerParams != null) {
-            metrics = Arrays.asList(this.pnAnalyzerParams.split(","));
-        }
         log.info("Metric Instance for SpringAnalyzer Activation: {}", applicationName + "-" + taskId);
     }
 
