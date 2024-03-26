@@ -6,9 +6,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.metrics.MetricsEndpoint;
 import org.springframework.scheduling.annotation.Scheduled;
 import software.amazon.awssdk.services.cloudwatch.model.Dimension;
+import software.amazon.awssdk.services.cloudwatch.model.MetricDatum;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @CustomLog
@@ -19,7 +21,7 @@ public class SpringAnalyzer {
     private String applicationName;
     @Value("#{'${pn.ecs.uri}'.split('[/]')[4].split('[-]')[0]}")
     private String taskId;
-    @Value("#{'${pn.analyzer.params}.split(',')}")
+    @Value("#{'${pn.analyzer.params}'.split(',')}")
     protected List<String> metrics;
 
     protected List<String> getMetrics() {
@@ -42,14 +44,33 @@ public class SpringAnalyzer {
 
     @Scheduled(cron = "${pn.analyzer.cloudwatch-metric-cron}")
     public void scheduledSendMetrics() {
+        String namespace = "SpringAnalyzer" + "-" + applicationName;
+        Collection<MetricDatum> metricDatumCollection = new ArrayList<>();
         metrics.forEach(value -> {
             if(!value.equals("")) {
-                this.createMetricAndSendCloudwatch(value);
+                MetricDatum metricDatum = this.createMetricCloudwatch(value);
+                if(metricDatum != null) {
+                    metricDatumCollection.add(metricDatum);
+                }
             }
         });
+        if(!metricDatumCollection.isEmpty()) {
+            cloudWatchMetricHandler.sendMetricCollection(namespace, metricDatumCollection).
+                    subscribe(putMetricDataResponse -> {
+                                metricDatumCollection.forEach(metricDatum -> {
+                                    metricSuccessfullSendListener(metricDatum.metricName());
+                                });
+                                log.trace("[{}] PutMetricDataResponse: {}", namespace, putMetricDataResponse.toString());
+                            },
+                            throwable -> log.warn(String.format("[%s] Error sending metrics", namespace), throwable));
+        }
+        else {
+            log.trace("No metrics to send");
+        }
     }
 
-    private void createMetricAndSendCloudwatch(String metricName) {
+
+    private MetricDatum createMetricCloudwatch(String metricName) {
         List<String> tag = new ArrayList<>();
         String namespace = "SpringAnalyzer" + "-" + applicationName;
         MetricsEndpoint.MetricResponse response = this.metricEndpoint.metric(metricName, tag);
@@ -63,17 +84,17 @@ public class SpringAnalyzer {
             dimension = customizedDimension(dimension, metricName);
             if (!response.getMeasurements().isEmpty()) {
                 log.trace("Sending Cloudwatch information {}= {}", metricName, response.getMeasurements().get(0).getValue());
-                cloudWatchMetricHandler.sendMetric(namespace, dimension, metricName, response.getMeasurements().get(0).getValue()).
-                        subscribe(putMetricDataResponse -> {
-                                    metricSuccessfullSendListener(metricName);
-                                    log.trace("[{}] PutMetricDataResponse: {}", namespace, putMetricDataResponse);
-                                },
-                                throwable -> log.warn(String.format("[%s] Error sending metric", namespace), throwable));
+                return  MetricDatum.builder()
+                        .metricName(metricName)
+                        .value(response.getMeasurements().get(0).getValue())
+                        .dimensions(dimension)
+                        .build();
             }
             else {
                 log.trace("Measurement {} not available", metricName);
             }
         }
+        return null;
     }
 
     protected Dimension customizedDimension(Dimension dimension, String metricName){
