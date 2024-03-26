@@ -40,7 +40,9 @@ public class SpringAnalyzer {
 
     @PostConstruct
     public void init() {
-        metrics = Arrays.asList(this.pnAnalyzerParams.split(","));
+        if(this.pnAnalyzerParams != null) {
+            metrics = Arrays.asList(this.pnAnalyzerParams.split(","));
+        }
         log.info("Metric Instance for SpringAnalyzer Activation: {}", applicationName + "-" + taskId);
     }
 
@@ -71,32 +73,6 @@ public class SpringAnalyzer {
         }
     }
 
-    private void createMetricAndSendCloudwatch(String metricName) {
-        List<String> tag = new ArrayList<>();
-        String namespace = "SpringAnalyzer" + "-" + applicationName;
-        MetricsEndpoint.MetricResponse response = this.metricEndpoint.metric(metricName, tag);
-        if (response == null) {
-            log.warn(String.format("[%s] Metric not available", namespace));
-        } else {
-            Dimension dimension = Dimension.builder()
-                    .name("ApplicationName_TaskId")
-                    .value(applicationName + "_" + taskId)
-                    .build();
-            dimension = customizedDimension(dimension, metricName);
-            if (!response.getMeasurements().isEmpty()) {
-                log.trace("Sending Cloudwatch information {}= {}", metricName, response.getMeasurements().get(0).getValue());
-                cloudWatchMetricHandler.sendMetric(namespace, dimension, metricName, response.getMeasurements().get(0).getValue()).
-                        subscribe(putMetricDataResponse -> {
-                                    metricSuccessfullSendListener(metricName);
-                                    log.trace("[{}] PutMetricDataResponse: {}", namespace, putMetricDataResponse);
-                                },
-                                throwable -> log.warn(String.format("[%s] Error sending metric", namespace), throwable));
-            }
-            else {
-                log.trace("Measurement {} not available", metricName);
-            }
-        }
-    }
 
     private MetricDatum createMetricCloudwatch(String metricName) {
         List<String> tag = new ArrayList<>();
