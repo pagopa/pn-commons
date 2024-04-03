@@ -45,7 +45,7 @@ public abstract class Handler<T, C> {
     }
 
     @NotNull
-    private Mono<? extends ResultFilter> manageHandlerResult(T item, C ruleContext, FilterHandlerResult handlerResult) {
+    private Mono<ResultFilter> manageHandlerResult(T item, C ruleContext, FilterHandlerResult handlerResult) {
         return switch (handlerResult) {
             case SUCCESS -> Mono.just(new ResultFilter(true));
             case FAIL -> Mono.just(new ResultFilter(false));
