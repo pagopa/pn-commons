@@ -18,7 +18,7 @@ import reactor.util.annotation.NonNull;
 import java.time.OffsetDateTime;
 
 /**
- * ChainHandler pensato per essere attivato dai microservizi REACTIVE tramite:
+ * Handler pensato per essere attivato dai microservizi REACTIVE tramite:
  *
  * @Component
  * @Order(-2)

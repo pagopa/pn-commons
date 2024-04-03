@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.time.OffsetDateTime;
 
 /**
- * ChainHandler pensato per essere attivato dai microservizi CLASSICI tramite:
+ * Handler pensato per essere attivato dai microservizi CLASSICI tramite:
  *
  * @org.springframework.web.bind.annotation.ControllerAdvice
  * @Import(ExceptionHelper.class)
