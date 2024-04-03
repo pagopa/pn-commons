@@ -9,15 +9,13 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class ListRuleEngineHandlerTest {
 
     ListRuleEngineHandlerExampleItem listRuleEngineHandlerExampleItem;
     @BeforeEach
     void setup() {
-        SimpleChainEngineHandler<ExampleItem, ListChainContext<ExampleItem>, ListChainResultFilter<ExampleItem>> simpleChainEngineHandler = new SimpleChainEngineHandler<>();
-        ListChainEngineHandler<ExampleItem, ListChainContext<ExampleItem>, ListChainResultFilter<ExampleItem>> listChainEngineHandler = new ListChainEngineHandler<>(simpleChainEngineHandler);
+        SimpleChainEngineHandler<ExampleItem, ListChainContext<ExampleItem>> simpleChainEngineHandler = new SimpleChainEngineHandler<>();
+        ListChainEngineHandler<ExampleItem, ListChainContext<ExampleItem>> listChainEngineHandler = new ListChainEngineHandler<>(simpleChainEngineHandler);
 
         listRuleEngineHandlerExampleItem = new ListRuleEngineHandlerExampleItem(listChainEngineHandler);
 

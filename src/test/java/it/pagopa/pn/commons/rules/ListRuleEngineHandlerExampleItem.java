@@ -1,9 +1,6 @@
 package it.pagopa.pn.commons.rules;
 
-import it.pagopa.pn.commons.rules.model.ListChainContext;
-import it.pagopa.pn.commons.rules.model.ListChainResultFilter;
-import it.pagopa.pn.commons.rules.model.ResultFilter;
-import it.pagopa.pn.commons.rules.model.RuleModel;
+import it.pagopa.pn.commons.rules.model.*;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import reactor.core.publisher.Mono;
@@ -11,8 +8,8 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 
 @Slf4j
-public class ListRuleEngineHandlerExampleItem extends ListRuleEngineHandler<List<RuleModel>, ExampleItem, ListChainContext<ExampleItem>, ListChainResultFilter<ExampleItem>> {
-    public ListRuleEngineHandlerExampleItem(ListChainEngineHandler<ExampleItem, ListChainContext<ExampleItem>, ListChainResultFilter<ExampleItem>> parent) {
+public class ListRuleEngineHandlerExampleItem extends ListRuleEngineHandler<List<RuleModel>, ExampleItem, ListChainContext<ExampleItem>> {
+    public ListRuleEngineHandlerExampleItem(ListChainEngineHandler<ExampleItem, ListChainContext<ExampleItem>> parent) {
         super(parent);
     }
 
@@ -24,18 +21,15 @@ public class ListRuleEngineHandlerExampleItem extends ListRuleEngineHandler<List
 
 
     @NotNull
-    private static Handler<ExampleItem, Object, ListChainResultFilter<ExampleItem>> getHandler(boolean result) {
+    private static Handler<ExampleItem, Object> getHandler(boolean result) {
         return new Handler<>() {
             @Override
-            Mono<ListChainResultFilter<ExampleItem>> filter(ExampleItem item, Object ruleContext) {
+            Mono<FilterHandlerResult> filter(ExampleItem item, Object ruleContext) {
 
                 if (!result)
-                    return Mono.just(new ListChainResultFilter<ExampleItem>(item, result)).doOnNext(r -> log.info("handler1 item={} returned={}", r.getItem(), r.isResult()));
+                    return Mono.just(FilterHandlerResult.FAIL);
                 else {
-                    if (nextHandler != null)
-                        return nextHandler.filter(item, ruleContext);
-                    else
-                        return Mono.just(new ListChainResultFilter<ExampleItem>(item, result)).doOnNext(r -> log.info("handler1 item={} returned={}", r.getItem(), r.isResult()));
+                    return Mono.just(FilterHandlerResult.NEXT);
                 }
             }
         };
@@ -43,18 +37,15 @@ public class ListRuleEngineHandlerExampleItem extends ListRuleEngineHandler<List
 
 
     @NotNull
-    private static Handler<ExampleItem, Object, ListChainResultFilter<ExampleItem>> getHandler2(boolean result) {
+    private static Handler<ExampleItem, Object> getHandler2(boolean result) {
         return new Handler<>() {
             @Override
-            Mono<ListChainResultFilter<ExampleItem>> filter(ExampleItem item, Object ruleContext) {
+            Mono<FilterHandlerResult> filter(ExampleItem item, Object ruleContext) {
 
                 if (!result)
-                    return Mono.just(new ListChainResultFilter<ExampleItem>(item, result)).doOnNext(r -> log.info("handler2 item={} returned={}", r.getItem(), r.isResult()));
+                    return Mono.just(FilterHandlerResult.FAIL);
                 else {
-                    if (nextHandler != null)
-                        return nextHandler.filter(item, ruleContext);
-                    else
-                        return Mono.just(new ListChainResultFilter<ExampleItem>(item, result)).doOnNext(r -> log.info("handler2 item={} returned={}", r.getItem(), r.isResult()));
+                    return Mono.just(FilterHandlerResult.SUCCESS);
                 }
             }
         };

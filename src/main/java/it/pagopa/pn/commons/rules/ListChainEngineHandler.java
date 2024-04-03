@@ -2,6 +2,7 @@ package it.pagopa.pn.commons.rules;
 
 import it.pagopa.pn.commons.rules.model.ListChainContext;
 import it.pagopa.pn.commons.rules.model.ListChainResultFilter;
+import it.pagopa.pn.commons.rules.model.ResultFilter;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.SerializationUtils;
 import org.jetbrains.annotations.NotNull;
@@ -21,16 +22,15 @@ import java.util.List;
  *
  * @param <T> vedi Handler
  * @param <C> vedi Handler
- * @param <R> vedi Handler
  */
 
 @AllArgsConstructor
 @Component
-public class ListChainEngineHandler<T extends Serializable, C extends ListChainContext<T>, R extends ListChainResultFilter<T>> {
+public class ListChainEngineHandler<T extends Serializable, C extends ListChainContext<T>> {
 
-    private SimpleChainEngineHandler<T, C, R> simpleChainEngineHandler;
+    private SimpleChainEngineHandler<T, C> simpleChainEngineHandler;
 
-    public Flux<R> filterItems(C context, List<T> items, Handler<T, C, R> handler){
+    public Flux<ListChainResultFilter<T>> filterItems(C context, List<T> items, Handler<T, C> handler){
         // il concatMap concatena i mono sequenzialmente 1 alla volta, che è il desiderata,
         // dato che ogni mono riceve in input il risultato aggiornato degli item precedenti
         return Flux.fromIterable(items)
@@ -38,15 +38,19 @@ public class ListChainEngineHandler<T extends Serializable, C extends ListChainC
     }
 
     @NotNull
-    private Mono<R> setupAndExecuteFilter(C context, Handler<T, C, R> handler, T item) {
+    private Mono<ListChainResultFilter<T>> setupAndExecuteFilter(C context, Handler<T, C> handler, T item) {
         C deepCopyContext = SerializationUtils.clone(context);
         return simpleChainEngineHandler
                 .filterItem(deepCopyContext, item, handler)
-                .map(r -> postProcessFilterResult(context, r));
+                .map(r -> postProcessFilterResult(context, item, r));
     }
 
-    private R postProcessFilterResult(C context, R r) {
-        context.addResult(r);
-        return r;
+    private ListChainResultFilter<T> postProcessFilterResult(C context, T item, ResultFilter r) {
+        ListChainResultFilter<T> finalResult = new ListChainResultFilter<>();
+        finalResult.setResult(r.isResult());
+        finalResult.setItem(item);
+
+        context.addResult(finalResult);
+        return finalResult;
     }
 }

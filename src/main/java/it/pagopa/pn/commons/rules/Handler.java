@@ -1,6 +1,9 @@
 package it.pagopa.pn.commons.rules;
 
+import it.pagopa.pn.commons.rules.model.FilterHandlerResult;
 import it.pagopa.pn.commons.rules.model.ResultFilter;
+import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import reactor.core.publisher.Mono;
 
 /**
@@ -13,11 +16,10 @@ import reactor.core.publisher.Mono;
  *
  * @param <T> L'istanza dell'oggetto di valutazione
  * @param <C> Eventuale contesto da utilizzare nella valutazione
- * @param <R> Risultato della valutazione
  */
-public abstract class Handler<T, C, R extends ResultFilter> {
-
-    protected Handler<T, C, R> nextHandler;
+@Slf4j
+public abstract class Handler<T, C> {
+    protected Handler<T, C> nextHandler;
 
     /**
      * Metodo per valutare la logica di filtro
@@ -26,13 +28,36 @@ public abstract class Handler<T, C, R extends ResultFilter> {
      * @param ruleContext eventuale contesto da utilizzare nella valutazione
      * @return risultato della valutazione.
      */
-    abstract Mono<R> filter(T item, C ruleContext);
+    abstract Mono<FilterHandlerResult> filter(T item, C ruleContext);
 
     /**
      * Imposta l'eventuale prossimo step nella catena di filtri.
      * @param nextHandler istanza del prossimo filtro da invocare nella catena.
      */
-    void setNext(Handler<T, C, R> nextHandler){
+    void setNext(Handler<T, C> nextHandler){
         this.nextHandler = nextHandler;
+    }
+
+    protected final Mono<ResultFilter> doFilter(T item, C ruleContext){
+        return filter(item, ruleContext)
+                .doOnNext(r -> log.debug("filter result={}", r))
+                .flatMap(handlerResult -> manageHandlerResult(item, ruleContext, handlerResult));
+    }
+
+    @NotNull
+    private Mono<? extends ResultFilter> manageHandlerResult(T item, C ruleContext, FilterHandlerResult handlerResult) {
+        return switch (handlerResult) {
+            case SUCCESS -> Mono.just(new ResultFilter(true));
+            case FAIL -> Mono.just(new ResultFilter(false));
+            case NEXT -> {
+                if (this.nextHandler != null) {
+                    log.debug("there is a nextHandler, returning that result");
+                    yield this.nextHandler.doFilter(item, ruleContext);
+                }
+                else {
+                    yield Mono.just(new ResultFilter(true));
+                }
+            }
+        };
     }
 }

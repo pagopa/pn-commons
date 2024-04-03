@@ -11,15 +11,14 @@ import reactor.core.publisher.Mono;
  *
  * @param <T> vedi Handler
  * @param <C> vedi Handler
- * @param <R> vedi Handler
  */
 @Component
 @Slf4j
-public class SimpleChainEngineHandler<T, C, R extends ResultFilter> {
-    public Mono<R> filterItem(C context, T item, Handler<T, C, R> handler){
+public class SimpleChainEngineHandler<T, C> {
+    public Mono<ResultFilter> filterItem(C context, T item, Handler<T, C> handler){
         // richiama wrappando il filtro, tipo con log
         log.debug("invoking filter item handler={} item={} context={}", handler.toString(), item, context);
-        return handler.filter(item, context)
+        return handler.doFilter(item, context)
                 .doOnNext(r -> log.info("invoked filter handler={}  item={} context={} result={}", handler, item, context, r));
     }
 }
