@@ -1,7 +1,7 @@
 package it.pagopa.pn.commons.rules;
 
 import it.pagopa.pn.commons.rules.model.ListChainContext;
-import it.pagopa.pn.commons.rules.model.ListChainResultFilter;
+import it.pagopa.pn.commons.rules.model.ListFilterChainResult;
 import it.pagopa.pn.commons.rules.model.RuleModel;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +31,7 @@ public abstract class ListRuleEngineHandler<U extends List<RuleModel>, T extends
     protected abstract Handler<T, C>  resolveHandlerFromRule(RuleModel r);
 
 
-    public Flux<ListChainResultFilter<T>> filterItems(C context, List<T> items, U rules){
+    public Flux<ListFilterChainResult<T>> filterItems(C context, List<T> items, U rules){
         // risolve la catena di handlers, utilizzando le regole passate
         Handler<T, C> firstHandlerOfChain = resolveHandlersFromRules(rules);
         return listChainEngineHandler.filterItems(context, items, firstHandlerOfChain);

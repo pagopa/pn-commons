@@ -24,13 +24,13 @@ public interface ListChainContext<T extends Serializable> extends Serializable {
      *
      * @return lista dei risultati
      */
-    List<ListChainResultFilter<T>> getActualResults();
+    List<ListFilterChainResult<T>> getActualResults();
 
     /**
      * Permette di aggiungere un esito alla lista
      *
      * @param result il risultato da aggiungere
      */
-    void addResult(ListChainResultFilter<T> result);
+    void addResult(ListFilterChainResult<T> result);
 
 }

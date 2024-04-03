@@ -1,6 +1,6 @@
 package it.pagopa.pn.commons.rules;
 
-import it.pagopa.pn.commons.rules.model.ResultFilter;
+import it.pagopa.pn.commons.rules.model.FilterChainResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono;
 @Component
 @Slf4j
 public class SimpleChainEngineHandler<T, C> {
-    public Mono<ResultFilter> filterItem(C context, T item, Handler<T, C> handler){
+    public Mono<FilterChainResult> filterItem(C context, T item, Handler<T, C> handler){
         // richiama wrappando il filtro, tipo con log
         log.debug("invoking filter item handler={} item={} context={}", handler.toString(), item, context);
         return handler.doFilter(item, context)

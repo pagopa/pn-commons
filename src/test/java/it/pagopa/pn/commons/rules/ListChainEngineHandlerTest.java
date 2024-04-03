@@ -2,7 +2,7 @@ package it.pagopa.pn.commons.rules;
 
 import it.pagopa.pn.commons.rules.model.FilterHandlerResult;
 import it.pagopa.pn.commons.rules.model.ListChainContext;
-import it.pagopa.pn.commons.rules.model.ListChainResultFilter;
+import it.pagopa.pn.commons.rules.model.ListFilterChainResult;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,7 +35,7 @@ class ListChainEngineHandlerTest {
 
 
         // WHEN
-        List<ListChainResultFilter<ExampleItem>> r = listChainEngineHandler.filterItems(context, items, h).collectList().block();
+        List<ListFilterChainResult<ExampleItem>> r = listChainEngineHandler.filterItems(context, items, h).collectList().block();
 
         // THEN
         Assertions.assertEquals(items.size(), r.size());
@@ -58,7 +58,7 @@ class ListChainEngineHandlerTest {
 
 
         // WHEN
-        List<ListChainResultFilter<ExampleItem>> r = listChainEngineHandler.filterItems(context, items, h).collectList().block();
+        List<ListFilterChainResult<ExampleItem>> r = listChainEngineHandler.filterItems(context, items, h).collectList().block();
 
         // THEN
         Assertions.assertEquals(items.size(), r.size());
@@ -81,7 +81,7 @@ class ListChainEngineHandlerTest {
 
 
         // WHEN
-        List<ListChainResultFilter<ExampleItem>> r = listChainEngineHandler.filterItems(context, items, h).collectList().block();
+        List<ListFilterChainResult<ExampleItem>> r = listChainEngineHandler.filterItems(context, items, h).collectList().block();
 
         // THEN
         Assertions.assertEquals(items.size(), r.size());
@@ -106,7 +106,7 @@ class ListChainEngineHandlerTest {
 
 
         // WHEN
-        List<ListChainResultFilter<ExampleItem>> r = listChainEngineHandler.filterItems(context, items, h).collectList().block();
+        List<ListFilterChainResult<ExampleItem>> r = listChainEngineHandler.filterItems(context, items, h).collectList().block();
 
         // THEN
         Assertions.assertEquals(items.size(), r.size());

@@ -12,11 +12,11 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 /**
- * Risultato del filtro per una lista, rispetto a ResultFilter contiene anche l'item
+ * Risultato del filtro per una lista, rispetto a FilterChainResult contiene anche l'item
  */
-public class ListChainResultFilter<T extends Serializable> extends ResultFilter implements Serializable {
+public class ListFilterChainResult<T extends Serializable> extends FilterChainResult implements Serializable {
 
-    public ListChainResultFilter(T item, boolean result) {
+    public ListFilterChainResult(T item, boolean result) {
         super(result);
 
         this.item = item;

@@ -12,7 +12,7 @@ import java.io.Serializable;
 /**
  * Risultato del filtro, può essere esteso per allegare informazioni
  */
-public class ResultFilter implements Serializable {
+public class FilterChainResult implements Serializable {
 
     private boolean result;
 }

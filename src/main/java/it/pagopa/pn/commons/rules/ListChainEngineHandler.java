@@ -1,8 +1,8 @@
 package it.pagopa.pn.commons.rules;
 
 import it.pagopa.pn.commons.rules.model.ListChainContext;
-import it.pagopa.pn.commons.rules.model.ListChainResultFilter;
-import it.pagopa.pn.commons.rules.model.ResultFilter;
+import it.pagopa.pn.commons.rules.model.ListFilterChainResult;
+import it.pagopa.pn.commons.rules.model.FilterChainResult;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.SerializationUtils;
 import org.jetbrains.annotations.NotNull;
@@ -30,7 +30,7 @@ public class ListChainEngineHandler<T extends Serializable, C extends ListChainC
 
     private SimpleChainEngineHandler<T, C> simpleChainEngineHandler;
 
-    public Flux<ListChainResultFilter<T>> filterItems(C context, List<T> items, Handler<T, C> handler){
+    public Flux<ListFilterChainResult<T>> filterItems(C context, List<T> items, Handler<T, C> handler){
         // il concatMap concatena i mono sequenzialmente 1 alla volta, che è il desiderata,
         // dato che ogni mono riceve in input il risultato aggiornato degli item precedenti
         return Flux.fromIterable(items)
@@ -38,15 +38,15 @@ public class ListChainEngineHandler<T extends Serializable, C extends ListChainC
     }
 
     @NotNull
-    private Mono<ListChainResultFilter<T>> setupAndExecuteFilter(C context, Handler<T, C> handler, T item) {
+    private Mono<ListFilterChainResult<T>> setupAndExecuteFilter(C context, Handler<T, C> handler, T item) {
         C deepCopyContext = SerializationUtils.clone(context);
         return simpleChainEngineHandler
                 .filterItem(deepCopyContext, item, handler)
                 .map(r -> postProcessFilterResult(context, item, r));
     }
 
-    private ListChainResultFilter<T> postProcessFilterResult(C context, T item, ResultFilter r) {
-        ListChainResultFilter<T> finalResult = new ListChainResultFilter<>();
+    private ListFilterChainResult<T> postProcessFilterResult(C context, T item, FilterChainResult r) {
+        ListFilterChainResult<T> finalResult = new ListFilterChainResult<>();
         finalResult.setResult(r.isResult());
         finalResult.setItem(item);
 

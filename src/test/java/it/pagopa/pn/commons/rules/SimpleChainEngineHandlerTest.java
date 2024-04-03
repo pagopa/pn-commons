@@ -1,8 +1,8 @@
 package it.pagopa.pn.commons.rules;
 
 import it.pagopa.pn.commons.exceptions.PnInternalException;
+import it.pagopa.pn.commons.rules.model.FilterChainResult;
 import it.pagopa.pn.commons.rules.model.FilterHandlerResult;
-import it.pagopa.pn.commons.rules.model.ResultFilter;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,7 +23,7 @@ class SimpleChainEngineHandlerTest {
     void filterItemTrue() {
         Handler<ExampleItem, Object> h = getHandler(true);
 
-        ResultFilter r = simpleChainEngineHandler.filterItem(new Object(), new ExampleItem(), h).block();
+        FilterChainResult r = simpleChainEngineHandler.filterItem(new Object(), new ExampleItem(), h).block();
 
         Assertions.assertTrue(r.isResult());
     }
@@ -33,7 +33,7 @@ class SimpleChainEngineHandlerTest {
     void filterItemFalse() {
         Handler<ExampleItem, Object> h = getHandler(false);
 
-        ResultFilter r = simpleChainEngineHandler.filterItem(new Object(), new ExampleItem(), h).block();
+        FilterChainResult r = simpleChainEngineHandler.filterItem(new Object(), new ExampleItem(), h).block();
 
         Assertions.assertFalse(r.isResult());
     }
@@ -48,7 +48,7 @@ class SimpleChainEngineHandlerTest {
 
 
 
-        ResultFilter r = simpleChainEngineHandler.filterItem(new Object(), new ExampleItem(), h).block();
+        FilterChainResult r = simpleChainEngineHandler.filterItem(new Object(), new ExampleItem(), h).block();
 
         Assertions.assertFalse(r.isResult());
     }
@@ -62,7 +62,7 @@ class SimpleChainEngineHandlerTest {
 
 
 
-        ResultFilter r = simpleChainEngineHandler.filterItem(new Object(), new ExampleItem(), h).block();
+        FilterChainResult r = simpleChainEngineHandler.filterItem(new Object(), new ExampleItem(), h).block();
 
         Assertions.assertTrue(r.isResult());
     }
@@ -77,7 +77,7 @@ class SimpleChainEngineHandlerTest {
 
 
 
-        ResultFilter r = simpleChainEngineHandler.filterItem(new Object(), new ExampleItem(), h).block();
+        FilterChainResult r = simpleChainEngineHandler.filterItem(new Object(), new ExampleItem(), h).block();
 
         Assertions.assertFalse(r.isResult());
     }
@@ -95,7 +95,7 @@ class SimpleChainEngineHandlerTest {
             }
         };
 
-        Mono<ResultFilter> mono = simpleChainEngineHandler.filterItem(new Object(), new ExampleItem(), h);
+        Mono<FilterChainResult> mono = simpleChainEngineHandler.filterItem(new Object(), new ExampleItem(), h);
 
         Assertions.assertThrows(PnInternalException.class, mono::block);
     }

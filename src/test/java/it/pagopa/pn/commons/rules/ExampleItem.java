@@ -9,15 +9,15 @@ import java.io.Serializable;
 /*
     @Test
     void filterItemFalse() {
-        Handler<Object, Object, ResultFilter> h = new Handler<>() {
+        Handler<Object, Object, FilterChainResult> h = new Handler<>() {
             @Override
-            Mono<ResultFilter> filter(Object item, Object ruleContext) {
+            Mono<FilterChainResult> filter(Object item, Object ruleContext) {
 
-                return Mono.just(new ResultFilter(false));
+                return Mono.just(new FilterChainResult(false));
             }
         };
 
-        ResultFilter r = simpleChainEngineHandler.filterItem(new Object(), new Object(), h).block();
+        FilterChainResult r = simpleChainEngineHandler.filterItem(new Object(), new Object(), h).block();
 
         Assertions.assertFalse(r.isResult());
     }
@@ -25,15 +25,15 @@ import java.io.Serializable;
 
     @Test
     void filterItem_Exception() {
-        Handler<Object, Object, ResultFilter> h = new Handler<>() {
+        Handler<Object, Object, FilterChainResult> h = new Handler<>() {
             @Override
-            Mono<ResultFilter> filter(Object item, Object ruleContext) {
+            Mono<FilterChainResult> filter(Object item, Object ruleContext) {
 
                 return Mono.error(new PnInternalException("errore", "errore!"));
             }
         };
 
-        Mono<ResultFilter> mono = simpleChainEngineHandler.filterItem(new Object(), new Object(), h);
+        Mono<FilterChainResult> mono = simpleChainEngineHandler.filterItem(new Object(), new Object(), h);
 
         Assertions.assertThrows(PnInternalException.class, mono::block);
     }

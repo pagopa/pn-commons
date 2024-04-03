@@ -1,7 +1,7 @@
 package it.pagopa.pn.commons.rules;
 
 import it.pagopa.pn.commons.rules.model.ListChainContext;
-import it.pagopa.pn.commons.rules.model.ListChainResultFilter;
+import it.pagopa.pn.commons.rules.model.ListFilterChainResult;
 import it.pagopa.pn.commons.rules.model.RuleModel;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,7 +35,7 @@ class ListRuleEngineHandlerTest {
 
 
         // WHEN
-        List<ListChainResultFilter<ExampleItem>> r = listRuleEngineHandlerExampleItem.filterItems(context, items, rules).collectList().block();
+        List<ListFilterChainResult<ExampleItem>> r = listRuleEngineHandlerExampleItem.filterItems(context, items, rules).collectList().block();
 
         // THEN
         Assertions.assertEquals(items.size(), r.size());
@@ -60,7 +60,7 @@ class ListRuleEngineHandlerTest {
 
 
         // WHEN
-        List<ListChainResultFilter<ExampleItem>> r = listRuleEngineHandlerExampleItem.filterItems(context, items, rules).collectList().block();
+        List<ListFilterChainResult<ExampleItem>> r = listRuleEngineHandlerExampleItem.filterItems(context, items, rules).collectList().block();
 
         // THEN
         Assertions.assertEquals(items.size(), r.size());

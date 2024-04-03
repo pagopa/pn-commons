@@ -1,7 +1,7 @@
 package it.pagopa.pn.commons.rules;
 
+import it.pagopa.pn.commons.rules.model.FilterChainResult;
 import it.pagopa.pn.commons.rules.model.FilterHandlerResult;
-import it.pagopa.pn.commons.rules.model.ResultFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import reactor.core.publisher.Mono;
@@ -38,24 +38,24 @@ public abstract class Handler<T, C> {
         this.nextHandler = nextHandler;
     }
 
-    protected final Mono<ResultFilter> doFilter(T item, C ruleContext){
+    protected final Mono<FilterChainResult> doFilter(T item, C ruleContext){
         return filter(item, ruleContext)
                 .doOnNext(r -> log.debug("filter result={}", r))
                 .flatMap(handlerResult -> manageHandlerResult(item, ruleContext, handlerResult));
     }
 
     @NotNull
-    private Mono<ResultFilter> manageHandlerResult(T item, C ruleContext, FilterHandlerResult handlerResult) {
+    private Mono<FilterChainResult> manageHandlerResult(T item, C ruleContext, FilterHandlerResult handlerResult) {
         return switch (handlerResult) {
-            case SUCCESS -> Mono.just(new ResultFilter(true));
-            case FAIL -> Mono.just(new ResultFilter(false));
+            case SUCCESS -> Mono.just(new FilterChainResult(true));
+            case FAIL -> Mono.just(new FilterChainResult(false));
             case NEXT -> {
                 if (this.nextHandler != null) {
                     log.debug("there is a nextHandler, returning that result");
                     yield this.nextHandler.doFilter(item, ruleContext);
                 }
                 else {
-                    yield Mono.just(new ResultFilter(true));
+                    yield Mono.just(new FilterChainResult(true));
                 }
             }
         };
