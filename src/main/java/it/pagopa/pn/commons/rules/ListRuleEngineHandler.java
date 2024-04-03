@@ -1,6 +1,5 @@
 package it.pagopa.pn.commons.rules;
 
-import it.pagopa.pn.commons.rules.model.ListChainContext;
 import it.pagopa.pn.commons.rules.model.ListFilterChainResult;
 import it.pagopa.pn.commons.rules.model.RuleModel;
 import lombok.AllArgsConstructor;
@@ -12,7 +11,7 @@ import java.util.List;
 
 /**
  * Implementazione di un valutatore di regole.
- * Traduce in una lista di Handler un set di "regole"
+ * Traduce in una lista di ChainHandler un set di "regole"
  *
  * @param <U>
  * @param <T>
@@ -20,7 +19,7 @@ import java.util.List;
  */
 @AllArgsConstructor
 @Slf4j
-public abstract class ListRuleEngineHandler<U extends List<RuleModel>, T extends Serializable, C extends ListChainContext<T>> {
+public abstract class ListRuleEngineHandler<U extends List<RuleModel>, T extends Serializable, C extends Serializable> {
 
     private ListChainEngineHandler<T, C> listChainEngineHandler;
     /**
@@ -28,18 +27,18 @@ public abstract class ListRuleEngineHandler<U extends List<RuleModel>, T extends
      * @param r regola da risolvere
      * @return istanza (thread-safe) dell'handler.
      */
-    protected abstract Handler<T, C>  resolveHandlerFromRule(RuleModel r);
+    protected abstract ListChainHandler<T, C> resolveHandlerFromRule(RuleModel r);
 
 
     public Flux<ListFilterChainResult<T>> filterItems(C context, List<T> items, U rules){
         // risolve la catena di handlers, utilizzando le regole passate
-        Handler<T, C> firstHandlerOfChain = resolveHandlersFromRules(rules);
+        ListChainHandler<T, C> firstHandlerOfChain = resolveHandlersFromRules(rules);
         return listChainEngineHandler.filterItems(context, items, firstHandlerOfChain);
     }
 
-    private Handler<T,C> resolveHandlersFromRules(U rules) {
+    private ListChainHandler<T,C> resolveHandlersFromRules(U rules) {
         log.debug("resolving rules rules={}", rules);
-        Handler<T,C> lastHandlerResolved = null;
+        ListChainHandler<T,C> lastHandlerResolved = null;
 
         // ciclo al contrario, perchè alla fine mi interessa ritornare il primo elemento della catena
         for(int i = rules.size()-1;i>=0;i--)
@@ -47,7 +46,7 @@ public abstract class ListRuleEngineHandler<U extends List<RuleModel>, T extends
             // Risolve l'handler, e poi imposta aggiorna il nextHandler
             // con il lastHandlerResolved della catena.
             // si noti che l'ultimo handler avrà null come next, interrompendo la catena
-            Handler<T,C> nextHandler = resolveHandlerFromRule(rules.get(i));
+            ListChainHandler<T,C> nextHandler = resolveHandlerFromRule(rules.get(i));
             nextHandler.setNext(lastHandlerResolved);
 
             lastHandlerResolved = nextHandler;

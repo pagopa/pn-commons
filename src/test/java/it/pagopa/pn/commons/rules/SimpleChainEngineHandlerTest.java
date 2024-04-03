@@ -12,7 +12,7 @@ import reactor.core.publisher.Mono;
 class SimpleChainEngineHandlerTest {
 
 
-    SimpleChainEngineHandler<ExampleItem, Object> simpleChainEngineHandler;
+    SimpleChainEngineHandler<ExampleItem, ExampleContext> simpleChainEngineHandler;
     @BeforeEach
     void setup() {
         simpleChainEngineHandler = new SimpleChainEngineHandler<>();
@@ -21,9 +21,9 @@ class SimpleChainEngineHandlerTest {
 
     @Test
     void filterItemTrue() {
-        Handler<ExampleItem, Object> h = getHandler(true);
+        ChainHandler<ExampleItem, ExampleContext> h = getHandler(true);
 
-        FilterChainResult r = simpleChainEngineHandler.filterItem(new Object(), new ExampleItem(), h).block();
+        FilterChainResult r = simpleChainEngineHandler.filterItem(new ExampleContext(), new ExampleItem(), h).block();
 
         Assertions.assertTrue(r.isResult());
     }
@@ -31,9 +31,9 @@ class SimpleChainEngineHandlerTest {
 
     @Test
     void filterItemFalse() {
-        Handler<ExampleItem, Object> h = getHandler(false);
+        ChainHandler<ExampleItem, ExampleContext> h = getHandler(false);
 
-        FilterChainResult r = simpleChainEngineHandler.filterItem(new Object(), new ExampleItem(), h).block();
+        FilterChainResult r = simpleChainEngineHandler.filterItem(new ExampleContext(), new ExampleItem(), h).block();
 
         Assertions.assertFalse(r.isResult());
     }
@@ -42,13 +42,13 @@ class SimpleChainEngineHandlerTest {
     @Test
     void filterItemChainFalse() {
 
-        Handler<ExampleItem, Object> h = getHandler(true);
-        Handler<ExampleItem, Object> h1 = getHandler(false);
+        ChainHandler<ExampleItem, ExampleContext> h = getHandler(true);
+        ChainHandler<ExampleItem, ExampleContext> h1 = getHandler(false);
         h.setNext(h1);
 
 
 
-        FilterChainResult r = simpleChainEngineHandler.filterItem(new Object(), new ExampleItem(), h).block();
+        FilterChainResult r = simpleChainEngineHandler.filterItem(new ExampleContext(), new ExampleItem(), h).block();
 
         Assertions.assertFalse(r.isResult());
     }
@@ -56,13 +56,13 @@ class SimpleChainEngineHandlerTest {
     @Test
     void filterItemChainTrue() {
 
-        Handler<ExampleItem, Object> h = getSuccessHandler();
-        Handler<ExampleItem, Object> h1 = getHandler(false);
+        ChainHandler<ExampleItem, ExampleContext> h = getSuccessHandler();
+        ChainHandler<ExampleItem, ExampleContext> h1 = getHandler(false);
         h.setNext(h1);
 
 
 
-        FilterChainResult r = simpleChainEngineHandler.filterItem(new Object(), new ExampleItem(), h).block();
+        FilterChainResult r = simpleChainEngineHandler.filterItem(new ExampleContext(), new ExampleItem(), h).block();
 
         Assertions.assertTrue(r.isResult());
     }
@@ -71,13 +71,13 @@ class SimpleChainEngineHandlerTest {
     @Test
     void filterItemChainFalse2() {
 
-        Handler<ExampleItem, Object> h = getHandler(false);
-        Handler<ExampleItem, Object> h1 = getHandler(true);
+        ChainHandler<ExampleItem, ExampleContext> h = getHandler(false);
+        ChainHandler<ExampleItem, ExampleContext> h1 = getHandler(true);
         h.setNext(h1);
 
 
 
-        FilterChainResult r = simpleChainEngineHandler.filterItem(new Object(), new ExampleItem(), h).block();
+        FilterChainResult r = simpleChainEngineHandler.filterItem(new ExampleContext(), new ExampleItem(), h).block();
 
         Assertions.assertFalse(r.isResult());
     }
@@ -87,25 +87,25 @@ class SimpleChainEngineHandlerTest {
 
     @Test
     void filterItem_Exception() {
-        Handler<ExampleItem, Object> h = new Handler<>() {
+        ChainHandler<ExampleItem, ExampleContext> h = new ChainHandler<>() {
             @Override
-            public Mono<FilterHandlerResult> filter(ExampleItem item, Object ruleContext) {
+            public Mono<FilterHandlerResult> filter(ExampleItem item, ExampleContext ruleContext) {
 
                 return Mono.error(new PnInternalException("errore", "errore!"));
             }
         };
 
-        Mono<FilterChainResult> mono = simpleChainEngineHandler.filterItem(new Object(), new ExampleItem(), h);
+        Mono<FilterChainResult> mono = simpleChainEngineHandler.filterItem(new ExampleContext(), new ExampleItem(), h);
 
         Assertions.assertThrows(PnInternalException.class, mono::block);
     }
 
 
     @NotNull
-    private static Handler<ExampleItem, Object> getHandler(boolean result) {
-        return new Handler<>() {
+    private static ChainHandler<ExampleItem, ExampleContext> getHandler(boolean result) {
+        return new ChainHandler<>() {
             @Override
-            public Mono<FilterHandlerResult> filter(ExampleItem item, Object ruleContext) {
+            public Mono<FilterHandlerResult> filter(ExampleItem item, ExampleContext ruleContext) {
 
                 if (!result)
                     return Mono.just(FilterHandlerResult.FAIL);
@@ -117,10 +117,10 @@ class SimpleChainEngineHandlerTest {
     }
 
     @NotNull
-    private static Handler<ExampleItem, Object> getSuccessHandler() {
-        return new Handler<>() {
+    private static ChainHandler<ExampleItem, ExampleContext> getSuccessHandler() {
+        return new ChainHandler<>() {
             @Override
-            public Mono<FilterHandlerResult> filter(ExampleItem item, Object ruleContext) {
+            public Mono<FilterHandlerResult> filter(ExampleItem item, ExampleContext ruleContext) {
 
                 return Mono.just(FilterHandlerResult.SUCCESS);
 

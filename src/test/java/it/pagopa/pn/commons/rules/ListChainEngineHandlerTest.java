@@ -14,23 +14,21 @@ import java.util.List;
 class ListChainEngineHandlerTest {
 
 
-    ListChainEngineHandler<ExampleItem, ListChainContext<ExampleItem>> listChainEngineHandler;
+    ListChainEngineHandler<ExampleItem, ExampleContext> listChainEngineHandler;
     @BeforeEach
     void setup() {
-        SimpleChainEngineHandler<ExampleItem, ListChainContext<ExampleItem>> simpleChainEngineHandler = new SimpleChainEngineHandler<>();
-        listChainEngineHandler = new ListChainEngineHandler<>(simpleChainEngineHandler);
+        listChainEngineHandler = new ListChainEngineHandler<>();
 
     }
     @Test
     void filterItemsTrue() {
         // GIVEN
-        Handler<ExampleItem, ListChainContext<ExampleItem>> h = getHandler();
+        ListChainHandler<ExampleItem, ExampleContext> h = getHandler();
 
         List<ExampleItem> items = List.of(new ExampleItem("info1"),new ExampleItem("info2"),new ExampleItem("info3"));
 
-        ListChainContext<ExampleItem> context = ListChainContextExampleItem.builder()
+        ExampleContext context = ExampleContext.builder()
                 .contextdata("somedata")
-                .items(items)
                 .build();
 
 
@@ -47,13 +45,12 @@ class ListChainEngineHandlerTest {
     @Test
     void filterItemsOneElement() {
         // GIVEN
-        Handler<ExampleItem, ListChainContext<ExampleItem>> h = getHandler();
+        ListChainHandler<ExampleItem, ExampleContext> h = getHandler();
 
         List<ExampleItem> items = List.of(new ExampleItem("info1"));
 
-        ListChainContext<ExampleItem> context = ListChainContextExampleItem.builder()
+        ExampleContext context = ExampleContext.builder()
                 .contextdata("somedata")
-                .items(items)
                 .build();
 
 
@@ -70,13 +67,12 @@ class ListChainEngineHandlerTest {
     @Test
     void filterItemsWithContext() {
         // GIVEN
-        Handler<ExampleItem, ListChainContext<ExampleItem>> h = getHandlerSpecialContext();
+        ListChainHandler<ExampleItem, ExampleContext> h = getHandlerSpecialContext();
 
         List<ExampleItem> items = List.of(new ExampleItem("info1"),new ExampleItem("info2"),new ExampleItem("info3"));
 
-        ListChainContext<ExampleItem> context = ListChainContextExampleItem.builder()
+        ExampleContext context = ExampleContext.builder()
                 .contextdata("somedata")
-                .items(items)
                 .build();
 
 
@@ -95,13 +91,12 @@ class ListChainEngineHandlerTest {
     @Test
     void filterItemsWithContextWithHistory() {
         // GIVEN
-        Handler<ExampleItem, ListChainContext<ExampleItem>> h = getHandlerSpecialContext2();
+        ListChainHandler<ExampleItem, ExampleContext> h = getHandlerSpecialContext2();
 
         List<ExampleItem> items = List.of(new ExampleItem("info1"),new ExampleItem("info2"),new ExampleItem("info3"));
 
-        ListChainContext<ExampleItem> context = ListChainContextExampleItem.builder()
+        ExampleContext context = ExampleContext.builder()
                 .contextdata("somedata")
-                .items(items)
                 .build();
 
 
@@ -121,10 +116,11 @@ class ListChainEngineHandlerTest {
 
 
     @NotNull
-    private static Handler<ExampleItem, ListChainContext<ExampleItem>> getHandler() {
-        return new Handler<>() {
+    private static ListChainHandler<ExampleItem, ExampleContext> getHandler() {
+        return new ListChainHandler<>() {
+
             @Override
-            public Mono<FilterHandlerResult> filter(ExampleItem item, ListChainContext<ExampleItem> ruleContext) {
+            public Mono<FilterHandlerResult> filter(ExampleItem item, ListChainContext<ExampleItem, ExampleContext>  ruleContext) {
 
                 return Mono.just(FilterHandlerResult.SUCCESS);
             }
@@ -134,10 +130,10 @@ class ListChainEngineHandlerTest {
 
 
     @NotNull
-    private static Handler<ExampleItem, ListChainContext<ExampleItem>> getHandlerSpecialContext() {
-        return new Handler<>() {
+    private static ListChainHandler<ExampleItem, ExampleContext> getHandlerSpecialContext() {
+        return new ListChainHandler<>() {
             @Override
-            public Mono<FilterHandlerResult> filter(ExampleItem item, ListChainContext<ExampleItem> ruleContext) {
+            public Mono<FilterHandlerResult> filter(ExampleItem item, ListChainContext<ExampleItem, ExampleContext> ruleContext) {
 
                 return Mono.just(item.getInfo().equals("info1")?FilterHandlerResult.SUCCESS:FilterHandlerResult.FAIL);
             }
@@ -147,10 +143,10 @@ class ListChainEngineHandlerTest {
 
 
     @NotNull
-    private static Handler<ExampleItem, ListChainContext<ExampleItem>> getHandlerSpecialContext2() {
-        return new Handler<>() {
+    private static ListChainHandler<ExampleItem, ExampleContext> getHandlerSpecialContext2() {
+        return new ListChainHandler<>() {
             @Override
-            public Mono<FilterHandlerResult> filter(ExampleItem item, ListChainContext<ExampleItem> ruleContext) {
+            public Mono<FilterHandlerResult> filter(ExampleItem item, ListChainContext<ExampleItem, ExampleContext> ruleContext) {
 
                 // questo filtro controlla che nel contesto ci siano i risultati precedenti
 

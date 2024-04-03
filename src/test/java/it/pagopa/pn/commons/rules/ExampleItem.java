@@ -9,7 +9,7 @@ import java.io.Serializable;
 /*
     @Test
     void filterItemFalse() {
-        Handler<Object, Object, FilterChainResult> h = new Handler<>() {
+        ChainHandler<Object, Object, FilterChainResult> h = new ChainHandler<>() {
             @Override
             Mono<FilterChainResult> filter(Object item, Object ruleContext) {
 
@@ -25,7 +25,7 @@ import java.io.Serializable;
 
     @Test
     void filterItem_Exception() {
-        Handler<Object, Object, FilterChainResult> h = new Handler<>() {
+        ChainHandler<Object, Object, FilterChainResult> h = new ChainHandler<>() {
             @Override
             Mono<FilterChainResult> filter(Object item, Object ruleContext) {
 

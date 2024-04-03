@@ -1,9 +1,8 @@
 package it.pagopa.pn.commons.rules;
 
+import it.pagopa.pn.commons.rules.model.FilterChainResult;
 import it.pagopa.pn.commons.rules.model.ListChainContext;
 import it.pagopa.pn.commons.rules.model.ListFilterChainResult;
-import it.pagopa.pn.commons.rules.model.FilterChainResult;
-import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.SerializationUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
@@ -20,37 +19,33 @@ import java.util.List;
  * Il contesto viene clonato prima di ogni step, per evitare che step successivi possano alterare i
  * risultati precedenti.
  *
- * @param <T> vedi Handler
- * @param <C> vedi Handler
+ * @param <T> vedi ChainHandler
+ * @param <C> vedi ChainHandler
  */
-
-@AllArgsConstructor
 @Component
-public class ListChainEngineHandler<T extends Serializable, C extends ListChainContext<T>> {
+public class ListChainEngineHandler<T extends Serializable, C extends Serializable> {
 
-    private SimpleChainEngineHandler<T, C> simpleChainEngineHandler;
-
-    public Flux<ListFilterChainResult<T>> filterItems(C context, List<T> items, Handler<T, C> handler){
+    public Flux<ListFilterChainResult<T>> filterItems(C context, List<T> items, ListChainHandler<T, C> handler){
         // il concatMap concatena i mono sequenzialmente 1 alla volta, che è il desiderata,
         // dato che ogni mono riceve in input il risultato aggiornato degli item precedenti
+        ListChainContext<T, C> chainContext = new ListChainContext<>(context, items);
         return Flux.fromIterable(items)
-                .concatMap(item -> setupAndExecuteFilter(context, handler, item));
+                .concatMap(item -> setupAndExecuteFilter(chainContext, handler, item));
     }
 
     @NotNull
-    private Mono<ListFilterChainResult<T>> setupAndExecuteFilter(C context, Handler<T, C> handler, T item) {
-        C deepCopyContext = SerializationUtils.clone(context);
-        return simpleChainEngineHandler
-                .filterItem(deepCopyContext, item, handler)
+    private Mono<ListFilterChainResult<T>> setupAndExecuteFilter(ListChainContext<T, C> context, ListChainHandler<T, C> handler, T item) {
+        ListChainContext<T, C> deepCopyContext = SerializationUtils.clone(context);
+        return handler.doFilter(item, deepCopyContext)
                 .map(r -> postProcessFilterResult(context, item, r));
     }
 
-    private ListFilterChainResult<T> postProcessFilterResult(C context, T item, FilterChainResult r) {
+    private ListFilterChainResult<T> postProcessFilterResult(ListChainContext<T, C> context, T item, FilterChainResult r) {
         ListFilterChainResult<T> finalResult = new ListFilterChainResult<>();
         finalResult.setResult(r.isResult());
         finalResult.setItem(item);
 
-        context.addResult(finalResult);
+        context.getActualResults().add(finalResult);
         return finalResult;
     }
 }

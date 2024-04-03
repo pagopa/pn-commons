@@ -1,6 +1,5 @@
 package it.pagopa.pn.commons.rules;
 
-import it.pagopa.pn.commons.rules.model.ListChainContext;
 import it.pagopa.pn.commons.rules.model.ListFilterChainResult;
 import it.pagopa.pn.commons.rules.model.RuleModel;
 import org.junit.jupiter.api.Assertions;
@@ -14,8 +13,7 @@ class ListRuleEngineHandlerTest {
     ListRuleEngineHandlerExampleItem listRuleEngineHandlerExampleItem;
     @BeforeEach
     void setup() {
-        SimpleChainEngineHandler<ExampleItem, ListChainContext<ExampleItem>> simpleChainEngineHandler = new SimpleChainEngineHandler<>();
-        ListChainEngineHandler<ExampleItem, ListChainContext<ExampleItem>> listChainEngineHandler = new ListChainEngineHandler<>(simpleChainEngineHandler);
+        ListChainEngineHandler<ExampleItem, ExampleContext> listChainEngineHandler = new ListChainEngineHandler<>();
 
         listRuleEngineHandlerExampleItem = new ListRuleEngineHandlerExampleItem(listChainEngineHandler);
 
@@ -26,9 +24,8 @@ class ListRuleEngineHandlerTest {
         // GIVEN
         List<ExampleItem> items = List.of(new ExampleItem("info1"),new ExampleItem("info2"),new ExampleItem("info3"));
 
-        ListChainContext<ExampleItem> context = ListChainContextExampleItem.builder()
+        ExampleContext context = ExampleContext.builder()
                 .contextdata("somedata")
-                .items(items)
                 .build();
 
         List<RuleModel> rules = List.of(() -> "regola1", () -> "regola2");
@@ -51,9 +48,8 @@ class ListRuleEngineHandlerTest {
         // GIVEN
         List<ExampleItem> items = List.of(new ExampleItem("info1"),new ExampleItem("info2"),new ExampleItem("info3"));
 
-        ListChainContext<ExampleItem> context = ListChainContextExampleItem.builder()
+        ExampleContext context = ExampleContext.builder()
                 .contextdata("somedata")
-                .items(items)
                 .build();
 
         List<RuleModel> rules = List.of(() -> "regola1", () -> "regola1");

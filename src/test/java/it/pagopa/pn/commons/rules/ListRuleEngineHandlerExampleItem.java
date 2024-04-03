@@ -8,23 +8,24 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 
 @Slf4j
-public class ListRuleEngineHandlerExampleItem extends ListRuleEngineHandler<List<RuleModel>, ExampleItem, ListChainContext<ExampleItem>> {
-    public ListRuleEngineHandlerExampleItem(ListChainEngineHandler<ExampleItem, ListChainContext<ExampleItem>> parent) {
+public class ListRuleEngineHandlerExampleItem extends ListRuleEngineHandler<List<RuleModel>, ExampleItem, ExampleContext> {
+    public ListRuleEngineHandlerExampleItem(ListChainEngineHandler<ExampleItem, ExampleContext> parent) {
         super(parent);
     }
 
     @Override
-    protected Handler resolveHandlerFromRule(RuleModel r) {
+    protected ListChainHandler resolveHandlerFromRule(RuleModel r) {
         return r.getRuleType().equals("regola1")?getHandler(true):getHandler2(false);
     }
 
 
 
     @NotNull
-    private static Handler<ExampleItem, Object> getHandler(boolean result) {
-        return new Handler<>() {
+    private static ListChainHandler<ExampleItem, ExampleContext> getHandler(boolean result) {
+        return new ListChainHandler<>() {
+
             @Override
-            public Mono<FilterHandlerResult> filter(ExampleItem item, Object ruleContext) {
+            public Mono<FilterHandlerResult> filter(ExampleItem item, ListChainContext<ExampleItem, ExampleContext> ruleContext) {
 
                 if (!result)
                     return Mono.just(FilterHandlerResult.FAIL);
@@ -37,10 +38,10 @@ public class ListRuleEngineHandlerExampleItem extends ListRuleEngineHandler<List
 
 
     @NotNull
-    private static Handler<ExampleItem, Object> getHandler2(boolean result) {
-        return new Handler<>() {
+    private static ListChainHandler<ExampleItem, ExampleContext> getHandler2(boolean result) {
+        return new ListChainHandler<>() {
             @Override
-            public Mono<FilterHandlerResult> filter(ExampleItem item, Object ruleContext) {
+            public Mono<FilterHandlerResult> filter(ExampleItem item, ListChainContext<ExampleItem, ExampleContext> ruleContext) {
 
                 if (!result)
                     return Mono.just(FilterHandlerResult.FAIL);

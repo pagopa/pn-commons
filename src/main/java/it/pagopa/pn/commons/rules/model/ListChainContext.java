@@ -1,6 +1,10 @@
 package it.pagopa.pn.commons.rules.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -10,27 +14,15 @@ import java.util.List;
  *
  * @param <T> oggetto da valutare
  */
-public interface ListChainContext<T extends Serializable> extends Serializable {
+@Data
+@AllArgsConstructor
+public class ListChainContext<T extends Serializable, C extends Serializable> extends ChainContext<C> implements Serializable {
 
-    /**
-     * Recupera gli item del contesto
-     *
-     * @return lista degli item
-     */
-    List<T> getItems();
+    private List<T> items;
+    private final List<ListFilterChainResult<T>> actualResults = new ArrayList<>();
 
-    /**
-     * Recupera i risultati presenti
-     *
-     * @return lista dei risultati
-     */
-    List<ListFilterChainResult<T>> getActualResults();
-
-    /**
-     * Permette di aggiungere un esito alla lista
-     *
-     * @param result il risultato da aggiungere
-     */
-    void addResult(ListFilterChainResult<T> result);
-
+    public ListChainContext(C context, List<T> items) {
+        super(context);
+        this.items = items;
+    }
 }
