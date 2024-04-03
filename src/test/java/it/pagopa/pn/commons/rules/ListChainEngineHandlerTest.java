@@ -124,7 +124,7 @@ class ListChainEngineHandlerTest {
     private static Handler<ExampleItem, ListChainContext<ExampleItem>> getHandler() {
         return new Handler<>() {
             @Override
-            Mono<FilterHandlerResult> filter(ExampleItem item, ListChainContext<ExampleItem> ruleContext) {
+            public Mono<FilterHandlerResult> filter(ExampleItem item, ListChainContext<ExampleItem> ruleContext) {
 
                 return Mono.just(FilterHandlerResult.SUCCESS);
             }
@@ -137,7 +137,7 @@ class ListChainEngineHandlerTest {
     private static Handler<ExampleItem, ListChainContext<ExampleItem>> getHandlerSpecialContext() {
         return new Handler<>() {
             @Override
-            Mono<FilterHandlerResult> filter(ExampleItem item, ListChainContext<ExampleItem> ruleContext) {
+            public Mono<FilterHandlerResult> filter(ExampleItem item, ListChainContext<ExampleItem> ruleContext) {
 
                 return Mono.just(item.getInfo().equals("info1")?FilterHandlerResult.SUCCESS:FilterHandlerResult.FAIL);
             }
@@ -150,7 +150,7 @@ class ListChainEngineHandlerTest {
     private static Handler<ExampleItem, ListChainContext<ExampleItem>> getHandlerSpecialContext2() {
         return new Handler<>() {
             @Override
-            Mono<FilterHandlerResult> filter(ExampleItem item, ListChainContext<ExampleItem> ruleContext) {
+            public Mono<FilterHandlerResult> filter(ExampleItem item, ListChainContext<ExampleItem> ruleContext) {
 
                 // questo filtro controlla che nel contesto ci siano i risultati precedenti
 

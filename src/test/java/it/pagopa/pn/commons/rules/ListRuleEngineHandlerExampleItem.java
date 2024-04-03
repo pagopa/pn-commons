@@ -24,7 +24,7 @@ public class ListRuleEngineHandlerExampleItem extends ListRuleEngineHandler<List
     private static Handler<ExampleItem, Object> getHandler(boolean result) {
         return new Handler<>() {
             @Override
-            Mono<FilterHandlerResult> filter(ExampleItem item, Object ruleContext) {
+            public Mono<FilterHandlerResult> filter(ExampleItem item, Object ruleContext) {
 
                 if (!result)
                     return Mono.just(FilterHandlerResult.FAIL);
@@ -40,7 +40,7 @@ public class ListRuleEngineHandlerExampleItem extends ListRuleEngineHandler<List
     private static Handler<ExampleItem, Object> getHandler2(boolean result) {
         return new Handler<>() {
             @Override
-            Mono<FilterHandlerResult> filter(ExampleItem item, Object ruleContext) {
+            public Mono<FilterHandlerResult> filter(ExampleItem item, Object ruleContext) {
 
                 if (!result)
                     return Mono.just(FilterHandlerResult.FAIL);

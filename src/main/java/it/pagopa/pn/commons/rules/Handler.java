@@ -28,7 +28,7 @@ public abstract class Handler<T, C> {
      * @param ruleContext eventuale contesto da utilizzare nella valutazione
      * @return risultato della valutazione.
      */
-    abstract Mono<FilterHandlerResult> filter(T item, C ruleContext);
+    public abstract Mono<FilterHandlerResult> filter(T item, C ruleContext);
 
     /**
      * Imposta l'eventuale prossimo step nella catena di filtri.

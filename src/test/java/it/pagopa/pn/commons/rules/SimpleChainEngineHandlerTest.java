@@ -89,7 +89,7 @@ class SimpleChainEngineHandlerTest {
     void filterItem_Exception() {
         Handler<ExampleItem, Object> h = new Handler<>() {
             @Override
-            Mono<FilterHandlerResult> filter(ExampleItem item, Object ruleContext) {
+            public Mono<FilterHandlerResult> filter(ExampleItem item, Object ruleContext) {
 
                 return Mono.error(new PnInternalException("errore", "errore!"));
             }
@@ -105,7 +105,7 @@ class SimpleChainEngineHandlerTest {
     private static Handler<ExampleItem, Object> getHandler(boolean result) {
         return new Handler<>() {
             @Override
-            Mono<FilterHandlerResult> filter(ExampleItem item, Object ruleContext) {
+            public Mono<FilterHandlerResult> filter(ExampleItem item, Object ruleContext) {
 
                 if (!result)
                     return Mono.just(FilterHandlerResult.FAIL);
@@ -120,7 +120,7 @@ class SimpleChainEngineHandlerTest {
     private static Handler<ExampleItem, Object> getSuccessHandler() {
         return new Handler<>() {
             @Override
-            Mono<FilterHandlerResult> filter(ExampleItem item, Object ruleContext) {
+            public Mono<FilterHandlerResult> filter(ExampleItem item, Object ruleContext) {
 
                 return Mono.just(FilterHandlerResult.SUCCESS);
 
