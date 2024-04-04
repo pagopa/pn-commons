@@ -19,7 +19,7 @@ import java.util.List;
  */
 @AllArgsConstructor
 @Slf4j
-public abstract class ListRuleEngineHandler<U extends List<? extends RuleModel>, T extends Serializable, C extends Serializable> {
+public abstract class ListRuleEngineHandler<U extends RuleModel, T extends Serializable, C extends Serializable> {
 
     private ListChainEngineHandler<T, C> listChainEngineHandler;
     /**
@@ -27,16 +27,16 @@ public abstract class ListRuleEngineHandler<U extends List<? extends RuleModel>,
      * @param r regola da risolvere
      * @return istanza (thread-safe) dell'handler.
      */
-    protected abstract ListChainHandler<T, C> resolveHandlerFromRule(RuleModel r);
+    protected abstract ListChainHandler<T, C> resolveHandlerFromRule(U r);
 
 
-    public Flux<ListFilterChainResult<T>> filterItems(C context, List<T> items, U rules){
+    public Flux<ListFilterChainResult<T>> filterItems(C context, List<T> items, List<U> rules){
         // risolve la catena di handlers, utilizzando le regole passate
         ListChainHandler<T, C> firstHandlerOfChain = resolveHandlersFromRules(rules);
         return listChainEngineHandler.filterItems(context, items, firstHandlerOfChain);
     }
 
-    private ListChainHandler<T,C> resolveHandlersFromRules(U rules) {
+    private ListChainHandler<T,C> resolveHandlersFromRules(List<U> rules) {
         log.debug("resolving rules rules={}", rules);
         ListChainHandler<T,C> lastHandlerResolved = null;
 

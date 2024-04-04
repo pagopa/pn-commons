@@ -8,7 +8,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 
 @Slf4j
-public class ListRuleEngineHandlerExampleItem extends ListRuleEngineHandler<List<RuleModel>, ExampleItem, ExampleContext> {
+public class ListRuleEngineHandlerExampleItem extends ListRuleEngineHandler<RuleModel, ExampleItem, ExampleContext> {
     public ListRuleEngineHandlerExampleItem(ListChainEngineHandler<ExampleItem, ExampleContext> parent) {
         super(parent);
     }
