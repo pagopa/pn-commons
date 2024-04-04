@@ -36,9 +36,9 @@ class ListRuleEngineHandlerTest {
 
         // THEN
         Assertions.assertEquals(items.size(), r.size());
-        Assertions.assertFalse(r.get(0).isResult());
-        Assertions.assertFalse(r.get(1).isResult());
-        Assertions.assertFalse(r.get(2).isResult());
+        Assertions.assertFalse(r.get(0).isSuccess());
+        Assertions.assertFalse(r.get(1).isSuccess());
+        Assertions.assertFalse(r.get(2).isSuccess());
 
     }
 
@@ -60,9 +60,9 @@ class ListRuleEngineHandlerTest {
 
         // THEN
         Assertions.assertEquals(items.size(), r.size());
-        Assertions.assertTrue(r.get(0).isResult());
-        Assertions.assertTrue(r.get(1).isResult());
-        Assertions.assertTrue(r.get(2).isResult());
+        Assertions.assertTrue(r.get(0).isSuccess());
+        Assertions.assertTrue(r.get(1).isSuccess());
+        Assertions.assertTrue(r.get(2).isSuccess());
 
     }
 }

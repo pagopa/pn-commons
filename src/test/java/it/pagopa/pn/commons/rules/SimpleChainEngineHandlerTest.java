@@ -25,7 +25,7 @@ class SimpleChainEngineHandlerTest {
 
         FilterChainResult r = simpleChainEngineHandler.filterItem(new ExampleContext(), new ExampleItem(), h).block();
 
-        Assertions.assertTrue(r.isResult());
+        Assertions.assertTrue(r.isSuccess());
     }
 
 
@@ -35,7 +35,7 @@ class SimpleChainEngineHandlerTest {
 
         FilterChainResult r = simpleChainEngineHandler.filterItem(new ExampleContext(), new ExampleItem(), h).block();
 
-        Assertions.assertFalse(r.isResult());
+        Assertions.assertFalse(r.isSuccess());
     }
 
 
@@ -50,7 +50,7 @@ class SimpleChainEngineHandlerTest {
 
         FilterChainResult r = simpleChainEngineHandler.filterItem(new ExampleContext(), new ExampleItem(), h).block();
 
-        Assertions.assertFalse(r.isResult());
+        Assertions.assertFalse(r.isSuccess());
     }
 
     @Test
@@ -64,7 +64,7 @@ class SimpleChainEngineHandlerTest {
 
         FilterChainResult r = simpleChainEngineHandler.filterItem(new ExampleContext(), new ExampleItem(), h).block();
 
-        Assertions.assertTrue(r.isResult());
+        Assertions.assertTrue(r.isSuccess());
     }
 
 
@@ -79,7 +79,7 @@ class SimpleChainEngineHandlerTest {
 
         FilterChainResult r = simpleChainEngineHandler.filterItem(new ExampleContext(), new ExampleItem(), h).block();
 
-        Assertions.assertFalse(r.isResult());
+        Assertions.assertFalse(r.isSuccess());
     }
 
 

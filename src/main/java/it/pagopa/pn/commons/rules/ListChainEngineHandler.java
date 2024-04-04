@@ -42,7 +42,7 @@ public class ListChainEngineHandler<T extends Serializable, C extends Serializab
 
     private ListFilterChainResult<T> postProcessFilterResult(ListChainContext<T, C> context, T item, FilterChainResult r) {
         ListFilterChainResult<T> finalResult = new ListFilterChainResult<>();
-        finalResult.setResult(r.isResult());
+        finalResult.setSuccess(r.isSuccess());
         finalResult.setItem(item);
 
         context.getActualResults().add(finalResult);

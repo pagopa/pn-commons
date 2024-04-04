@@ -37,9 +37,9 @@ class ListChainEngineHandlerTest {
 
         // THEN
         Assertions.assertEquals(items.size(), r.size());
-        Assertions.assertTrue(r.get(0).isResult());
-        Assertions.assertTrue(r.get(1).isResult());
-        Assertions.assertTrue(r.get(2).isResult());
+        Assertions.assertTrue(r.get(0).isSuccess());
+        Assertions.assertTrue(r.get(1).isSuccess());
+        Assertions.assertTrue(r.get(2).isSuccess());
     }
 
     @Test
@@ -59,7 +59,7 @@ class ListChainEngineHandlerTest {
 
         // THEN
         Assertions.assertEquals(items.size(), r.size());
-        Assertions.assertTrue(r.get(0).isResult());
+        Assertions.assertTrue(r.get(0).isSuccess());
 
     }
 
@@ -81,9 +81,9 @@ class ListChainEngineHandlerTest {
 
         // THEN
         Assertions.assertEquals(items.size(), r.size());
-        Assertions.assertTrue(r.get(0).isResult());
-        Assertions.assertFalse(r.get(1).isResult());
-        Assertions.assertFalse(r.get(2).isResult());
+        Assertions.assertTrue(r.get(0).isSuccess());
+        Assertions.assertFalse(r.get(1).isSuccess());
+        Assertions.assertFalse(r.get(2).isSuccess());
 
     }
 
@@ -105,11 +105,11 @@ class ListChainEngineHandlerTest {
 
         // THEN
         Assertions.assertEquals(items.size(), r.size());
-        Assertions.assertTrue(r.get(0).isResult());
+        Assertions.assertTrue(r.get(0).isSuccess());
         Assertions.assertEquals(r.get(0).getItem().getInfo(), items.get(0).getInfo());
-        Assertions.assertTrue(r.get(1).isResult());
+        Assertions.assertTrue(r.get(1).isSuccess());
         Assertions.assertEquals(r.get(1).getItem().getInfo(), items.get(1).getInfo());
-        Assertions.assertTrue(r.get(2).isResult());
+        Assertions.assertTrue(r.get(2).isSuccess());
         Assertions.assertEquals(r.get(2).getItem().getInfo(), items.get(2).getInfo());
 
     }
@@ -154,14 +154,14 @@ class ListChainEngineHandlerTest {
                     return Mono.just(FilterHandlerResult.SUCCESS);
                 if (ruleContext.getActualResults().size() == 1
                         && ruleContext.getActualResults().get(0).getItem().getInfo().equals("info1")
-                        && ruleContext.getActualResults().get(0).isResult()
+                        && ruleContext.getActualResults().get(0).isSuccess()
                         && item.getInfo().equals("info2"))
                     return Mono.just(FilterHandlerResult.SUCCESS);
                 if (ruleContext.getActualResults().size() == 2
                         && ruleContext.getActualResults().get(0).getItem().getInfo().equals("info1")
-                        && ruleContext.getActualResults().get(0).isResult()
+                        && ruleContext.getActualResults().get(0).isSuccess()
                         && ruleContext.getActualResults().get(1).getItem().getInfo().equals("info2")
-                        && ruleContext.getActualResults().get(1).isResult()
+                        && ruleContext.getActualResults().get(1).isSuccess()
                         && item.getInfo().equals("info3"))
                     return Mono.just(FilterHandlerResult.SUCCESS);
 

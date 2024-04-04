@@ -14,5 +14,5 @@ import java.io.Serializable;
  */
 public class FilterChainResult implements Serializable {
 
-    private boolean result;
+    private boolean success;
 }
