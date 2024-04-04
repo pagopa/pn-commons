@@ -3,6 +3,7 @@ package it.pagopa.pn.commons.rules.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 
@@ -18,8 +19,11 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class FilterHandlerResult implements Serializable {
 
+    @NotNull
     private FilterHandlerResultEnum result;
+
     private String code;
+
     private String diagnostic;
 
 }
