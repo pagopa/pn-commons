@@ -2,6 +2,7 @@ package it.pagopa.pn.commons.rules.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import java.util.List;
  * @param <T> oggetto da valutare
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 public class ListChainContext<T extends Serializable, C extends Serializable> extends ChainContext<C> implements Serializable {
 
