@@ -4,6 +4,9 @@ import lombok.*;
 
 import java.io.Serializable;
 
+/**
+ * Risultato del filtro per una lista, rispetto a FilterChainResult contiene anche l'item
+ */
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -11,9 +14,6 @@ import java.io.Serializable;
 @Builder(toBuilder = true)
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-/**
- * Risultato del filtro per una lista, rispetto a FilterChainResult contiene anche l'item
- */
 public class ListFilterChainResult<T extends Serializable> extends FilterChainResult implements Serializable {
 
     public ListFilterChainResult(T item, boolean result) {

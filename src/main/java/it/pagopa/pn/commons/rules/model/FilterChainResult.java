@@ -4,14 +4,14 @@ import lombok.*;
 
 import java.io.Serializable;
 
+/**
+ * Risultato del filtro
+ */
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 @EqualsAndHashCode
-/**
- * Risultato del filtro
- */
 public class FilterChainResult implements Serializable {
 
     private boolean success;
