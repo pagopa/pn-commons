@@ -19,7 +19,7 @@ import java.util.List;
  */
 @AllArgsConstructor
 @Slf4j
-public abstract class ListRuleEngineHandler<U extends List<RuleModel>, T extends Serializable, C extends Serializable> {
+public abstract class ListRuleEngineHandler<U extends List<? extends RuleModel>, T extends Serializable, C extends Serializable> {
 
     private ListChainEngineHandler<T, C> listChainEngineHandler;
     /**
