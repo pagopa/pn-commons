@@ -3,6 +3,7 @@ package it.pagopa.pn.commons.rules;
 import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.commons.rules.model.FilterChainResult;
 import it.pagopa.pn.commons.rules.model.FilterHandlerResult;
+import it.pagopa.pn.commons.rules.model.FilterHandlerResultEnum;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -108,9 +109,9 @@ class SimpleChainEngineHandlerTest {
             public Mono<FilterHandlerResult> filter(ExampleItem item, ExampleContext ruleContext) {
 
                 if (!result)
-                    return Mono.just(FilterHandlerResult.FAIL);
+                    return Mono.just(new FilterHandlerResult(FilterHandlerResultEnum.FAIL, null,null));
                 else {
-                    return Mono.just(FilterHandlerResult.NEXT);
+                    return Mono.just(new FilterHandlerResult(FilterHandlerResultEnum.NEXT, null,null));
                 }
             }
         };
@@ -122,7 +123,7 @@ class SimpleChainEngineHandlerTest {
             @Override
             public Mono<FilterHandlerResult> filter(ExampleItem item, ExampleContext ruleContext) {
 
-                return Mono.just(FilterHandlerResult.SUCCESS);
+                return Mono.just(new FilterHandlerResult(FilterHandlerResultEnum.SUCCESS, null,null));
 
             }
         };

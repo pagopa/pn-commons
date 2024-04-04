@@ -3,7 +3,6 @@ package it.pagopa.pn.commons.rules;
 import it.pagopa.pn.commons.rules.model.ChainContext;
 import it.pagopa.pn.commons.rules.model.FilterChainResult;
 import it.pagopa.pn.commons.rules.model.FilterHandlerResult;
-import it.pagopa.pn.commons.rules.model.ListChainContext;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import reactor.core.publisher.Mono;
@@ -37,16 +36,16 @@ abstract class BaseChainHandler<T, C extends Serializable> {
     protected  abstract Mono<FilterChainResult> doFilter(T item, ChainContext<C> ruleContext);
 
     @NotNull Mono<FilterChainResult> manageHandlerResult(T item, ChainContext<C> ruleContext, FilterHandlerResult handlerResult) {
-        return switch (handlerResult) {
-            case SUCCESS -> Mono.just(new FilterChainResult(true));
-            case FAIL -> Mono.just(new FilterChainResult(false));
+        return switch (handlerResult.getResult()) {
+            case SUCCESS -> Mono.just(new FilterChainResult(true, handlerResult.getCode(), handlerResult.getDiagnostic() ));
+            case FAIL -> Mono.just(new FilterChainResult(false, handlerResult.getCode(), handlerResult.getDiagnostic()));
             case NEXT -> {
                 if (this.nextHandler != null) {
                     log.debug("there is a nextHandler, returning that result");
                     yield this.nextHandler.doFilter(item, ruleContext);
                 }
                 else {
-                    yield Mono.just(new FilterChainResult(true));
+                    yield Mono.just(new FilterChainResult(true, handlerResult.getCode(), handlerResult.getDiagnostic()));
                 }
             }
         };

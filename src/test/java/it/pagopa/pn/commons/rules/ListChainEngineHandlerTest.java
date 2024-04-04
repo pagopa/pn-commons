@@ -1,6 +1,7 @@
 package it.pagopa.pn.commons.rules;
 
 import it.pagopa.pn.commons.rules.model.FilterHandlerResult;
+import it.pagopa.pn.commons.rules.model.FilterHandlerResultEnum;
 import it.pagopa.pn.commons.rules.model.ListChainContext;
 import it.pagopa.pn.commons.rules.model.ListFilterChainResult;
 import org.jetbrains.annotations.NotNull;
@@ -122,7 +123,7 @@ class ListChainEngineHandlerTest {
             @Override
             public Mono<FilterHandlerResult> filter(ExampleItem item, ListChainContext<ExampleItem, ExampleContext>  ruleContext) {
 
-                return Mono.just(FilterHandlerResult.SUCCESS);
+                return Mono.just(new FilterHandlerResult(FilterHandlerResultEnum.SUCCESS, null,null));
             }
         };
     }
@@ -135,7 +136,7 @@ class ListChainEngineHandlerTest {
             @Override
             public Mono<FilterHandlerResult> filter(ExampleItem item, ListChainContext<ExampleItem, ExampleContext> ruleContext) {
 
-                return Mono.just(item.getInfo().equals("info1")?FilterHandlerResult.SUCCESS:FilterHandlerResult.FAIL);
+                return Mono.just(item.getInfo().equals("info1")?new FilterHandlerResult(FilterHandlerResultEnum.SUCCESS, null,null):new FilterHandlerResult(FilterHandlerResultEnum.FAIL, null,null));
             }
         };
     }
@@ -151,21 +152,21 @@ class ListChainEngineHandlerTest {
                 // questo filtro controlla che nel contesto ci siano i risultati precedenti
 
                 if (ruleContext.getActualResults().size() == 0 && item.getInfo().equals("info1"))
-                    return Mono.just(FilterHandlerResult.SUCCESS);
+                    return Mono.just(new FilterHandlerResult(FilterHandlerResultEnum.SUCCESS, null,null));
                 if (ruleContext.getActualResults().size() == 1
                         && ruleContext.getActualResults().get(0).getItem().getInfo().equals("info1")
                         && ruleContext.getActualResults().get(0).isSuccess()
                         && item.getInfo().equals("info2"))
-                    return Mono.just(FilterHandlerResult.SUCCESS);
+                    return Mono.just(new FilterHandlerResult(FilterHandlerResultEnum.SUCCESS, null,null));
                 if (ruleContext.getActualResults().size() == 2
                         && ruleContext.getActualResults().get(0).getItem().getInfo().equals("info1")
                         && ruleContext.getActualResults().get(0).isSuccess()
                         && ruleContext.getActualResults().get(1).getItem().getInfo().equals("info2")
                         && ruleContext.getActualResults().get(1).isSuccess()
                         && item.getInfo().equals("info3"))
-                    return Mono.just(FilterHandlerResult.SUCCESS);
+                    return Mono.just(new FilterHandlerResult(FilterHandlerResultEnum.SUCCESS, null,null));
 
-                return Mono.just(FilterHandlerResult.FAIL);
+                return Mono.just(new FilterHandlerResult(FilterHandlerResultEnum.FAIL, null,null));
             }
         };
     }

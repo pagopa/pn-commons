@@ -17,7 +17,13 @@ import java.io.Serializable;
 public class ListFilterChainResult<T extends Serializable> extends FilterChainResult implements Serializable {
 
     public ListFilterChainResult(T item, boolean result) {
-        super(result);
+        super(result, null, null);
+
+        this.item = item;
+    }
+
+    public ListFilterChainResult(T item, boolean result, String code, String diagnostic) {
+        super(result, code, diagnostic);
 
         this.item = item;
     }

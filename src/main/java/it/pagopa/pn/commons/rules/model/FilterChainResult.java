@@ -10,9 +10,11 @@ import java.io.Serializable;
 @Setter
 @EqualsAndHashCode
 /**
- * Risultato del filtro, può essere esteso per allegare informazioni
+ * Risultato del filtro
  */
 public class FilterChainResult implements Serializable {
 
     private boolean success;
+    private String code;
+    private String diagnostic;
 }

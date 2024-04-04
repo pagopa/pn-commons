@@ -28,9 +28,9 @@ public class ListRuleEngineHandlerExampleItem extends ListRuleEngineHandler<Rule
             public Mono<FilterHandlerResult> filter(ExampleItem item, ListChainContext<ExampleItem, ExampleContext> ruleContext) {
 
                 if (!result)
-                    return Mono.just(FilterHandlerResult.FAIL);
+                    return Mono.just(new FilterHandlerResult(FilterHandlerResultEnum.FAIL, null,null));
                 else {
-                    return Mono.just(FilterHandlerResult.NEXT);
+                    return Mono.just(new FilterHandlerResult(FilterHandlerResultEnum.NEXT, null,null));
                 }
             }
         };
@@ -44,9 +44,9 @@ public class ListRuleEngineHandlerExampleItem extends ListRuleEngineHandler<Rule
             public Mono<FilterHandlerResult> filter(ExampleItem item, ListChainContext<ExampleItem, ExampleContext> ruleContext) {
 
                 if (!result)
-                    return Mono.just(FilterHandlerResult.FAIL);
+                    return Mono.just(new FilterHandlerResult(FilterHandlerResultEnum.FAIL, null,null));
                 else {
-                    return Mono.just(FilterHandlerResult.SUCCESS);
+                    return Mono.just(new FilterHandlerResult(FilterHandlerResultEnum.NEXT, null,null));
                 }
             }
         };

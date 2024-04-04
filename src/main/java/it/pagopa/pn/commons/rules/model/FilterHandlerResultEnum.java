@@ -1,9 +1,5 @@
 package it.pagopa.pn.commons.rules.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.io.Serializable;
 
 
@@ -13,13 +9,9 @@ import java.io.Serializable;
  * - NEXT: lo step è positivo, si procedere con la valutazione dello step successivo (o ritorna esito positivo nel caso di ultimo step)
  * - FAIL: la catena di filtri termina immediatamente con esito negativo
  */
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class FilterHandlerResult implements Serializable {
-
-    private FilterHandlerResultEnum result;
-    private String code;
-    private String diagnostic;
+public enum FilterHandlerResultEnum implements Serializable {
+    SUCCESS,
+    NEXT,
+    FAIL;
 
 }
