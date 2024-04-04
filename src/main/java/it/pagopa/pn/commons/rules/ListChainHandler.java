@@ -32,10 +32,10 @@ public abstract class ListChainHandler<T extends Serializable, C extends Seriali
      */
     public abstract Mono<FilterHandlerResult> filter(T item, ListChainContext<T, C> context);
 
-
-    protected final Mono<FilterChainResult> doFilter(T item, ChainContext<C> ruleContext){
-        return filter(item, (ListChainContext<T, C>)ruleContext)
+    @Override
+    protected final Mono<FilterChainResult> doFilter(T item, ChainContext<C> chainContext){
+        return filter(item, (ListChainContext<T, C>)chainContext)
                 .doOnNext(r -> log.debug("filter result={}", r))
-                .flatMap(handlerResult -> super.manageHandlerResult(item, ruleContext, handlerResult));
+                .flatMap(handlerResult -> super.manageHandlerResult(item, chainContext, handlerResult));
     }
 }

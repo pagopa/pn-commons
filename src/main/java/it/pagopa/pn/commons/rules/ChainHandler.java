@@ -32,6 +32,7 @@ public abstract class ChainHandler<T, C extends Serializable> extends BaseChainH
     public abstract Mono<FilterHandlerResult> filter(T item, C context);
 
 
+    @Override
     protected final Mono<FilterChainResult> doFilter(T item, ChainContext<C> chainContext){
         return filter(item, chainContext.getContext())
                 .doOnNext(r -> log.debug("filter result={}", r))

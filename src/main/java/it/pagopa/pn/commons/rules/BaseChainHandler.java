@@ -34,7 +34,7 @@ abstract class BaseChainHandler<T, C extends Serializable> {
         this.nextHandler = nextHandler;
     }
 
-    protected abstract Mono<FilterChainResult> doFilter(T item, ChainContext<C> ruleContext);
+    protected  abstract Mono<FilterChainResult> doFilter(T item, ChainContext<C> ruleContext);
 
     @NotNull Mono<FilterChainResult> manageHandlerResult(T item, ChainContext<C> ruleContext, FilterHandlerResult handlerResult) {
         return switch (handlerResult) {
