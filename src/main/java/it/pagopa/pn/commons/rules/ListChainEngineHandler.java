@@ -25,7 +25,7 @@ import java.util.List;
 @Component
 public class ListChainEngineHandler<T extends Serializable, C extends Serializable> {
 
-    public Flux<ListFilterChainResult<T>> filterItems(C context, List<T> items, ListChainHandler<T, C> handler){
+    public Flux<ListFilterChainResult<T>> filterItems(C context, @NotNull List<T> items, @NotNull ListChainHandler<T, C> handler){
         // il concatMap concatena i mono sequenzialmente 1 alla volta, che è il desiderata,
         // dato che ogni mono riceve in input il risultato aggiornato degli item precedenti
         ListChainContext<T, C> chainContext = new ListChainContext<>(context, items);

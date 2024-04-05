@@ -3,6 +3,7 @@ package it.pagopa.pn.commons.rules;
 import it.pagopa.pn.commons.rules.model.ChainContext;
 import it.pagopa.pn.commons.rules.model.FilterChainResult;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -18,9 +19,9 @@ import java.io.Serializable;
 @Component
 @Slf4j
 public class SimpleChainEngineHandler<T, C extends Serializable> {
-    public Mono<FilterChainResult> filterItem(C context, T item, ChainHandler<T, C> handler){
+    public Mono<FilterChainResult> filterItem(C context, @NotNull T item, @NotNull ChainHandler<T, C> handler){
         // richiama wrappando il filtro, tipo con log
-        log.debug("invoking filter item handler={} item={} context={}", handler.toString(), item, context);
+        log.debug("invoking filter item handler={} item={} context={}", handler, item, context);
         ChainContext<C> chainContext = new ChainContext<>(context);
         return handler.doFilter(item, chainContext)
                 .doOnNext(r -> log.info("invoked filter handler={}  item={} context={} result={}", handler, item, context, r));
