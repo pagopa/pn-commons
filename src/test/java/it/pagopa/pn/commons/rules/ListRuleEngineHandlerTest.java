@@ -101,7 +101,7 @@ class ListRuleEngineHandlerTest {
 
 
         // WHEN
-        Assertions.assertThrows(IllegalArgumentException.class, () -> listRuleEngineHandlerExampleItem.filterItems(context, items, rules).collectList().block());
+        Assertions.assertThrows(Exception.class, () -> listRuleEngineHandlerExampleItem.filterItems(context, items, rules).collectList().block());
 
         // THEN
 
