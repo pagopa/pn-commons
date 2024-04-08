@@ -126,6 +126,8 @@ class ListRuleEngineHandlerTest {
         // THEN
         Assertions.assertEquals(items.size(), r.size());
         Assertions.assertTrue(r.get(0).isSuccess());
+        Assertions.assertEquals("COD2", r.get(0).getCode());
+        Assertions.assertEquals("diag2", r.get(0).getDiagnostic());
         Assertions.assertTrue(r.get(1).isSuccess());
         Assertions.assertTrue(r.get(2).isSuccess());
 

@@ -28,9 +28,9 @@ public class ListRuleEngineHandlerExampleItem extends ListRuleEngineHandler<Rule
             public Mono<FilterHandlerResult> filter(ExampleItem item, ListChainContext<ExampleItem, ExampleContext> ruleContext) {
 
                 if (!result)
-                    return Mono.just(new FilterHandlerResult(FilterHandlerResultEnum.FAIL, null,null));
+                    return Mono.just(new FilterHandlerResult(FilterHandlerResultEnum.FAIL, "COD1","diag1"));
                 else {
-                    return Mono.just(new FilterHandlerResult(FilterHandlerResultEnum.NEXT, null,null));
+                    return Mono.just(new FilterHandlerResult(FilterHandlerResultEnum.NEXT, "COD2","diag2"));
                 }
             }
         };
