@@ -13,7 +13,6 @@ import org.springframework.boot.actuate.metrics.MetricsEndpoint;
 import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
 
-import java.util.logging.Level;
 
 @ExtendWith(OutputCaptureExtension.class)
 class SpringAnalyzerTest {

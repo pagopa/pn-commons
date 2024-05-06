@@ -8,6 +8,7 @@ import software.amazon.awssdk.services.cloudwatch.model.*;
 
 import javax.annotation.PostConstruct;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.Collections;
 
 @RequiredArgsConstructor
@@ -31,6 +32,16 @@ public class CloudWatchMetricHandler {
 
     }
 
+    public Mono<PutMetricDataResponse> sendMetricCollection(String namespace, Collection<MetricDatum> metricDatumCollection) {
+
+        log.trace("Sending collection to namespace=[{}]", namespace);
+
+        PutMetricDataRequest metricDataRequest = createCollectionDataRequest(namespace, metricDatumCollection);
+
+        return Mono.fromFuture(cloudWatchAsyncClient.putMetricData(metricDataRequest));
+
+    }
+
     private PutMetricDataRequest createMetricDataRequest(String metricName, Dimension dimension, String namespace, double value){
         MetricDatum metricDatum = MetricDatum.builder()
                 .metricName(metricName)
@@ -43,6 +54,13 @@ public class CloudWatchMetricHandler {
         return PutMetricDataRequest.builder()
                 .namespace(namespace)
                 .metricData(Collections.singletonList(metricDatum))
+                .build();
+    }
+
+    private PutMetricDataRequest createCollectionDataRequest(String namespace, Collection<MetricDatum> metricDatumCollection){
+        return PutMetricDataRequest.builder()
+                .namespace(namespace)
+                .metricData(metricDatumCollection)
                 .build();
     }
 }

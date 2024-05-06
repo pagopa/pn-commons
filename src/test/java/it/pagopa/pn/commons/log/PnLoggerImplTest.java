@@ -223,6 +223,22 @@ class PnLoggerImplTest {
                 .getLevel());
     }
 
+    @Test
+    void logEndingDownstreamProcessNotFound() {
+        //Given
+        String str = "processo";
+
+        //When
+        fooLogger.logInvokationResultDownstreamNotFound(str, null);
+
+        //Then
+        // JUnit assertions
+        List<ILoggingEvent> logsList = listAppender.list;
+        Assertions.assertEquals("[DOWNSTREAM] Service " + str + " returned errors=<not specified>", logsList.get(0)
+            .getFormattedMessage());
+        Assertions.assertEquals(Level.INFO, logsList.get(0)
+            .getLevel());
+    }
 
     @Test
     void infoInvokingAsyncExternalService() {
