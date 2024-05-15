@@ -11,9 +11,12 @@ import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
 import software.amazon.awssdk.services.cloudwatch.CloudWatchAsyncClient;
 import software.amazon.awssdk.services.cloudwatch.model.Dimension;
+import software.amazon.awssdk.services.cloudwatch.model.MetricDatum;
 import software.amazon.awssdk.services.cloudwatch.model.PutMetricDataRequest;
 import software.amazon.awssdk.services.cloudwatch.model.PutMetricDataResponse;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -43,5 +46,18 @@ class CloudWatchMetricHandlerTest {
                 .value("pn-commons_123456")
                 .build();
         Assertions.assertDoesNotThrow(() -> cloudWatchMetricHandler.sendMetric("CloudWatchMetricHandler", dimension,"executor.active", 1));
+    }
+
+    @Test
+    void testSendMetricCollection() {
+        Collection<MetricDatum> metricDatumCollection = new ArrayList<>();
+        metricDatumCollection.add(MetricDatum.builder().build());
+        PutMetricDataResponse putMetricDataResponse = PutMetricDataResponse.builder().build();
+        when(cloudWatchAsyncClient.putMetricData(any(PutMetricDataRequest.class))).thenReturn(CompletableFuture.completedFuture(putMetricDataResponse));
+        Dimension dimension = Dimension.builder()
+                .name("ApplicationName_TaskId")
+                .value("pn-commons_123456")
+                .build();
+        Assertions.assertDoesNotThrow(() -> cloudWatchMetricHandler.sendMetricCollection("CloudWatchMetricHandler", metricDatumCollection));
     }
 }

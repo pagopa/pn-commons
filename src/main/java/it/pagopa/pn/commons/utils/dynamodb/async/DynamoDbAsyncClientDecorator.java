@@ -3,12 +3,14 @@ package it.pagopa.pn.commons.utils.dynamodb.async;
 import it.pagopa.pn.commons.utils.MDCUtils;
 import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
 import software.amazon.awssdk.services.dynamodb.model.*;
+import software.amazon.awssdk.services.dynamodb.model.ScanRequest.Builder;
 import software.amazon.awssdk.services.dynamodb.paginators.BatchGetItemPublisher;
 import software.amazon.awssdk.services.dynamodb.paginators.QueryPublisher;
 
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
+import software.amazon.awssdk.services.dynamodb.paginators.ScanPublisher;
 
 public class DynamoDbAsyncClientDecorator implements DynamoDbAsyncClient {
 
@@ -141,5 +143,15 @@ public class DynamoDbAsyncClientDecorator implements DynamoDbAsyncClient {
         Map<String, String> copyOfContextMap = MDCUtils.retrieveMDCContextMap();
         return this.dynamoDbAsyncClient.batchWriteItem(batchWriteItemRequest)
                 .thenApply(batchWriteItemResponse -> MDCUtils.enrichWithMDC(batchWriteItemResponse, copyOfContextMap));
+    }
+
+    @Override
+    public ScanPublisher scanPaginator(ScanRequest scanRequest) {
+        return dynamoDbAsyncClient.scanPaginator(scanRequest);
+    }
+
+    @Override
+    public ScanPublisher scanPaginator(Consumer<Builder> scanRequest) {
+        return dynamoDbAsyncClient.scanPaginator(scanRequest);
     }
 }

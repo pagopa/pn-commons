@@ -163,6 +163,14 @@ public interface PnLogger extends Logger {
     void logInvokationResultDownstreamFailed(String service, String description);
 
     /**
+     * metodo per loggare l'esito di not found per una invocazione ad un servizio di downstream
+     *
+     * @param service     nome servizio, possibilmente usare quelli definiti in PnLogger.EXTERNAL_SERVICES
+     * @param description eventuale descrizione dell'errore
+     */
+    void logInvokationResultDownstreamNotFound(String service, String description);
+
+    /**
      * metodo per loggare la PUT item su dynamoDB. Indica quale record e su quale tabella si effettuerà la PUT
      *
      * @param tableName nome della tabella dynamoDB
