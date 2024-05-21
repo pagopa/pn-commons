@@ -302,11 +302,11 @@ class PnLoggerImplTest {
         //Then
         // JUnit assertions
         List<ILoggingEvent> logsList = listAppender.list;
-        Assertions.assertEquals("ALLARM!: " + str, logsList.get(0)
+        Assertions.assertEquals("* FATAL * ALLARM!: " + str, logsList.get(0)
                 .getFormattedMessage());
         Assertions.assertEquals(Level.ERROR, logsList.get(0)
                 .getLevel());
-        Assertions.assertEquals("ALLARM!", logsList.get(0)
+        Assertions.assertEquals("* FATAL * ALLARM!", logsList.get(0)
                 .getMarker().getName());
     }
 
@@ -322,11 +322,11 @@ class PnLoggerImplTest {
         //Then
         // JUnit assertions
         List<ILoggingEvent> logsList = listAppender.list;
-        Assertions.assertEquals("ALLARM!: " + "errore grave p1=0 p2=pippo", logsList.get(0)
+        Assertions.assertEquals("* FATAL * ALLARM!: " + "errore grave p1=0 p2=pippo", logsList.get(0)
                 .getFormattedMessage());
         Assertions.assertEquals(Level.ERROR, logsList.get(0)
                 .getLevel());
-        Assertions.assertEquals("ALLARM!", logsList.get(0)
+        Assertions.assertEquals("* FATAL * ALLARM!", logsList.get(0)
                 .getMarker().getName());
     }
 
@@ -341,13 +341,13 @@ class PnLoggerImplTest {
         //Then
         // JUnit assertions
         List<ILoggingEvent> logsList = listAppender.list;
-        Assertions.assertEquals("ALLARM!: " + "errore grave p1=0 p2=pippo", logsList.get(0)
+        Assertions.assertEquals("* FATAL * ALLARM!: " + "errore grave p1=0 p2=pippo", logsList.get(0)
                 .getFormattedMessage());
         assertTrue(logsList.get(0)
                 .getThrowableProxy().getClassName().contains("java.lang.RuntimeException"));
         Assertions.assertEquals(Level.ERROR, logsList.get(0)
                 .getLevel());
-        Assertions.assertEquals("ALLARM!", logsList.get(0)
+        Assertions.assertEquals("* FATAL * ALLARM!", logsList.get(0)
                 .getMarker().getName());
     }
 
@@ -372,11 +372,11 @@ class PnLoggerImplTest {
         //Then
         // JUnit assertions
         List<ILoggingEvent> logsList = listAppender.list;
-        Assertions.assertEquals("ALLARM!: " + "errore grave p1=PnLoggerImplTest.TestObj(pippo=pippo)", logsList.get(0)
+        Assertions.assertEquals("* FATAL * ALLARM!: " + "errore grave p1=PnLoggerImplTest.TestObj(pippo=pippo)", logsList.get(0)
                 .getFormattedMessage());
         Assertions.assertEquals(Level.ERROR, logsList.get(0)
                 .getLevel());
-        Assertions.assertEquals("ALLARM!", logsList.get(0)
+        Assertions.assertEquals("* FATAL * ALLARM!", logsList.get(0)
                 .getMarker().getName());
     }
 
@@ -392,13 +392,13 @@ class PnLoggerImplTest {
         //Then
         // JUnit assertions
         List<ILoggingEvent> logsList = listAppender.list;
-        Assertions.assertEquals("ALLARM!: " + "errore grave ", logsList.get(0)
+        Assertions.assertEquals("* FATAL * ALLARM!: " + "errore grave ", logsList.get(0)
                 .getFormattedMessage());
         assertTrue(logsList.get(0)
                 .getThrowableProxy().getClassName().contains("java.lang.RuntimeException"));
         Assertions.assertEquals(Level.ERROR, logsList.get(0)
                 .getLevel());
-        Assertions.assertEquals("ALLARM!", logsList.get(0)
+        Assertions.assertEquals("* FATAL * ALLARM!", logsList.get(0)
                 .getMarker().getName());
     }
 

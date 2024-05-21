@@ -14,7 +14,8 @@ public interface PnLogger extends Logger {
     }
 
     // viene volutamente scritta "male", per essere più facilmente ricercabile nei log
-    public static final String ALARM_LOG = "ALLARM!";
+    // aggiunto * FATAL * per essere ricercato dalle sonde
+    public static final String ALARM_LOG = "* FATAL * ALLARM!";
 
 
     public final class EXTERNAL_SERVICES {
