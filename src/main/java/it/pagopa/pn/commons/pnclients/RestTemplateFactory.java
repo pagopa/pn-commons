@@ -1,5 +1,6 @@
 package it.pagopa.pn.commons.pnclients;
 
+import lombok.CustomLog;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,9 +12,11 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+@CustomLog
 public class RestTemplateFactory {
 
     @Bean
@@ -71,6 +74,7 @@ public class RestTemplateFactory {
             if (traceId != null) {
                 request.getHeaders().add(traceIdHeader, traceId);
             }
+            log.debug("[LOG FOR TEST PURPOSES, PLEASE REMOVE!] Request info -> body : {}, headers : {}", new String(body, StandardCharsets.UTF_8), request.getHeaders());
             return execution.execute(request, body);
         }
     }
