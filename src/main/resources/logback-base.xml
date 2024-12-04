@@ -37,6 +37,7 @@
     </if>
     <logger name="it.pagopa.pn.commons.pnclients.RestTemplateRetryable" level="INFO"/>
     <logger name="it.pagopa.pn" level="DEBUG"/>
+    <logger name="it.pagopa.tech.lollipop.consumer.logger.impl" level="WARN"/>
     <root level="INFO">
         <appender-ref ref="STDOUT"/>
     </root>
