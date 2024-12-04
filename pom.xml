@@ -69,22 +69,22 @@
 		<dependency>
 			<groupId>it.pagopa.tech.lollipop-consumer-java-sdk</groupId>
 			<artifactId>core</artifactId>
-			<version>1.0.0-RC6</version>
+			<version>1.0.0-RC6-BETA1</version>
 		</dependency>
 		<dependency>
 			<groupId>it.pagopa.tech.lollipop-consumer-java-sdk</groupId>
 			<artifactId>http-verifier</artifactId>
-			<version>1.0.0-RC6</version>
+			<version>1.0.0-RC6-BETA1</version>
 		</dependency>
 		<dependency>
 			<groupId>it.pagopa.tech.lollipop-consumer-java-sdk</groupId>
 			<artifactId>assertion-rest-client-native</artifactId>
-			<version>1.0.0-RC6</version>
+			<version>1.0.0-RC6-BETA1</version>
 		</dependency>
 		<dependency>
 			<groupId>it.pagopa.tech.lollipop-consumer-java-sdk</groupId>
 			<artifactId>identity-service-rest-client-native</artifactId>
-			<version>1.0.0-RC6</version>
+			<version>1.0.0-RC6-BETA1</version>
 		</dependency>
 
 		<dependency>
