@@ -53,7 +53,7 @@ public class LollipopWebFilter implements OrderedWebFilter {
     }
     @Override
     public @NotNull Mono<Void> filter(@NotNull ServerWebExchange exchange, @NotNull WebFilterChain chain) {
-
+        log.info("Before Lollipop filter");
         ServerHttpRequest request = exchange.getRequest();
         HttpHeaders headers = exchange.getRequest().getHeaders();
 
@@ -69,10 +69,12 @@ public class LollipopWebFilter implements OrderedWebFilter {
                         .defaultIfEmpty("")
                         .flatMap(reqBody -> validateRequest(exchange, request, reqBody))
                         .collectList()
+                        .doOnNext(objects -> log.info("After Lollipop Filter"))
                         .flatMap(requests -> chain.filter(exchange));
             } else {
                 return validateRequest(exchange, request, null)
-                .flatMap(stringMono -> chain.filter(exchange));
+                        .doOnNext(objects -> log.info("After Lollipop Filter"))
+                        .flatMap(stringMono -> chain.filter(exchange));
             }
         }
         return chain.filter(exchange);
