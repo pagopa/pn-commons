@@ -53,13 +53,13 @@ public class LollipopWebFilter implements OrderedWebFilter {
     }
     @Override
     public @NotNull Mono<Void> filter(@NotNull ServerWebExchange exchange, @NotNull WebFilterChain chain) {
-
         ServerHttpRequest request = exchange.getRequest();
         HttpHeaders headers = exchange.getRequest().getHeaders();
 
         if (headers.containsKey(HEADER_FIELD)
                 && Objects.equals(headers.getFirst(HEADER_FIELD), HEADER_VALUE)) {
 
+            log.debug("Before Lollipop filter");
             HttpMethod method = request.getMethod();
 
             // Get request body as String
@@ -69,10 +69,12 @@ public class LollipopWebFilter implements OrderedWebFilter {
                         .defaultIfEmpty("")
                         .flatMap(reqBody -> validateRequest(exchange, request, reqBody))
                         .collectList()
+                        .doOnNext(objects -> log.debug("After Lollipop Filter"))
                         .flatMap(requests -> chain.filter(exchange));
             } else {
                 return validateRequest(exchange, request, null)
-                .flatMap(stringMono -> chain.filter(exchange));
+                        .doOnNext(objects -> log.debug("After Lollipop Filter"))
+                        .flatMap(stringMono -> chain.filter(exchange));
             }
         }
         return chain.filter(exchange);
