@@ -101,6 +101,7 @@ public enum PnAuditLogEventType {
     AUD_DV_DEC(PnAuditLogMarker.AUDIT5Y),
     AUD_NT_REC_DECEASED(PnAuditLogMarker.AUDIT10Y),
     AUD_NT_REC_DECEASED_VIEW(PnAuditLogMarker.AUDIT10Y),
+    AUD_NR_INIPEC(PnAuditLogMarker.AUDIT10Y),
     AUD_NR_PG_PHYSICAL(PnAuditLogMarker.AUDIT10Y),
     AUD_NR_PG_DIGITAL(PnAuditLogMarker.AUDIT10Y),
     AUD_NR_PF_PHYSICAL(PnAuditLogMarker.AUDIT10Y),
