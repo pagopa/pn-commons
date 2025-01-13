@@ -31,6 +31,7 @@ class AbstractCachedSsmParameterConsumerTest {
         this.consumer = new AbstractCachedSsmParameterConsumer( ssmClient );
     }
 
+
     @ExtendWith(MockitoExtension.class)
     @Test
     void getParameterValueSuccess() {
