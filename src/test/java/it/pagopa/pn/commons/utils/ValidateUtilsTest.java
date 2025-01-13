@@ -3,6 +3,7 @@ package it.pagopa.pn.commons.utils;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import it.pagopa.pn.commons.configs.TaxIdInBlackListParameterConsumer;
 import it.pagopa.pn.commons.configs.TaxIdInWhiteListParameterConsumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,6 +20,9 @@ class ValidateUtilsTest {
     @Mock
     TaxIdInWhiteListParameterConsumer taxIdInWhiteListParameterConsumer;
 
+    @Mock
+    TaxIdInBlackListParameterConsumer taxIdInBlackListParameterConsumer;
+
 
     /**
      * Method under test: {@link ValidateUtils#validate(String)}
@@ -26,7 +30,7 @@ class ValidateUtilsTest {
 
     @BeforeEach
     void setup() {
-        validateUtils = new ValidateUtils( taxIdInWhiteListParameterConsumer );
+        validateUtils = new ValidateUtils( taxIdInWhiteListParameterConsumer, taxIdInBlackListParameterConsumer);
     }
 
     @Test
@@ -70,7 +74,7 @@ class ValidateUtilsTest {
 
     @Test
     void validateInWitheList() {
-        validateUtils = new ValidateUtils(taxIdInWhiteListParameterConsumer);
+        validateUtils = new ValidateUtils(taxIdInWhiteListParameterConsumer, taxIdInBlackListParameterConsumer);
         Mockito.when( taxIdInWhiteListParameterConsumer.isInWhiteList( Mockito.anyString() ) ).thenReturn( true );
         assertTrue(validateUtils.validate("AAAAEEEEEEEDDD"));
     }
@@ -102,6 +106,43 @@ class ValidateUtilsTest {
         String fakeTaxId = "MRNLCC00A01H50MA";
         Mockito.when( taxIdInWhiteListParameterConsumer.isInWhiteList( Mockito.anyString() ) ).thenReturn( false );
         assertFalse(validateUtils.validate(fakeTaxId, true, false));
+    }
+
+    @Test
+    void validateWithSkipBlackList() {
+        String fakeTaxId = "MRNLCC00A01H50MJ";
+        Mockito.when( taxIdInWhiteListParameterConsumer.isInWhiteList( Mockito.anyString() ) ).thenReturn( false );
+        assertTrue(validateUtils.validate(fakeTaxId, true, false, true));
+    }
+
+    @Test
+    void validateWithCheckInBlackList() {
+        String fakeTaxId = "MRNLCC00A01H50MJ";
+        Mockito.when( taxIdInBlackListParameterConsumer.isInBlackList( Mockito.anyString() ) ).thenReturn( true );
+        assertTrue(validateUtils.validate(fakeTaxId, true, true, false));
+    }
+
+    @Test
+    void validateWithCheckInBlaclList2() {
+        String fakeTaxId = "MRNLCC00A01H50MA";
+        Mockito.when( taxIdInBlackListParameterConsumer.isInBlackList( Mockito.anyString() ) ).thenReturn( false );
+        assertFalse(validateUtils.validate(fakeTaxId, true, true, false));
+    }
+
+    @Test
+    void validateWithCheckInWhiteAndBlackList() {
+        String fakeTaxId = "MRNLCC00A01H50MJ";
+        Mockito.when( taxIdInWhiteListParameterConsumer.isInWhiteList( Mockito.anyString() ) ).thenReturn( true );
+        Mockito.when( taxIdInBlackListParameterConsumer.isInBlackList( Mockito.anyString() ) ).thenReturn( true );
+        assertTrue(validateUtils.validate(fakeTaxId, true, false, false));
+    }
+
+    @Test
+    void validateWithCheckInWhiteAndBlackList2() {
+        String fakeTaxId = "MRNLCC00A01H50MA";
+        Mockito.when( taxIdInWhiteListParameterConsumer.isInWhiteList( Mockito.anyString() ) ).thenReturn( false );
+        Mockito.when( taxIdInBlackListParameterConsumer.isInBlackList( Mockito.anyString() ) ).thenReturn( false );
+        assertFalse(validateUtils.validate(fakeTaxId, true, false, false));
     }
 }
 

@@ -1,5 +1,6 @@
 package it.pagopa.pn.commons.utils;
 
+import it.pagopa.pn.commons.configs.TaxIdInBlackListParameterConsumer;
 import it.pagopa.pn.commons.configs.TaxIdInWhiteListParameterConsumer;
 import lombok.extern.slf4j.Slf4j;
 
@@ -7,9 +8,12 @@ import lombok.extern.slf4j.Slf4j;
 public class ValidateUtils {
 
     private final TaxIdInWhiteListParameterConsumer taxIdInWhiteListParameterConsumer;
+    private final TaxIdInBlackListParameterConsumer taxIdInBlackListParameterConsumer;
 
-    public ValidateUtils(TaxIdInWhiteListParameterConsumer taxIdInWhiteListParameterConsumer) {
+    public ValidateUtils(TaxIdInWhiteListParameterConsumer taxIdInWhiteListParameterConsumer,
+                         TaxIdInBlackListParameterConsumer taxIdInBlackListParameterConsumer) {
         this.taxIdInWhiteListParameterConsumer = taxIdInWhiteListParameterConsumer;
+        this.taxIdInBlackListParameterConsumer = taxIdInBlackListParameterConsumer;
     }
 
     /**
@@ -51,6 +55,29 @@ public class ValidateUtils {
         if (!skipCheckWhiteList &&
                 (Boolean.TRUE.equals(taxIdInWhiteListParameterConsumer.isInWhiteList(taxId)))) {
                 return true;
+        }
+
+        if(!isPf && taxId.length() == 11 ){
+            return validateIva(taxId);
+        }
+        else if( taxId.length() == 16 ){
+            return validateCf(taxId);
+        }
+        return false;
+    }
+
+    public boolean validate(String taxId, boolean isPf, boolean skipCheckWhiteList, boolean skipCheckBlackList){
+        taxId = normalize(taxId);
+        if( taxId.length() == 0 ){
+            return false;
+        }
+        if (!skipCheckWhiteList &&
+                (Boolean.TRUE.equals(taxIdInWhiteListParameterConsumer.isInWhiteList(taxId)))) {
+            return true;
+        }
+        if (!skipCheckBlackList &&
+                (Boolean.TRUE.equals(taxIdInBlackListParameterConsumer.isInBlackList(taxId)))) {
+            return false;
         }
 
         if(!isPf && taxId.length() == 11 ){
