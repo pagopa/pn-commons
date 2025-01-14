@@ -23,18 +23,18 @@ public class TaxIdInBlackListParameterConsumer {
 
     public Boolean isInBlackList( String taxId ) {
         String maskedTaxId = maskTaxId(taxId);
-        log.debug( "Start isInWhiteList for taxId={}", maskedTaxId);
-        Optional<TaxIdInBlackList[]> optionalTaxIdIsInWhiteList = parameterConsumer.getParameterValue(PARAMETER_STORE_MAP_TAX_ID_BLACK_LIST_NAME, TaxIdInBlackList[].class);
-        if (optionalTaxIdIsInWhiteList.isPresent()) {
-            TaxIdInBlackList[] taxIdInWhiteListList = optionalTaxIdIsInWhiteList.get();
-            for (TaxIdInBlackList taxIdInWhiteList : taxIdInWhiteListList) {
-                if ( taxIdInWhiteList.taxId.equals( taxId ) ) {
-                    log.debug("taxId={} is in white list", maskedTaxId );
+        log.debug( "Start isInBlackList for taxId={}", maskedTaxId);
+        Optional<TaxIdInBlackList[]> optionalTaxIdIsInBlackList = parameterConsumer.getParameterValue(PARAMETER_STORE_MAP_TAX_ID_BLACK_LIST_NAME, TaxIdInBlackList[].class);
+        if (optionalTaxIdIsInBlackList.isPresent()) {
+            TaxIdInBlackList[] isTaxIdInBlackList = optionalTaxIdIsInBlackList.get();
+            for (TaxIdInBlackList taxIdInBlackList : isTaxIdInBlackList) {
+                if ( taxIdInBlackList.taxId.equals( taxId ) ) {
+                    log.debug("taxId={} is in black list", maskedTaxId );
                     return true;
                 }
             }
         }
-        log.debug("taxId={} not found in white list", maskedTaxId);
+        log.debug("taxId={} not found in black list", maskedTaxId);
         return false;
     }
 

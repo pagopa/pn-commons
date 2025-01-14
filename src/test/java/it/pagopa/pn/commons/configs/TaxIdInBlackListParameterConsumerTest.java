@@ -13,7 +13,7 @@ import java.util.Optional;
 
 class TaxIdInBlackListParameterConsumerTest {
 
-    private static final String TAX_ID_IN_WHITE_LIST = "EEEEEEEEEEE";
+    private static final String TAX_ID_IN_BLACK_LIST = "EEEEEEEEEEE";
 
     @Mock
     private ParameterConsumer parameterConsumer;
@@ -31,12 +31,12 @@ class TaxIdInBlackListParameterConsumerTest {
     void getTaxIdIsInBlackList() {
 
         TaxIdInBlackListParameterConsumer.TaxIdInBlackList[] taxIdInBlackLists = new TaxIdInBlackListParameterConsumer.TaxIdInBlackList[2];
-        taxIdInBlackLists[0] = new TaxIdInBlackListParameterConsumer.TaxIdInBlackList( TAX_ID_IN_WHITE_LIST );
+        taxIdInBlackLists[0] = new TaxIdInBlackListParameterConsumer.TaxIdInBlackList( TAX_ID_IN_BLACK_LIST );
 
         Mockito.when( parameterConsumer.getParameterValue( Mockito.anyString(), Mockito.any() ) )
                 .thenReturn(Optional.of(taxIdInBlackLists));
 
-        Boolean inBlackList = taxIdInBlackListParameterConsumer.isInBlackList(TAX_ID_IN_WHITE_LIST);
+        Boolean inBlackList = taxIdInBlackListParameterConsumer.isInBlackList(TAX_ID_IN_BLACK_LIST);
         Assertions.assertTrue( inBlackList );
     }
 
@@ -47,7 +47,7 @@ class TaxIdInBlackListParameterConsumerTest {
         Mockito.when( parameterConsumer.getParameterValue( Mockito.anyString(), Mockito.any() ) )
                 .thenReturn(Optional.empty());
 
-        Boolean inBlackList = taxIdInBlackListParameterConsumer.isInBlackList(TAX_ID_IN_WHITE_LIST);
+        Boolean inBlackList = taxIdInBlackListParameterConsumer.isInBlackList(TAX_ID_IN_BLACK_LIST);
         Assertions.assertFalse( inBlackList );
     }
 }
