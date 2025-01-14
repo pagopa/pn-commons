@@ -124,21 +124,18 @@ class ValidateUtilsTest {
     @Test
     void validateWithSkipBlackList() {
         String fakeTaxId = "MRNLCC00A01H50MJ";
-        Mockito.when( taxIdInBlackListParameterConsumer.isInBlackList( Mockito.anyString() ) ).thenReturn( false );
         assertTrue(validateUtils.validate(fakeTaxId, true, false, true));
     }
 
     @Test
     void validateWithSkipBlackListNumeric() {
         String fakeTaxId = "61283750612";
-        Mockito.when( taxIdInBlackListParameterConsumer.isInBlackList( Mockito.anyString() ) ).thenReturn( false );
         assertTrue(validateUtils.validate(fakeTaxId, false, false, true));
     }
 
     @Test
     void validateWithSkipBlackListNumericWithPf() {
         String fakeTaxId = "61283750612";
-        Mockito.when( taxIdInBlackListParameterConsumer.isInBlackList( Mockito.anyString() ) ).thenReturn( false );
         assertFalse(validateUtils.validate(fakeTaxId, true, false, true));
     }
 
