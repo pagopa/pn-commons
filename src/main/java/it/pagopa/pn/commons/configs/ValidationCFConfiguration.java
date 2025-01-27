@@ -18,8 +18,13 @@ public class ValidationCFConfiguration {
     }
 
     @Bean
+    public TaxIdInBlackListParameterConsumer taxIdInBlackListParameterConsumer() {
+        return new TaxIdInBlackListParameterConsumer( parameterConsumer );
+    }
+
+    @Bean
     public ValidateUtils validationUtils() {
-        return new ValidateUtils( taxIdInWhiteListParameterConsumer() );
+        return new ValidateUtils( taxIdInWhiteListParameterConsumer(), taxIdInBlackListParameterConsumer());
     }
 
 }
