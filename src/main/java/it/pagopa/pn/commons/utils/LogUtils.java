@@ -18,6 +18,10 @@ public class LogUtils {
 
         String[] parts = strEmail.split("@");
 
+        if (parts.length == 1) {
+            return parts[0];
+        }
+
         //mask first part
         String strId;
         if(parts[0].length() < 4)
