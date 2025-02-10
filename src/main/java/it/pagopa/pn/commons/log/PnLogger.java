@@ -53,6 +53,9 @@ public interface PnLogger extends Logger {
         public static final String IPA = "IPA";
         public static final String PDND = "PDND";
         public static final String GPD = "GPD";
+        public static final String EMD_CORE = "EMD_CORE";
+        public static final String MIL_AUTH = "MIL_AUTH";
+        public static final String PN_EMD_INTEGRATION = "PN_EMD_INTEGRATION";
     }
 
     /**
