@@ -54,6 +54,12 @@ public class MDCWebFilter implements OrderedWebFilter {
     @Value("${pn.log.pn-cx-role-header}")
     private String pnCxRoleHeader;
 
+    @Value("${pn.log.pn-source-channel-header}")
+    private String pnSourceChannelHeader;
+
+    @Value("${pn.log.pn-source-channel-details-header}")
+    private String pnSourceChannelDetailsHeader;
+
     private static final String MDC_CONTEXT_REACTOR_KEY = MDCWebFilter.class.getName();
 
     @PostConstruct
@@ -84,6 +90,8 @@ public class MDCWebFilter implements OrderedWebFilter {
             addToMDC(requestHeaders.get(pnCxTypeHeader), MDC_PN_CX_TYPE_KEY);
             addToMDC(requestHeaders.get(pnCxGroupsHeader), MDC_PN_CX_GROUPS_KEY);
             addToMDC(requestHeaders.get(pnCxRoleHeader), MDC_PN_CX_ROLE_KEY);
+            addToMDC(requestHeaders.get(pnSourceChannelHeader), MDC_PN_SOURCE_CHANNEL_KEY);
+            addToMDC(requestHeaders.get(pnSourceChannelDetailsHeader), MDC_PN_SOURCE_CHANNEL_DETAILS_KEY);
             addToMDC(requestHeaders.get(LOLLIPOP_ORIGINAL_URL), MDC_PN_LP_ORIGINAL_URL);
             addToMDC(requestHeaders.get(LOLLIPOP_ORIGINAL_METHOD), MDC_PN_LP_ORIGINAL_METHOD);
             addToMDC(requestHeaders.get(LOLLIPOP_PUBLIC_KEY), MDC_PN_LP_PUBLIC_KEY);
@@ -119,6 +127,8 @@ public class MDCWebFilter implements OrderedWebFilter {
         ctx = addToWebFluxContext(ctx, requestHeaders.get(pnCxTypeHeader), MDC_PN_CX_TYPE_KEY);
         ctx = addToWebFluxContext(ctx, requestHeaders.get(pnCxGroupsHeader), MDC_PN_CX_GROUPS_KEY);
         ctx = addToWebFluxContext(ctx, requestHeaders.get(pnCxRoleHeader), MDC_PN_CX_ROLE_KEY);
+        ctx = addToWebFluxContext(ctx, requestHeaders.get(pnSourceChannelHeader), MDC_PN_SOURCE_CHANNEL_KEY);
+        ctx = addToWebFluxContext(ctx, requestHeaders.get(pnSourceChannelDetailsHeader), MDC_PN_SOURCE_CHANNEL_DETAILS_KEY);
         ctx = addToWebFluxContext(ctx, requestHeaders.get(LOLLIPOP_ORIGINAL_URL), MDC_PN_LP_ORIGINAL_URL);
         ctx = addToWebFluxContext(ctx, requestHeaders.get(LOLLIPOP_ORIGINAL_METHOD), MDC_PN_LP_ORIGINAL_METHOD);
         ctx = addToWebFluxContext(ctx, requestHeaders.get(LOLLIPOP_PUBLIC_KEY), MDC_PN_LP_PUBLIC_KEY);
