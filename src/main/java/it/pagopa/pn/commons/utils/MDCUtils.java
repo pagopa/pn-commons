@@ -21,6 +21,8 @@ public class MDCUtils {
     public static final String MDC_PN_CX_TYPE_KEY = "cx_type";
     public static final String MDC_PN_CX_GROUPS_KEY = "cx_groups";
     public static final String MDC_PN_CX_ROLE_KEY = "cx_role";
+    public static final String MDC_PN_SOURCE_CHANNEL_KEY = "source_channel";
+    public static final String MDC_PN_SOURCE_CHANNEL_DETAILS_KEY = "source_channel_details";
 
     public static final String MDC_PN_IUN_KEY = "iun";
     public static final String MDC_PN_MANDATEID_KEY = "mandateid";
@@ -55,8 +57,9 @@ public class MDCUtils {
 
     public static List<String> getAllMDCKeys() {
         return List.of(MDC_TRACE_ID_KEY, MDC_JTI_KEY, MDC_PN_UID_KEY, MDC_CX_ID_KEY
-                , MDC_PN_CX_TYPE_KEY, MDC_PN_CX_GROUPS_KEY, MDC_PN_CX_ROLE_KEY, MDC_PN_IUN_KEY
-                , MDC_PN_MANDATEID_KEY, MDC_PN_CTX_RECIPIENT_INDEX, MDC_PN_CTX_REQUEST_ID, MDC_PN_CTX_SAFESTORAGE_FILEKEY
+                , MDC_PN_CX_TYPE_KEY, MDC_PN_CX_GROUPS_KEY, MDC_PN_CX_ROLE_KEY, MDC_PN_SOURCE_CHANNEL_KEY
+                , MDC_PN_SOURCE_CHANNEL_DETAILS_KEY, MDC_PN_IUN_KEY, MDC_PN_MANDATEID_KEY, MDC_PN_CTX_RECIPIENT_INDEX
+                , MDC_PN_CTX_REQUEST_ID, MDC_PN_CTX_SAFESTORAGE_FILEKEY
                 , MDC_PN_CTX_TOPIC, MDC_PN_CTX_MESSAGE_ID, MDC_PN_SET_ID
                 , MDC_PN_LP_ORIGINAL_URL, MDC_PN_LP_ORIGINAL_METHOD, MDC_PN_LP_PUBLIC_KEY
                 , MDC_PN_LP_ASSERTION_REF, MDC_PN_LP_ASSERTION_TYPE

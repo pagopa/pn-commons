@@ -21,13 +21,12 @@ import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @Slf4j
 @ExtendWith(SpringExtension.class)
 @TestPropertySource(properties = { "pn.log.trace-id-header=X-Amzn-Trace-Id", "pn.log.jti-header=x-pagopa-pn-jti",
         "pn.log.pn-uid-header=x-pagopa-pn-uid", "pn.log.cx-id-header=x-pagopa-cx-id", "pn.log.pn-cx-type-header=x-pagopa-pn-cx-type",
-        "pn.log.pn-cx-groups-header=x-pagopa-pn-cx-groups", "pn.log.pn-cx-role-header=x-pagopa-pn-cx-role" })
+        "pn.log.pn-cx-groups-header=x-pagopa-pn-cx-groups", "pn.log.pn-cx-role-header=x-pagopa-pn-cx-role",
+        "pn.log.pn-source-channel-header=x-pagopa-pn-src-ch", "pn.log.pn-source-channel-details-header=x-pagopa-pn-src-ch-details" })
 class MDCWebFilterTest {
 
     public static final String MY_HEADER = "Root=1-61b1d38b-752391d8200695e11e2e5bac;";
@@ -182,6 +181,42 @@ class MDCWebFilterTest {
 
         WebHandler webHandler = serverWebExchange -> {
             Assertions.assertEquals("role-value", MDC.get(MDCUtils.MDC_PN_CX_ROLE_KEY));
+            return Mono.empty();
+        };
+        WebFilterChain filterChain = new DefaultWebFilterChain(webHandler, Collections.emptyList());
+
+        mdcTraceIdWebFilter.filter(exchange, filterChain).block();
+
+    }
+
+    @Test
+    void filterWithSourceChannel() {
+
+        MockServerHttpRequest request = MockServerHttpRequest.get("http://localhost")
+                .header("x-pagopa-pn-src-ch", "src-ch-value")
+                .build();
+        ServerWebExchange exchange = MockServerWebExchange.from(request);
+
+        WebHandler webHandler = serverWebExchange -> {
+            Assertions.assertEquals("src-ch-value", MDC.get(MDCUtils.MDC_PN_SOURCE_CHANNEL_KEY));
+            return Mono.empty();
+        };
+        WebFilterChain filterChain = new DefaultWebFilterChain(webHandler, Collections.emptyList());
+
+        mdcTraceIdWebFilter.filter(exchange, filterChain).block();
+
+    }
+
+    @Test
+    void filterWithSourceChannelDetails() {
+
+        MockServerHttpRequest request = MockServerHttpRequest.get("http://localhost")
+                .header("x-pagopa-pn-src-ch-details", "src-ch-details-value")
+                .build();
+        ServerWebExchange exchange = MockServerWebExchange.from(request);
+
+        WebHandler webHandler = serverWebExchange -> {
+            Assertions.assertEquals("src-ch-details-value", MDC.get(MDCUtils.MDC_PN_SOURCE_CHANNEL_DETAILS_KEY));
             return Mono.empty();
         };
         WebFilterChain filterChain = new DefaultWebFilterChain(webHandler, Collections.emptyList());
