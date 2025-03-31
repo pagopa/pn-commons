@@ -49,15 +49,12 @@ public abstract class BaseDAO<T> {
         this.tClass = tClass;
     }
 
-    protected Mono<T> put(T entity){
-        log.logPuttingDynamoDBEntity(dynamoTable.tableName(), entity);
+    protected Mono<T> put(T entity) {
         PutItemEnhancedRequest<T> putRequest = PutItemEnhancedRequest.builder(tClass)
                 .item(entity)
                 .build();
-        return Mono.fromFuture(dynamoTable.putItem(putRequest).thenApply(x -> {
-            log.logPutDoneDynamoDBEntity(dynamoTable.tableName());
-            return entity;
-        }));
+        return Mono.fromFuture(dynamoTable.putItem(putRequest))
+                .thenReturn(entity);
     }
 
     protected Mono<T> delete(String partitionKey, String sortKey){
@@ -65,10 +62,7 @@ public abstract class BaseDAO<T> {
         if (!StringUtils.isBlank(sortKey)){
             keyBuilder.sortValue(sortKey);
         }
-        return Mono.fromFuture(dynamoTable.deleteItem(keyBuilder.build()).thenApply(t -> {
-            log.logDeleteDynamoDBEntity(dynamoTable.tableName(), keyBuild(partitionKey, sortKey), t);
-            return t;
-        }));
+        return Mono.fromFuture(dynamoTable.deleteItem(keyBuilder.build()));
     }
 
     protected Mono<Void> putWithTransact(TransactWriteItemsEnhancedRequest transactRequest){
@@ -81,10 +75,7 @@ public abstract class BaseDAO<T> {
     protected Mono<T> update(T entity){
         UpdateItemEnhancedRequest<T> updateRequest = UpdateItemEnhancedRequest
                 .builder(tClass).item(entity).build();
-        return Mono.fromFuture(dynamoTable.updateItem(updateRequest).thenApply(t -> {
-            log.logUpdateDynamoDBEntity(dynamoTable.tableName(), t);
-            return t;
-        }));
+        return Mono.fromFuture(dynamoTable.updateItem(updateRequest));
     }
 
     protected Mono<T> get(String partitionKey, String sortKey){
@@ -92,11 +83,7 @@ public abstract class BaseDAO<T> {
         if (!StringUtils.isBlank(sortKey)){
             keyBuilder.sortValue(sortKey);
         }
-
-        return Mono.fromFuture(dynamoTable.getItem(keyBuilder.build()).thenApply(data -> {
-            log.logGetDynamoDBEntity(dynamoTable.tableName(), keyBuild(partitionKey, sortKey), data);
-            return data;
-        }));
+        return Mono.fromFuture(dynamoTable.getItem(keyBuilder.build()));
     }
 
     public Flux<T> getBySecondaryIndex(String index, String partitionKey, String sortKey){
