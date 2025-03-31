@@ -56,6 +56,7 @@ public enum PnAuditLogEventType {
     AUD_DA_SEND_SMS(PnAuditLogMarker.AUDIT5Y),
     AUD_DA_SEND_EMAIL(PnAuditLogMarker.AUDIT5Y),
     AUD_DA_SEND_IO(PnAuditLogMarker.AUDIT5Y),
+    AUD_DA_SEND_TPP(PnAuditLogMarker.AUDIT5Y),
     AUD_DL_CREATE(PnAuditLogMarker.AUDIT10Y),
     AUD_DL_ACCEPT(PnAuditLogMarker.AUDIT10Y),
     AUD_DL_UPDATE(PnAuditLogMarker.AUDIT10Y),
@@ -97,7 +98,10 @@ public enum PnAuditLogEventType {
     AUD_RADD_AORINQUIRY(PnAuditLogMarker.AUDIT10Y),
     AUD_RADD_ACTTRAN(PnAuditLogMarker.AUDIT10Y),
     AUD_RADD_AORTRAN(PnAuditLogMarker.AUDIT10Y),
-    AUD_NT_RADD_OPEN(PnAuditLogMarker.AUDIT10Y);
+    AUD_NT_RADD_OPEN(PnAuditLogMarker.AUDIT10Y),
+    AUD_DV_DEC(PnAuditLogMarker.AUDIT5Y),
+    AUD_NT_REC_DECEASED(PnAuditLogMarker.AUDIT10Y),
+    AUD_NT_REC_DECEASED_VIEW(PnAuditLogMarker.AUDIT10Y);
 
     
     final org.slf4j.Marker marker;

@@ -27,6 +27,12 @@ class ValidationCFConfigurationTest {
     }
 
     @Test
+    void createTaxIdInBlackListParameterConsumer() {
+        TaxIdInBlackListParameterConsumer taxIdInBlackListParameterConsumer = validationCFConfiguration.taxIdInBlackListParameterConsumer();
+        Assertions.assertNotNull( taxIdInBlackListParameterConsumer );
+    }
+
+    @Test
     void createValidationCFConfig() {
         ValidateUtils validateUtils = validationCFConfiguration.validationUtils();
         Assertions.assertNotNull( validateUtils );
