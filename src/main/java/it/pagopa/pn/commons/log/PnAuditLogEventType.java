@@ -102,7 +102,8 @@ public enum PnAuditLogEventType {
     AUD_DV_DEC(PnAuditLogMarker.AUDIT5Y),
     AUD_NT_REC_DECEASED(PnAuditLogMarker.AUDIT10Y),
     AUD_NT_REC_DECEASED_VIEW(PnAuditLogMarker.AUDIT10Y),
-    AUD_NT_VALIDATION_ADDRESS_SEARCH(PnAuditLogMarker.AUDIT10Y);
+    AUD_NT_VALIDATION_ADDRESS_SEARCH(PnAuditLogMarker.AUDIT10Y),
+    AUD_NT_LOOKUP_ADDRESS_ENABLED(PnAuditLogMarker.AUDIT10Y);
 
     
     final org.slf4j.Marker marker;
