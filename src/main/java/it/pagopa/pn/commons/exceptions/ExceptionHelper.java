@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.FieldError;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
-import javax.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolation;
 import java.lang.annotation.Annotation;
 import java.time.Instant;
 import java.util.*;
@@ -46,7 +46,7 @@ public class ExceptionHelper {
         Problem res;
 
         // gestione dedicata delle constraintviolation, lanciate da spring direttamente
-        if (ex instanceof javax.validation.ConstraintViolationException constraintViolationException) {
+        if (ex instanceof jakarta.validation.ConstraintViolationException constraintViolationException) {
             // eccezione di constraint, recupero le info dei campi
             ex = new PnValidationExceptionBuilder<>(this)
                     .validationErrors(constraintViolationException.getConstraintViolations())
@@ -68,10 +68,11 @@ public class ExceptionHelper {
                     .build();
         }
         else if (ex instanceof org.springframework.web.server.ResponseStatusException responseStatusException){
+            int statusCode = responseStatusException.getStatusCode().value();
             // eccezione di spring riguardante errori di altra natura
             ex = new PnRuntimeException(Objects.requireNonNull(responseStatusException.getMessage() == null ? "Web error" : responseStatusException.getMessage()),
                                         Objects.requireNonNull(responseStatusException.getReason() == null ?  "Web error" : responseStatusException.getReason()),
-                    responseStatusException.getRawStatusCode(),
+                    statusCode,
                                         ERROR_CODE_PN_WEB_GENERIC_ERROR, null, null, responseStatusException);
         }
 
@@ -187,60 +188,60 @@ public class ExceptionHelper {
 
 
     private void initValidationMap() {
-        this.validationMap.put(javax.validation.constraints.AssertFalse.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_ASSERTFALSE);
-        this.validationMap.put(javax.validation.constraints.AssertFalse.List.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_ASSERTFALSE);
-        this.validationMap.put(javax.validation.constraints.AssertTrue.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_ASSERTTRUE);
-        this.validationMap.put(javax.validation.constraints.AssertTrue.List.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_ASSERTTRUE);
+        this.validationMap.put(jakarta.validation.constraints.AssertFalse.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_ASSERTFALSE);
+        this.validationMap.put(jakarta.validation.constraints.AssertFalse.List.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_ASSERTFALSE);
+        this.validationMap.put(jakarta.validation.constraints.AssertTrue.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_ASSERTTRUE);
+        this.validationMap.put(jakarta.validation.constraints.AssertTrue.List.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_ASSERTTRUE);
 
-        this.validationMap.put(javax.validation.constraints.DecimalMax.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_MAX);
-        this.validationMap.put(javax.validation.constraints.DecimalMax.List.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_MAX);
-        this.validationMap.put(javax.validation.constraints.Max.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_MAX);
-        this.validationMap.put(javax.validation.constraints.Max.List.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_MAX);
-        this.validationMap.put(javax.validation.constraints.DecimalMin.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_MIN);
-        this.validationMap.put(javax.validation.constraints.DecimalMin.List.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_MIN);
-        this.validationMap.put(javax.validation.constraints.Min.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_MIN);
-        this.validationMap.put(javax.validation.constraints.Min.List.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_MIN);
+        this.validationMap.put(jakarta.validation.constraints.DecimalMax.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_MAX);
+        this.validationMap.put(jakarta.validation.constraints.DecimalMax.List.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_MAX);
+        this.validationMap.put(jakarta.validation.constraints.Max.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_MAX);
+        this.validationMap.put(jakarta.validation.constraints.Max.List.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_MAX);
+        this.validationMap.put(jakarta.validation.constraints.DecimalMin.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_MIN);
+        this.validationMap.put(jakarta.validation.constraints.DecimalMin.List.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_MIN);
+        this.validationMap.put(jakarta.validation.constraints.Min.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_MIN);
+        this.validationMap.put(jakarta.validation.constraints.Min.List.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_MIN);
 
-        this.validationMap.put(javax.validation.constraints.Digits.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_DIGITS);
-        this.validationMap.put(javax.validation.constraints.Digits.List.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_DIGITS);
+        this.validationMap.put(jakarta.validation.constraints.Digits.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_DIGITS);
+        this.validationMap.put(jakarta.validation.constraints.Digits.List.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_DIGITS);
 
-        this.validationMap.put(javax.validation.constraints.Future.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_FUTURE);
-        this.validationMap.put(javax.validation.constraints.Future.List.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_FUTURE);
-        this.validationMap.put(javax.validation.constraints.FutureOrPresent.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_FUTUREORPRESENT);
-        this.validationMap.put(javax.validation.constraints.FutureOrPresent.List.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_FUTUREORPRESENT);
-        this.validationMap.put(javax.validation.constraints.Past.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_PAST);
-        this.validationMap.put(javax.validation.constraints.Past.List.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_PAST);
-        this.validationMap.put(javax.validation.constraints.PastOrPresent.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_PASTORPRESENT);
-        this.validationMap.put(javax.validation.constraints.PastOrPresent.List.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_PASTORPRESENT);
+        this.validationMap.put(jakarta.validation.constraints.Future.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_FUTURE);
+        this.validationMap.put(jakarta.validation.constraints.Future.List.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_FUTURE);
+        this.validationMap.put(jakarta.validation.constraints.FutureOrPresent.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_FUTUREORPRESENT);
+        this.validationMap.put(jakarta.validation.constraints.FutureOrPresent.List.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_FUTUREORPRESENT);
+        this.validationMap.put(jakarta.validation.constraints.Past.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_PAST);
+        this.validationMap.put(jakarta.validation.constraints.Past.List.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_PAST);
+        this.validationMap.put(jakarta.validation.constraints.PastOrPresent.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_PASTORPRESENT);
+        this.validationMap.put(jakarta.validation.constraints.PastOrPresent.List.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_PASTORPRESENT);
 
 
-        this.validationMap.put(javax.validation.constraints.NotNull.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_REQUIRED);
-        this.validationMap.put(javax.validation.constraints.NotNull.List.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_REQUIRED);
-        this.validationMap.put(javax.validation.constraints.NotBlank.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_REQUIRED);
-        this.validationMap.put(javax.validation.constraints.NotBlank.List.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_REQUIRED);
-        this.validationMap.put(javax.validation.constraints.NotEmpty.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_REQUIRED);
-        this.validationMap.put(javax.validation.constraints.NotEmpty.List.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_REQUIRED);
+        this.validationMap.put(jakarta.validation.constraints.NotNull.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_REQUIRED);
+        this.validationMap.put(jakarta.validation.constraints.NotNull.List.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_REQUIRED);
+        this.validationMap.put(jakarta.validation.constraints.NotBlank.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_REQUIRED);
+        this.validationMap.put(jakarta.validation.constraints.NotBlank.List.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_REQUIRED);
+        this.validationMap.put(jakarta.validation.constraints.NotEmpty.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_REQUIRED);
+        this.validationMap.put(jakarta.validation.constraints.NotEmpty.List.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_REQUIRED);
 
-        this.validationMap.put(javax.validation.constraints.Null.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_NULL);
-        this.validationMap.put(javax.validation.constraints.Null.List.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_NULL);
+        this.validationMap.put(jakarta.validation.constraints.Null.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_NULL);
+        this.validationMap.put(jakarta.validation.constraints.Null.List.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_NULL);
 
-        this.validationMap.put(javax.validation.constraints.Pattern.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_PATTERN);
-        this.validationMap.put(javax.validation.constraints.Pattern.List.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_PATTERN);
+        this.validationMap.put(jakarta.validation.constraints.Pattern.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_PATTERN);
+        this.validationMap.put(jakarta.validation.constraints.Pattern.List.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_PATTERN);
 
-        this.validationMap.put(javax.validation.constraints.Size.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_SIZE);
-        this.validationMap.put(javax.validation.constraints.Size.List.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_SIZE);
+        this.validationMap.put(jakarta.validation.constraints.Size.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_SIZE);
+        this.validationMap.put(jakarta.validation.constraints.Size.List.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_SIZE);
 
-        this.validationMap.put(javax.validation.constraints.Email.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_EMAIL);
-        this.validationMap.put(javax.validation.constraints.Email.List.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_EMAIL);
+        this.validationMap.put(jakarta.validation.constraints.Email.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_EMAIL);
+        this.validationMap.put(jakarta.validation.constraints.Email.List.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_EMAIL);
 
-        this.validationMap.put(javax.validation.constraints.Negative.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_NEGATIVE);
-        this.validationMap.put(javax.validation.constraints.Negative.List.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_NEGATIVE);
-        this.validationMap.put(javax.validation.constraints.NegativeOrZero.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_NEGATIVEORZERO);
-        this.validationMap.put(javax.validation.constraints.NegativeOrZero.List.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_NEGATIVEORZERO);
-        this.validationMap.put(javax.validation.constraints.Positive.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_POSITIVE);
-        this.validationMap.put(javax.validation.constraints.Positive.List.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_POSITIVE);
-        this.validationMap.put(javax.validation.constraints.PositiveOrZero.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_POSITIVEORZERO);
-        this.validationMap.put(javax.validation.constraints.PositiveOrZero.List.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_POSITIVEORZERO);
+        this.validationMap.put(jakarta.validation.constraints.Negative.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_NEGATIVE);
+        this.validationMap.put(jakarta.validation.constraints.Negative.List.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_NEGATIVE);
+        this.validationMap.put(jakarta.validation.constraints.NegativeOrZero.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_NEGATIVEORZERO);
+        this.validationMap.put(jakarta.validation.constraints.NegativeOrZero.List.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_NEGATIVEORZERO);
+        this.validationMap.put(jakarta.validation.constraints.Positive.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_POSITIVE);
+        this.validationMap.put(jakarta.validation.constraints.Positive.List.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_POSITIVE);
+        this.validationMap.put(jakarta.validation.constraints.PositiveOrZero.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_POSITIVEORZERO);
+        this.validationMap.put(jakarta.validation.constraints.PositiveOrZero.List.class.getName(), ERROR_CODE_PN_GENERIC_INVALIDPARAMETER_POSITIVEORZERO);
 
 
     }
