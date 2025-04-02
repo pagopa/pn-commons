@@ -3,7 +3,7 @@ package it.pagopa.pn.commons.exceptions.mapper;
 import it.pagopa.pn.commons.exceptions.ExceptionHelper;
 import it.pagopa.pn.commons.exceptions.dto.ProblemError;
 
-import javax.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolation;
 
 public class ConstraintViolationToProblemErrorMapper {
 
