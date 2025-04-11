@@ -1,5 +1,8 @@
 package it.pagopa.pn.commons.log;
 
+import it.pagopa.pn.commons.log.dto.metrics.GeneralMetric;
+
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -11,6 +14,7 @@ public class PnAuditLogEvent {
     private PnAuditLogType level;
     private final String uuid;
     private final Map<String, String> mdc;
+    private List<GeneralMetric> metricsArray;
 
     Object[] getArguments() {
         return arguments;
@@ -35,6 +39,15 @@ public class PnAuditLogEvent {
         this.type = type;
         this.mdc = mdc;
         this.message = message;
+        this.arguments = arguments;
+        this.uuid = UUID.randomUUID().toString();
+    }
+
+    public PnAuditLogEvent(PnAuditLogEventType type, Map<String, String> mdc, String message, List<GeneralMetric> metricsArray, Object... arguments) {
+        this.type = type;
+        this.mdc = mdc;
+        this.message = message;
+        this.metricsArray = metricsArray;
         this.arguments = arguments;
         this.uuid = UUID.randomUUID().toString();
     }
