@@ -2,13 +2,18 @@ package it.pagopa.pn.commons.log;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
+import it.pagopa.pn.commons.log.dto.metrics.Dimension;
+import it.pagopa.pn.commons.log.dto.metrics.GeneralMetric;
+import it.pagopa.pn.commons.log.dto.metrics.Metric;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static it.pagopa.pn.commons.log.PnAuditLog.AUDIT_TYPE;
-import static it.pagopa.pn.commons.log.PnAuditLogEventType.*;
+import static it.pagopa.pn.commons.log.PnAuditLogEventType.AUD_ACC_LOGIN;
+import static it.pagopa.pn.commons.log.PnAuditLogEventType.AUD_NT_AAR;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PnAuditLogTest {
@@ -25,6 +30,7 @@ class PnAuditLogTest {
         // addAppender is outdated now
         PnAuditLog.getLogger().addAppender(listAppender);
         auditLogger = new PnAuditLogBuilder();
+
     }
 
     @Test
@@ -143,5 +149,166 @@ class PnAuditLogTest {
         assertTrue(loggingEvent2.getFormattedMessage().startsWith("[AUD_NT_AAR] WARNING"));
         assertTrue(loggingEvent2.getFormattedMessage().endsWith(message));
         assertEquals("CNZS-RZBB-HJAT-202205-E-1",logEvent.getMdc().get("iun"));
+    }
+
+    @Test
+    void testAuditLogPnfMetricInAfterMethod() {
+        // create AuditEvents
+        PnAuditLogEvent logEvent = auditLogger.before( AUD_NT_AAR, "Test1").iun("CNZS-RZBB-HJAT-202205-E-1").build();
+        logEvent.setMetricFormatType(PnAuditLogMetricFormatType.PNF.name());
+
+        List<GeneralMetric> metricsArray = List.of(getGeneralMetric("1"),getGeneralMetric("2"));
+
+        // call method under test
+        logEvent.log();
+        final String message = "ERROR in calling method";
+        logEvent.generateWarning(message, metricsArray).log();
+
+        // JUnit assertions
+        List<ILoggingEvent> logsList = listAppender.list;
+        final ILoggingEvent loggingEvent1 = logsList.get(0);
+        assertEquals("AUDIT10Y", loggingEvent1.getMarker().getName());
+        assertEquals("INFO", loggingEvent1.getLevel().toString());
+        assertEquals("AUD_NT_AAR", loggingEvent1.getMDCPropertyMap().get(AUDIT_TYPE));
+        assertTrue(loggingEvent1.getFormattedMessage().startsWith("[AUD_NT_AAR] BEFORE"));
+        assertTrue(loggingEvent1.getFormattedMessage().endsWith(" - Test1"));
+        assertEquals("CNZS-RZBB-HJAT-202205-E-1", logEvent.getMdc().get("iun"));
+
+
+        final ILoggingEvent loggingEvent2 = logsList.get(1);
+        assertEquals("AUDIT10Y", loggingEvent2.getMarker().getName());
+        assertEquals("WARN", loggingEvent2.getLevel().toString());
+        assertEquals("AUD_NT_AAR", loggingEvent2.getMDCPropertyMap().get(AUDIT_TYPE));
+        assertTrue(loggingEvent2.getFormattedMessage().startsWith("[AUD_NT_AAR] WARNING"));
+        assertTrue(loggingEvent2.getFormattedMessage().endsWith(message));
+        assertEquals("CNZS-RZBB-HJAT-202205-E-1",logEvent.getMdc().get("iun"));
+        assertNotNull(loggingEvent2.getMDCPropertyMap().get("PNApplicationMetrics"));
+        assertEquals("[{\"Namespace\":\"MultiNamespace_1\",\"Dimensions\":[{\"name\":\"Key1_1\",\"value\":\"Value1\"},{\"name\":\"Key2_1\",\"value\":\"Value2\"}],\"Timestamp\":\"2023-10-05T12:00:00Z\",\"Name\":\"Metric1_1\",\"Value\":\"100\",\"Unit\":\"Milliseconds\"},{\"Namespace\":\"MultiNamespace_1\",\"Dimensions\":[{\"name\":\"Key1_1\",\"value\":\"Value1\"},{\"name\":\"Key2_1\",\"value\":\"Value2\"}],\"Timestamp\":\"2023-10-05T12:00:00Z\",\"Name\":\"Metric2_1\",\"Value\":\"200\",\"Unit\":\"Milliseconds\"},{\"Namespace\":\"MultiNamespace_2\",\"Dimensions\":[{\"name\":\"Key1_2\",\"value\":\"Value1\"},{\"name\":\"Key2_2\",\"value\":\"Value2\"}],\"Timestamp\":\"2023-10-05T12:00:00Z\",\"Name\":\"Metric1_2\",\"Value\":\"100\",\"Unit\":\"Milliseconds\"},{\"Namespace\":\"MultiNamespace_2\",\"Dimensions\":[{\"name\":\"Key1_2\",\"value\":\"Value1\"},{\"name\":\"Key2_2\",\"value\":\"Value2\"}],\"Timestamp\":\"2023-10-05T12:00:00Z\",\"Name\":\"Metric2_2\",\"Value\":\"200\",\"Unit\":\"Milliseconds\"}]", loggingEvent2.getMDCPropertyMap().get("PNApplicationMetrics"));
+    }
+
+    @Test
+    void testAuditLogPnfMetricInBeforeMethod() {
+        List<GeneralMetric> metricsArray = List.of(getGeneralMetric("1"),getGeneralMetric("2"));
+
+        // create AuditEvents
+        PnAuditLogEvent logEvent = auditLogger.before( AUD_NT_AAR, "Test1", metricsArray).iun("CNZS-RZBB-HJAT-202205-E-1").build();
+        logEvent.setMetricFormatType(PnAuditLogMetricFormatType.PNF.name());
+
+
+
+        // call method under test
+        logEvent.log();
+        final String message = "ERROR in calling method";
+        logEvent.generateWarning(message).log();
+
+        // JUnit assertions
+        List<ILoggingEvent> logsList = listAppender.list;
+        final ILoggingEvent loggingEvent1 = logsList.get(0);
+        assertEquals("AUDIT10Y", loggingEvent1.getMarker().getName());
+        assertEquals("INFO", loggingEvent1.getLevel().toString());
+        assertEquals("AUD_NT_AAR", loggingEvent1.getMDCPropertyMap().get(AUDIT_TYPE));
+        assertTrue(loggingEvent1.getFormattedMessage().startsWith("[AUD_NT_AAR] BEFORE"));
+        assertTrue(loggingEvent1.getFormattedMessage().endsWith(" - Test1"));
+        assertEquals("CNZS-RZBB-HJAT-202205-E-1", logEvent.getMdc().get("iun"));
+        assertNotNull(loggingEvent1.getMDCPropertyMap().get("PNApplicationMetrics"));
+        assertEquals("[{\"Namespace\":\"MultiNamespace_1\",\"Dimensions\":[{\"name\":\"Key1_1\",\"value\":\"Value1\"},{\"name\":\"Key2_1\",\"value\":\"Value2\"}],\"Timestamp\":\"2023-10-05T12:00:00Z\",\"Name\":\"Metric1_1\",\"Value\":\"100\",\"Unit\":\"Milliseconds\"},{\"Namespace\":\"MultiNamespace_1\",\"Dimensions\":[{\"name\":\"Key1_1\",\"value\":\"Value1\"},{\"name\":\"Key2_1\",\"value\":\"Value2\"}],\"Timestamp\":\"2023-10-05T12:00:00Z\",\"Name\":\"Metric2_1\",\"Value\":\"200\",\"Unit\":\"Milliseconds\"},{\"Namespace\":\"MultiNamespace_2\",\"Dimensions\":[{\"name\":\"Key1_2\",\"value\":\"Value1\"},{\"name\":\"Key2_2\",\"value\":\"Value2\"}],\"Timestamp\":\"2023-10-05T12:00:00Z\",\"Name\":\"Metric1_2\",\"Value\":\"100\",\"Unit\":\"Milliseconds\"},{\"Namespace\":\"MultiNamespace_2\",\"Dimensions\":[{\"name\":\"Key1_2\",\"value\":\"Value1\"},{\"name\":\"Key2_2\",\"value\":\"Value2\"}],\"Timestamp\":\"2023-10-05T12:00:00Z\",\"Name\":\"Metric2_2\",\"Value\":\"200\",\"Unit\":\"Milliseconds\"}]", loggingEvent1.getMDCPropertyMap().get("PNApplicationMetrics"));
+
+
+
+        final ILoggingEvent loggingEvent2 = logsList.get(1);
+        assertEquals("AUDIT10Y", loggingEvent2.getMarker().getName());
+        assertEquals("WARN", loggingEvent2.getLevel().toString());
+        assertEquals("AUD_NT_AAR", loggingEvent2.getMDCPropertyMap().get(AUDIT_TYPE));
+        assertTrue(loggingEvent2.getFormattedMessage().startsWith("[AUD_NT_AAR] WARNING"));
+        assertTrue(loggingEvent2.getFormattedMessage().endsWith(message));
+        assertEquals("CNZS-RZBB-HJAT-202205-E-1",logEvent.getMdc().get("iun"));
+    }
+
+    @Test
+    void testAuditLogEmfMetricInAfterMethod() {
+        // create AuditEvents
+        PnAuditLogEvent logEvent = auditLogger.before(AUD_NT_AAR, "Test1").iun("CNZS-RZBB-HJAT-202205-E-1").build();
+        logEvent.setMetricFormatType(PnAuditLogMetricFormatType.EMF.name());
+
+        List<GeneralMetric> metricsArray = List.of(getGeneralMetric("1"), getGeneralMetric("2"));
+
+        // call method under test
+        logEvent.log();
+        final String message = "ERROR in calling method";
+        logEvent.generateWarning(message, metricsArray).log();
+
+        // JUnit assertions
+        List<ILoggingEvent> logsList = listAppender.list;
+        final ILoggingEvent loggingEvent1 = logsList.get(0);
+        assertEquals("AUDIT10Y", loggingEvent1.getMarker().getName());
+        assertEquals("INFO", loggingEvent1.getLevel().toString());
+        assertEquals("AUD_NT_AAR", loggingEvent1.getMDCPropertyMap().get(AUDIT_TYPE));
+        assertTrue(loggingEvent1.getFormattedMessage().startsWith("[AUD_NT_AAR] BEFORE"));
+        assertTrue(loggingEvent1.getFormattedMessage().endsWith(" - Test1"));
+        assertEquals("CNZS-RZBB-HJAT-202205-E-1", logEvent.getMdc().get("iun"));
+
+
+        final ILoggingEvent loggingEvent2 = logsList.get(1);
+        assertEquals("AUDIT10Y", loggingEvent2.getMarker().getName());
+        assertEquals("WARN", loggingEvent2.getLevel().toString());
+        assertEquals("AUD_NT_AAR", loggingEvent2.getMDCPropertyMap().get(AUDIT_TYPE));
+        assertTrue(loggingEvent2.getFormattedMessage().startsWith("[AUD_NT_AAR] WARNING"));
+        assertTrue(loggingEvent2.getFormattedMessage().endsWith(message));
+        assertEquals("CNZS-RZBB-HJAT-202205-E-1", logEvent.getMdc().get("iun"));
+        assertNotNull(loggingEvent2.getMDCPropertyMap().get("_aws"));
+        assertEquals("{\"Timestamp\": \"" + metricsArray.get(0).getTimestamp() + "\", \"CloudWatchMetrics\": [{\"Namespace\":\"MultiNamespace_1\",\"Dimensions\":[[\"Key1_1\",\"Key2_1\"]],\"Metrics\":[{\"Name\":\"Metric1_1\",\"Unit\":\"Milliseconds\"},{\"Name\":\"Metric2_1\",\"Unit\":\"Milliseconds\"}]},{\"Namespace\":\"MultiNamespace_2\",\"Dimensions\":[[\"Key1_2\",\"Key2_2\"]],\"Metrics\":[{\"Name\":\"Metric1_2\",\"Unit\":\"Milliseconds\"},{\"Name\":\"Metric2_2\",\"Unit\":\"Milliseconds\"}]}]}", loggingEvent2.getMDCPropertyMap().get("_aws"));
+
+    }
+
+    @Test
+    void testAuditLogEmfMetricInBeforeMethod() {
+        List<GeneralMetric> metricsArray = List.of(getGeneralMetric("1"), getGeneralMetric("2"));
+
+        // create AuditEvents
+        PnAuditLogEvent logEvent = auditLogger.before(AUD_NT_AAR, "Test1", metricsArray).iun("CNZS-RZBB-HJAT-202205-E-1").build();
+        logEvent.setMetricFormatType(PnAuditLogMetricFormatType.EMF.name());
+
+        // call method under test
+        logEvent.log();
+        final String message = "ERROR in calling method";
+        logEvent.generateWarning(message).log();
+
+        // JUnit assertions
+        List<ILoggingEvent> logsList = listAppender.list;
+        final ILoggingEvent loggingEvent1 = logsList.get(0);
+        assertEquals("AUDIT10Y", loggingEvent1.getMarker().getName());
+        assertEquals("INFO", loggingEvent1.getLevel().toString());
+        assertEquals("AUD_NT_AAR", loggingEvent1.getMDCPropertyMap().get(AUDIT_TYPE));
+        assertTrue(loggingEvent1.getFormattedMessage().startsWith("[AUD_NT_AAR] BEFORE"));
+        assertTrue(loggingEvent1.getFormattedMessage().endsWith(" - Test1"));
+        assertEquals("CNZS-RZBB-HJAT-202205-E-1", logEvent.getMdc().get("iun"));
+        assertNotNull(loggingEvent1.getMDCPropertyMap().get("_aws"));
+        assertEquals("{\"Timestamp\": \"" + metricsArray.get(0).getTimestamp() + "\", \"CloudWatchMetrics\": [{\"Namespace\":\"MultiNamespace_1\",\"Dimensions\":[[\"Key1_1\",\"Key2_1\"]],\"Metrics\":[{\"Name\":\"Metric1_1\",\"Unit\":\"Milliseconds\"},{\"Name\":\"Metric2_1\",\"Unit\":\"Milliseconds\"}]},{\"Namespace\":\"MultiNamespace_2\",\"Dimensions\":[[\"Key1_2\",\"Key2_2\"]],\"Metrics\":[{\"Name\":\"Metric1_2\",\"Unit\":\"Milliseconds\"},{\"Name\":\"Metric2_2\",\"Unit\":\"Milliseconds\"}]}]}", loggingEvent1.getMDCPropertyMap().get("_aws"));
+
+
+        final ILoggingEvent loggingEvent2 = logsList.get(1);
+        assertEquals("AUDIT10Y", loggingEvent2.getMarker().getName());
+        assertEquals("WARN", loggingEvent2.getLevel().toString());
+        assertEquals("AUD_NT_AAR", loggingEvent2.getMDCPropertyMap().get(AUDIT_TYPE));
+        assertTrue(loggingEvent2.getFormattedMessage().startsWith("[AUD_NT_AAR] WARNING"));
+        assertTrue(loggingEvent2.getFormattedMessage().endsWith(message));
+        assertEquals("CNZS-RZBB-HJAT-202205-E-1", logEvent.getMdc().get("iun"));
+    }
+
+    @NotNull
+    private static GeneralMetric getGeneralMetric(String i) {
+        GeneralMetric generalMetric = new GeneralMetric();
+        generalMetric.setNamespace("MultiNamespace_" +i);
+        generalMetric.setTimestamp("2023-10-05T12:00:00Z");
+        generalMetric.setUnit("Milliseconds");
+
+        Dimension dimension1 = new Dimension("Key1_" +i, "Value1");
+        Dimension dimension2 = new Dimension("Key2_" +i, "Value2");
+        generalMetric.setDimensions(List.of(dimension1, dimension2));
+
+        Metric metric1 = new Metric("Metric1_" +i, "100");
+        Metric metric2 = new Metric("Metric2_" +i, "200");
+        generalMetric.setMetrics(List.of(metric1, metric2));
+        return generalMetric;
     }
 }
