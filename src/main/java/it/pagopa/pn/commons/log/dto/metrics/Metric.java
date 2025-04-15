@@ -12,6 +12,8 @@ public class Metric {
     private String name;
     private String value;
 
+    public String toJson() {
+        return StringUtils.EMPTY;
+    }
 
-    public String toJson() { return StringUtils.EMPTY; }
 }
