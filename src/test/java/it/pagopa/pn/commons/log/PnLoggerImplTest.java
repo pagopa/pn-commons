@@ -3,8 +3,12 @@ package it.pagopa.pn.commons.log;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
+import it.pagopa.pn.commons.log.dto.metrics.Dimension;
+import it.pagopa.pn.commons.log.dto.metrics.GeneralMetric;
+import it.pagopa.pn.commons.log.dto.metrics.Metric;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -505,6 +509,55 @@ class PnLoggerImplTest {
         assertLog(Level.ERROR, str, () -> fooLogger.error(m, str, new RuntimeException("error")), true, m);
     }
 
+    @Test
+    void testMetrichePNF() {
+        //Given
+        List<GeneralMetric> metricsArray = List.of(getGeneralMetric("1"),getGeneralMetric("2"));
+        String str = "{\"PNApplicationMetrics\":[{\"Namespace\":\"MultiNamespace_1\",\"Dimensions\":[{\"name\":\"Key1_1\",\"value\":\"Value1\"},{\"name\":\"Key2_1\",\"value\":\"Value2\"}],\"Timestamp\":\"2023-10-05T12:00:00Z\",\"Name\":\"Metric1_1\",\"Value\":\"100\",\"Unit\":\"Milliseconds\"},{\"Namespace\":\"MultiNamespace_1\",\"Dimensions\":[{\"name\":\"Key1_1\",\"value\":\"Value1\"},{\"name\":\"Key2_1\",\"value\":\"Value2\"}],\"Timestamp\":\"2023-10-05T12:00:00Z\",\"Name\":\"Metric2_1\",\"Value\":\"200\",\"Unit\":\"Milliseconds\"},{\"Namespace\":\"MultiNamespace_2\",\"Dimensions\":[{\"name\":\"Key1_2\",\"value\":\"Value1\"},{\"name\":\"Key2_2\",\"value\":\"Value2\"}],\"Timestamp\":\"2023-10-05T12:00:00Z\",\"Name\":\"Metric1_2\",\"Value\":\"100\",\"Unit\":\"Milliseconds\"},{\"Namespace\":\"MultiNamespace_2\",\"Dimensions\":[{\"name\":\"Key1_2\",\"value\":\"Value1\"},{\"name\":\"Key2_2\",\"value\":\"Value2\"}],\"Timestamp\":\"2023-10-05T12:00:00Z\",\"Name\":\"Metric2_2\",\"Value\":\"200\",\"Unit\":\"Milliseconds\"}]}";
+
+        //When
+        fooLogger.logMetric(metricsArray, PnAuditLogMetricFormatType.PNF.name());
+
+        //Then
+        // JUnit assertions
+        List<ILoggingEvent> logsList = listAppender.list;
+        Assertions.assertEquals(str, logsList.get(0).getFormattedMessage());
+        Assertions.assertEquals(Level.INFO, logsList.get(0).getLevel());
+    }
+
+    @Test
+    void testMetricheEMF() {
+        //Given
+        List<GeneralMetric> metricsArray = List.of(getGeneralMetric("1"),getGeneralMetric("2"));
+        String str = "{\"_aws\":{\"Timestamp\": \"2023-10-05T12:00:00Z\", \"CloudWatchMetrics\": [{\"Namespace\":\"MultiNamespace_1\",\"Dimensions\":[[\"Key1_1\",\"Key2_1\"]],\"Metrics\":[{\"Name\":\"Metric1_1\",\"Unit\":\"Milliseconds\"},{\"Name\":\"Metric2_1\",\"Unit\":\"Milliseconds\"}]},{\"Namespace\":\"MultiNamespace_2\",\"Dimensions\":[[\"Key1_2\",\"Key2_2\"]],\"Metrics\":[{\"Name\":\"Metric1_2\",\"Unit\":\"Milliseconds\"},{\"Name\":\"Metric2_2\",\"Unit\":\"Milliseconds\"}]}]},\"Key2_2\":\"Value2\",\"Key1_1\":\"Value1\",\"Key2_1\":\"Value2\",\"Key1_2\":\"Value1\",\"Metric2_1\":\"200\",\"Metric1_2\":\"100\",\"Metric2_2\":\"200\",\"Metric1_1\":\"100\"}";
+
+        //When
+        fooLogger.logMetric(metricsArray, PnAuditLogMetricFormatType.EMF.name());
+
+        //Then
+        // JUnit assertions
+        List<ILoggingEvent> logsList = listAppender.list;
+        Assertions.assertEquals(str, logsList.get(0).getFormattedMessage());
+        Assertions.assertEquals(Level.INFO, logsList.get(0).getLevel());
+    }
+
+    @NotNull
+    private static GeneralMetric getGeneralMetric(String i) {
+        GeneralMetric generalMetric = new GeneralMetric();
+        generalMetric.setNamespace("MultiNamespace_" +i);
+        generalMetric.setTimestamp("2023-10-05T12:00:00Z");
+        generalMetric.setUnit("Milliseconds");
+
+        Dimension dimension1 = new Dimension("Key1_" +i, "Value1");
+        Dimension dimension2 = new Dimension("Key2_" +i, "Value2");
+        generalMetric.setDimensions(List.of(dimension1, dimension2));
+
+        Metric metric1 = new Metric("Metric1_" +i, "100");
+        Metric metric2 = new Metric("Metric2_" +i, "200");
+        generalMetric.setMetrics(List.of(metric1, metric2));
+        return generalMetric;
+    }
+
     void assertLog(Level level, String result, Runnable r, boolean checkException, Marker marker) {
         //Given
 
@@ -523,7 +576,5 @@ class PnLoggerImplTest {
         if (marker != null)
             Assertions.assertEquals(marker.getName(), logsList.get(0).getMarker().getName());
     }
-
-
 
 }

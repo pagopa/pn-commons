@@ -1,10 +1,14 @@
 package it.pagopa.pn.commons.log;
 
+import it.pagopa.pn.commons.log.dto.metrics.GeneralMetric;
+import it.pagopa.pn.commons.utils.MetricUtils;
 import org.slf4j.*;
+import org.springframework.util.CollectionUtils;
 import software.amazon.awssdk.enhanced.dynamodb.Key;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.TransactWriteItem;
 
+import java.util.List;
 import java.util.Map;
 
 class PnLoggerImpl implements PnLogger {
@@ -145,6 +149,25 @@ class PnLoggerImpl implements PnLogger {
             logTransactionDynamoDBEntity("Update", transactWriteItem.update().tableName(), transactWriteItem.update().key());
         }
 
+    }
+
+    @Override
+    public void logMetric(List<GeneralMetric> metricsArray, String metricFormatType) {
+        if (CollectionUtils.isEmpty(metricsArray)) {
+            return;
+        }
+        String jsonMetric;
+
+        if(metricFormatType.equals(PnAuditLogMetricFormatType.PNF.name())) {
+            jsonMetric = String.format("{\"PNApplicationMetrics\":%s}", MetricUtils.generateJsonPNFMetric(metricsArray));
+            log.info(jsonMetric);
+        } else if (metricFormatType.equals(PnAuditLogMetricFormatType.EMF.name())) {
+            String emfParameters = MetricUtils.generateJsonEMFMetricParameters(metricsArray).keySet().stream().map(
+                    key -> String.format("\"%s\":\"%s\"", key, MetricUtils.generateJsonEMFMetricParameters(metricsArray).get(key))
+            ).reduce((a, b) -> a + "," + b).orElse("");
+            jsonMetric = String.format("{\"_aws\":%s,%s}", MetricUtils.generateJsonEMFMetric(metricsArray), emfParameters);
+            log.info(jsonMetric);
+        }
     }
 
     private void logTransactionDynamoDBEntity(String action, String tableName, Map<String, AttributeValue> keyOrItem) {
