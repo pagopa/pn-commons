@@ -6,7 +6,9 @@
             <providers>
                 <timestamp/>
                 <version/>
-                <message/>
+                <pattern>
+                    <pattern>{"message": "#tryJson{%message}"}</pattern>
+                </pattern>
                 <loggerName/>
                 <threadName/>
                 <logLevel/>
@@ -23,7 +25,7 @@
                 </pattern>
                 <arguments/>
                 <logstashMarkers/>
-                <contextName/>
+                <logLevelValue/>
             </providers>
         </encoder>
     </appender>
