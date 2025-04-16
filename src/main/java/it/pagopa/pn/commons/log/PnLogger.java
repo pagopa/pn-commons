@@ -252,5 +252,7 @@ public interface PnLogger extends Logger {
      *
      * @param metricsArray la lista di metriche
      */
-    void logMetric(List<GeneralMetric> metricsArray, String metricFormatType);
+    void logMetric(List<GeneralMetric> metricsArray, String message);
+
+    void logMetric(List<GeneralMetric> metricsArray, String message, String metricFormatType);
 }

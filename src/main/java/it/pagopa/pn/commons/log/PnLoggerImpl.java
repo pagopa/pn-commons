@@ -1,5 +1,6 @@
 package it.pagopa.pn.commons.log;
 
+import it.pagopa.pn.commons.configs.EnvironmentConfig;
 import it.pagopa.pn.commons.log.dto.metrics.GeneralMetric;
 import it.pagopa.pn.commons.utils.MetricUtils;
 import org.slf4j.*;
@@ -8,6 +9,7 @@ import software.amazon.awssdk.enhanced.dynamodb.Key;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.TransactWriteItem;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -152,22 +154,32 @@ class PnLoggerImpl implements PnLogger {
     }
 
     @Override
-    public void logMetric(List<GeneralMetric> metricsArray, String metricFormatType) {
+    public void logMetric(List<GeneralMetric> metricsArray, String message) {
+        logMetric(metricsArray, message, EnvironmentConfig.getMetricFormatType());
+    }
+
+    @Override
+    public void logMetric(List<GeneralMetric> metricsArray, String message, String metricFormatType) {
         if (CollectionUtils.isEmpty(metricsArray)) {
+            log.info("{} [No metrics to log]", message);
             return;
         }
-        String jsonMetric;
 
-        if(metricFormatType.equals(PnAuditLogMetricFormatType.PNF.name())) {
-            jsonMetric = String.format("{\"PNApplicationMetrics\":%s}", MetricUtils.generateJsonPNFMetric(metricsArray));
-            log.info(jsonMetric);
-        } else if (metricFormatType.equals(PnAuditLogMetricFormatType.EMF.name())) {
-            String emfParameters = MetricUtils.generateJsonEMFMetricParameters(metricsArray).keySet().stream().map(
-                    key -> String.format("\"%s\":\"%s\"", key, MetricUtils.generateJsonEMFMetricParameters(metricsArray).get(key))
-            ).reduce((a, b) -> a + "," + b).orElse("");
-            jsonMetric = String.format("{\"_aws\":%s,%s}", MetricUtils.generateJsonEMFMetric(metricsArray), emfParameters);
-            log.info(jsonMetric);
+        ArrayList<String> keysToRemoveFromMDC = new ArrayList<>();
+
+        if(PnAuditLogMetricFormatType.PNF.name().equals(metricFormatType)) {
+            MDC.put("PNApplicationMetrics", MetricUtils.generateJsonPNFMetric(metricsArray));
+            keysToRemoveFromMDC.add("PNApplicationMetrics");
+        } else if (PnAuditLogMetricFormatType.EMF.name().equals(metricFormatType)) {
+            MDC.put("_aws", MetricUtils.generateJsonEMFMetric(metricsArray));
+            keysToRemoveFromMDC.add("_aws");
+            Map<String, String> emfParameters = MetricUtils.generateJsonEMFMetricParameters(metricsArray);
+            emfParameters.forEach(MDC::put);
+            keysToRemoveFromMDC.addAll(emfParameters.keySet());
         }
+
+        log.info(message);
+        keysToRemoveFromMDC.forEach(MDC::remove);
     }
 
     private void logTransactionDynamoDBEntity(String action, String tableName, Map<String, AttributeValue> keyOrItem) {

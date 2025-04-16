@@ -18,7 +18,7 @@ import org.slf4j.MarkerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class PnLoggerImplTest {
 
@@ -513,32 +513,34 @@ class PnLoggerImplTest {
     void testMetrichePNF() {
         //Given
         List<GeneralMetric> metricsArray = List.of(getGeneralMetric("1"),getGeneralMetric("2"));
-        String str = "{\"PNApplicationMetrics\":[{\"Namespace\":\"MultiNamespace_1\",\"Dimensions\":[{\"name\":\"Key1_1\",\"value\":\"Value1\"},{\"name\":\"Key2_1\",\"value\":\"Value2\"}],\"Timestamp\":\"2023-10-05T12:00:00Z\",\"Name\":\"Metric1_1\",\"Value\":\"100\",\"Unit\":\"Milliseconds\"},{\"Namespace\":\"MultiNamespace_1\",\"Dimensions\":[{\"name\":\"Key1_1\",\"value\":\"Value1\"},{\"name\":\"Key2_1\",\"value\":\"Value2\"}],\"Timestamp\":\"2023-10-05T12:00:00Z\",\"Name\":\"Metric2_1\",\"Value\":\"200\",\"Unit\":\"Milliseconds\"},{\"Namespace\":\"MultiNamespace_2\",\"Dimensions\":[{\"name\":\"Key1_2\",\"value\":\"Value1\"},{\"name\":\"Key2_2\",\"value\":\"Value2\"}],\"Timestamp\":\"2023-10-05T12:00:00Z\",\"Name\":\"Metric1_2\",\"Value\":\"100\",\"Unit\":\"Milliseconds\"},{\"Namespace\":\"MultiNamespace_2\",\"Dimensions\":[{\"name\":\"Key1_2\",\"value\":\"Value1\"},{\"name\":\"Key2_2\",\"value\":\"Value2\"}],\"Timestamp\":\"2023-10-05T12:00:00Z\",\"Name\":\"Metric2_2\",\"Value\":\"200\",\"Unit\":\"Milliseconds\"}]}";
+        String str = "[{\"Namespace\":\"MultiNamespace_1\",\"Dimensions\":[{\"name\":\"Key1_1\",\"value\":\"Value1\"},{\"name\":\"Key2_1\",\"value\":\"Value2\"}],\"Timestamp\":\"2023-10-05T12:00:00Z\",\"Name\":\"Metric1_1\",\"Value\":\"100\"},{\"Namespace\":\"MultiNamespace_1\",\"Dimensions\":[{\"name\":\"Key1_1\",\"value\":\"Value1\"},{\"name\":\"Key2_1\",\"value\":\"Value2\"}],\"Timestamp\":\"2023-10-05T12:00:00Z\",\"Name\":\"Metric2_1\",\"Value\":\"200\"},{\"Namespace\":\"MultiNamespace_2\",\"Dimensions\":[{\"name\":\"Key1_2\",\"value\":\"Value1\"},{\"name\":\"Key2_2\",\"value\":\"Value2\"}],\"Timestamp\":\"2023-10-05T12:00:00Z\",\"Name\":\"Metric1_2\",\"Value\":\"100\"},{\"Namespace\":\"MultiNamespace_2\",\"Dimensions\":[{\"name\":\"Key1_2\",\"value\":\"Value1\"},{\"name\":\"Key2_2\",\"value\":\"Value2\"}],\"Timestamp\":\"2023-10-05T12:00:00Z\",\"Name\":\"Metric2_2\",\"Value\":\"200\"}]";
 
         //When
-        fooLogger.logMetric(metricsArray, PnAuditLogMetricFormatType.PNF.name());
+        fooLogger.logMetric(metricsArray, "metricTest" ,PnAuditLogMetricFormatType.PNF.name());
 
         //Then
         // JUnit assertions
         List<ILoggingEvent> logsList = listAppender.list;
-        Assertions.assertEquals(str, logsList.get(0).getFormattedMessage());
-        Assertions.assertEquals(Level.INFO, logsList.get(0).getLevel());
+        final ILoggingEvent loggingEvent = logsList.get(0);
+        assertNotNull(loggingEvent.getMDCPropertyMap().get("PNApplicationMetrics"));
+        assertEquals(str, loggingEvent.getMDCPropertyMap().get("PNApplicationMetrics"));
     }
 
     @Test
     void testMetricheEMF() {
         //Given
         List<GeneralMetric> metricsArray = List.of(getGeneralMetric("1"),getGeneralMetric("2"));
-        String str = "{\"_aws\":{\"Timestamp\": \"2023-10-05T12:00:00Z\", \"CloudWatchMetrics\": [{\"Namespace\":\"MultiNamespace_1\",\"Dimensions\":[[\"Key1_1\",\"Key2_1\"]],\"Metrics\":[{\"Name\":\"Metric1_1\",\"Unit\":\"Milliseconds\"},{\"Name\":\"Metric2_1\",\"Unit\":\"Milliseconds\"}]},{\"Namespace\":\"MultiNamespace_2\",\"Dimensions\":[[\"Key1_2\",\"Key2_2\"]],\"Metrics\":[{\"Name\":\"Metric1_2\",\"Unit\":\"Milliseconds\"},{\"Name\":\"Metric2_2\",\"Unit\":\"Milliseconds\"}]}]},\"Key2_2\":\"Value2\",\"Key1_1\":\"Value1\",\"Key2_1\":\"Value2\",\"Key1_2\":\"Value1\",\"Metric2_1\":\"200\",\"Metric1_2\":\"100\",\"Metric2_2\":\"200\",\"Metric1_1\":\"100\"}";
+        String str = "{\"Timestamp\": \"2023-10-05T12:00:00Z\", \"CloudWatchMetrics\": [{\"Namespace\":\"MultiNamespace_1\",\"Dimensions\":[[\"Key1_1\",\"Key2_1\"]],\"Metrics\":[{\"Name\":\"Metric1_1\"},{\"Name\":\"Metric2_1\"}]},{\"Namespace\":\"MultiNamespace_2\",\"Dimensions\":[[\"Key1_2\",\"Key2_2\"]],\"Metrics\":[{\"Name\":\"Metric1_2\"},{\"Name\":\"Metric2_2\"}]}]}";
 
         //When
-        fooLogger.logMetric(metricsArray, PnAuditLogMetricFormatType.EMF.name());
+        fooLogger.logMetric(metricsArray, "metricTest", PnAuditLogMetricFormatType.EMF.name());
 
         //Then
         // JUnit assertions
         List<ILoggingEvent> logsList = listAppender.list;
-        Assertions.assertEquals(str, logsList.get(0).getFormattedMessage());
-        Assertions.assertEquals(Level.INFO, logsList.get(0).getLevel());
+        final ILoggingEvent loggingEvent = logsList.get(0);
+        assertNotNull(loggingEvent.getMDCPropertyMap().get("_aws"));
+        assertEquals(str, loggingEvent.getMDCPropertyMap().get("_aws"));
     }
 
     @NotNull
