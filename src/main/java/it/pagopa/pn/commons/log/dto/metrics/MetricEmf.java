@@ -4,8 +4,8 @@ public class MetricEmf extends Metric {
 
     public MetricEmf(Metric metric) { super(metric.getName(), metric.getValue()); }
 
-
-    public String toJson(String unit) {
-        return String.format("{\"Name\":\"%s\",\"Unit\":\"%s\"}", getName(), unit);
+    @Override
+    public String toJson() {
+        return String.format("{\"Name\":\"%s\"}", getName());
     }
 }

@@ -15,7 +15,7 @@ class EmfMetricTest {
 
         EmfMetric emfMetric = new EmfMetric(generalMetric);
 
-        String expectedJson = "{\"Namespace\":\"MultiNamespace\",\"Dimensions\":[[\"Key1\",\"Key2\"]],\"Metrics\":[{\"Name\":\"Metric1\",\"Unit\":\"Milliseconds\"},{\"Name\":\"Metric2\",\"Unit\":\"Milliseconds\"}]}";
+        String expectedJson = "{\"Namespace\":\"MultiNamespace\",\"Dimensions\":[[\"Key1\",\"Key2\"]],\"Metrics\":[{\"Name\":\"Metric1\"},{\"Name\":\"Metric2\"}]}";
         assertEquals(expectedJson, emfMetric.toJson());
     }
 
