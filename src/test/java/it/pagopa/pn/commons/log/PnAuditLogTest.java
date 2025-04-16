@@ -256,7 +256,7 @@ class PnAuditLogTest {
         assertTrue(loggingEvent2.getFormattedMessage().endsWith(message));
         assertEquals("CNZS-RZBB-HJAT-202205-E-1", logEvent.getMdc().get("iun"));
         assertNotNull(loggingEvent2.getMDCPropertyMap().get("_aws"));
-        assertEquals("{\"Timestamp\": \"" + metricsArray.get(0).getTimestamp() + "\", \"CloudWatchMetrics\": [{\"Namespace\":\"MultiNamespace_1\",\"Dimensions\":[[\"Key1_1\",\"Key2_1\"]],\"Metrics\":[{\"Name\":\"Metric1_1\",\"Unit\":\"Milliseconds\"},{\"Name\":\"Metric2_1\",\"Unit\":\"Milliseconds\"}]},{\"Namespace\":\"MultiNamespace_2\",\"Dimensions\":[[\"Key1_2\",\"Key2_2\"]],\"Metrics\":[{\"Name\":\"Metric1_2\",\"Unit\":\"Milliseconds\"},{\"Name\":\"Metric2_2\",\"Unit\":\"Milliseconds\"}]}]}", loggingEvent2.getMDCPropertyMap().get("_aws"));
+        assertEquals("{\"Timestamp\": \"" + metricsArray.get(0).getTimestamp() + "\", \"CloudWatchMetrics\": [{\"Namespace\":\"MultiNamespace_1\",\"Dimensions\":[[\"Key1_1\",\"Key2_1\"]],\"Metrics\":[{\"Name\":\"Metric1_1\"},{\"Name\":\"Metric2_1\"}]},{\"Namespace\":\"MultiNamespace_2\",\"Dimensions\":[[\"Key1_2\",\"Key2_2\"]],\"Metrics\":[{\"Name\":\"Metric1_2\"},{\"Name\":\"Metric2_2\"}]}]}", loggingEvent2.getMDCPropertyMap().get("_aws"));
 
     }
 
@@ -283,7 +283,7 @@ class PnAuditLogTest {
         assertTrue(loggingEvent1.getFormattedMessage().endsWith(" - Test1"));
         assertEquals("CNZS-RZBB-HJAT-202205-E-1", logEvent.getMdc().get("iun"));
         assertNotNull(loggingEvent1.getMDCPropertyMap().get("_aws"));
-        assertEquals("{\"Timestamp\": \"" + metricsArray.get(0).getTimestamp() + "\", \"CloudWatchMetrics\": [{\"Namespace\":\"MultiNamespace_1\",\"Dimensions\":[[\"Key1_1\",\"Key2_1\"]],\"Metrics\":[{\"Name\":\"Metric1_1\",\"Unit\":\"Milliseconds\"},{\"Name\":\"Metric2_1\",\"Unit\":\"Milliseconds\"}]},{\"Namespace\":\"MultiNamespace_2\",\"Dimensions\":[[\"Key1_2\",\"Key2_2\"]],\"Metrics\":[{\"Name\":\"Metric1_2\",\"Unit\":\"Milliseconds\"},{\"Name\":\"Metric2_2\",\"Unit\":\"Milliseconds\"}]}]}", loggingEvent1.getMDCPropertyMap().get("_aws"));
+        assertEquals("{\"Timestamp\": \"" + metricsArray.get(0).getTimestamp() + "\", \"CloudWatchMetrics\": [{\"Namespace\":\"MultiNamespace_1\",\"Dimensions\":[[\"Key1_1\",\"Key2_1\"]],\"Metrics\":[{\"Name\":\"Metric1_1\"},{\"Name\":\"Metric2_1\"}]},{\"Namespace\":\"MultiNamespace_2\",\"Dimensions\":[[\"Key1_2\",\"Key2_2\"]],\"Metrics\":[{\"Name\":\"Metric1_2\"},{\"Name\":\"Metric2_2\"}]}]}", loggingEvent1.getMDCPropertyMap().get("_aws"));
 
 
         final ILoggingEvent loggingEvent2 = logsList.get(1);
@@ -300,7 +300,6 @@ class PnAuditLogTest {
         GeneralMetric generalMetric = new GeneralMetric();
         generalMetric.setNamespace("MultiNamespace_" +i);
         generalMetric.setTimestamp("2023-10-05T12:00:00Z");
-        generalMetric.setUnit("Milliseconds");
 
         Dimension dimension1 = new Dimension("Key1_" +i, "Value1");
         Dimension dimension2 = new Dimension("Key2_" +i, "Value2");
