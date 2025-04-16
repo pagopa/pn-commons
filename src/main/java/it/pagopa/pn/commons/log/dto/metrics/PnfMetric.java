@@ -9,14 +9,14 @@ public class PnfMetric extends GeneralMetric {
     @Override
     public String toJson() {
         return getMetrics().stream().map(metric -> {
-            String dimensionsString = getDimensions().stream().map(Dimension::toJsonPnf)
+            String dimensionsString = getDimensions().stream().map(dimension -> new DimensionPnf(dimension).toJson())
                     .reduce((a, b) -> a + "," + b)
                     .orElse("");
 
-            String metricsString = metric.toJsonPnf();
+            String metricsString = new MetricPnf(metric).toJson();
 
             return String.format("{\"Namespace\":\"%s\",\"Dimensions\":[%s],\"Timestamp\":\"%s\",%s,\"Unit\":\"%s\"}",
-                    getNamespace(), dimensionsString, getTimestamp(), metricsString,getUnit());
+                    getNamespace(), dimensionsString, getTimestamp(), metricsString, getUnit());
         }).reduce((a, b) -> a + "," + b).orElse("");
     }
 
