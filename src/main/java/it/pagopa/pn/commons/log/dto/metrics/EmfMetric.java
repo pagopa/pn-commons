@@ -10,13 +10,13 @@ public class EmfMetric extends GeneralMetric {
 
     @Override
     public String toJson() {
-        String dimensionsString = getDimensions().stream().map(Dimension::toJsonEmf)
+        String dimensionsString = getDimensions().stream().map( dimension -> new DimensionEmf(dimension).toJson())
                 .reduce((a, b) -> a + "," + b)
                 .orElse("");
 
         String metricsString = CollectionUtils.isEmpty(getMetrics()) ? "[]" :
                 getMetrics().stream()
-                        .map(metric -> metric.toJsonEmf(getUnit()))
+                        .map(metric -> new MetricEmf(metric).toJson())
                         .reduce((a, b) -> a + "," + b)
                         .orElse("");
 

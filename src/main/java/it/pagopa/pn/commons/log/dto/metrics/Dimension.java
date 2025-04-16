@@ -3,6 +3,7 @@ package it.pagopa.pn.commons.log.dto.metrics;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 
 @Data
 @NoArgsConstructor
@@ -11,11 +12,5 @@ public class Dimension {
     private String name;
     private String value;
 
-    public String toJsonPnf() {
-        return String.format("{\"name\":\"%s\",\"value\":\"%s\"}", name, value);
-    }
-
-    public String toJsonEmf() {
-        return String.format("\"%s\"", name);
-    }
+    public String toJson() { return StringUtils.EMPTY; }
 }
