@@ -15,7 +15,7 @@ class PnfMetricTest {
 
         PnfMetric pnfMetric = new PnfMetric(generalMetric);
 
-        String expectedJson = "{\"Namespace\":\"MultiNamespace\",\"Dimensions\":[{\"name\":\"Key1\",\"value\":\"Value1\"},{\"name\":\"Key2\",\"value\":\"Value2\"}],\"Name\":\"Metric1\",\"Value\":\"100\",\"Unit\":\"Milliseconds\"},{\"Namespace\":\"MultiNamespace\",\"Dimensions\":[{\"name\":\"Key1\",\"value\":\"Value1\"},{\"name\":\"Key2\",\"value\":\"Value2\"}],\"Name\":\"Metric2\",\"Value\":\"200\",\"Unit\":\"Milliseconds\"}";
+        String expectedJson = "{\"Namespace\":\"MultiNamespace\",\"Dimensions\":[{\"name\":\"Key1\",\"value\":\"Value1\"},{\"name\":\"Key2\",\"value\":\"Value2\"}],\"Timestamp\":\"2023-10-05T12:00:00Z\",\"Name\":\"Metric1\",\"Value\":\"100\"},{\"Namespace\":\"MultiNamespace\",\"Dimensions\":[{\"name\":\"Key1\",\"value\":\"Value1\"},{\"name\":\"Key2\",\"value\":\"Value2\"}],\"Timestamp\":\"2023-10-05T12:00:00Z\",\"Name\":\"Metric2\",\"Value\":\"200\"}";
         assertEquals(expectedJson, pnfMetric.toJson());
     }
 
