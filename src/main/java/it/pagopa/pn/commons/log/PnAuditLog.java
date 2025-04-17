@@ -9,15 +9,19 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.util.CollectionUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
 import static ch.qos.logback.classic.Level.*;
+import static net.logstash.logback.marker.Markers.appendEntries;
+import static net.logstash.logback.marker.Markers.appendRaw;
 
 public class PnAuditLog {
 
     public static final String AUDIT_TYPE = "aud_type";
     public static final String AUDIT_UUID = "aud_orig";
-    private static final ArrayList<String> keysToRemoveFromMDC = new ArrayList<>();
 
     private PnAuditLog() {
         throw new UnsupportedOperationException();
@@ -59,7 +63,7 @@ public class PnAuditLog {
                 arguments.addAll( Arrays.asList(eventArguments) );
             }
 
-            generateMetricsLog(pnAuditLogEvent.getMetricsArray(), pnAuditLogEvent.getMetricFormatType());
+            MetricUtils.generateMetricsLog(logger, pnAuditLogEvent.getMetricsArray(), pnAuditLogEvent.getMetricFormatType());
 
             Set<String> mdcKeySet = pnAuditLogEvent.getMdc().keySet();
             try {
@@ -75,40 +79,9 @@ public class PnAuditLog {
             } finally {
                 MDC.remove(AUDIT_TYPE);
                 MDC.remove(AUDIT_UUID);
-                keysToRemoveFromMDC.forEach(MDC::remove);
-                keysToRemoveFromMDC.clear();
                 // Non vengono più rimosse le altre eventuali chiavi, dato che sono in comune con quelle normalmente presenti nei log
             }
         }
-    }
-
-    private static void generateMetricsLog(List<GeneralMetric> metricsArray, String metricFormatType) {
-        if (CollectionUtils.isEmpty(metricsArray)) {
-            return;
-        }
-
-        if(metricFormatType.equals(PnAuditLogMetricFormatType.PNF.name())) {
-            addPNFMetric(metricsArray);
-        } else if (metricFormatType.equals(PnAuditLogMetricFormatType.EMF.name())) {
-            addEMFMetric(metricsArray);
-            addEMFMetricParameters(metricsArray);
-        }
-    }
-
-    private static void addEMFMetricParameters(List<GeneralMetric> metricsArray) {
-        Map<String, String> emfParameters = MetricUtils.generateJsonEMFMetricParameters(metricsArray);
-        emfParameters.forEach(MDC::put);
-        keysToRemoveFromMDC.addAll(emfParameters.keySet());
-    }
-
-    private static void addEMFMetric(List<GeneralMetric> metricsArray) {
-        MDC.put("_aws", MetricUtils.generateJsonEMFMetric(metricsArray));
-        keysToRemoveFromMDC.add("_aws");
-    }
-
-    private static void addPNFMetric(List<GeneralMetric> metricsArray) {
-        MDC.put("PNApplicationMetrics", MetricUtils.generateJsonPNFMetric(metricsArray));
-        keysToRemoveFromMDC.add("PNApplicationMetrics");
     }
 
     private static void setLogger(Level level, Logger logger, String format, ArrayList<Object> arguments, PnAuditLogEventType auditLogEventType) {
