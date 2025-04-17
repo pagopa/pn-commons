@@ -8,7 +8,7 @@ public class MetricPnf extends Metric {
 
     @Override
     public String toJson() {
-        return String.format("\"Name\":\"%s\",\"Value\":\"%s\"", getName(), getValue());
+        return String.format("\"Name\":\"%s\",\"Value\":%s", getName(), getValue());
     }
 
 }
