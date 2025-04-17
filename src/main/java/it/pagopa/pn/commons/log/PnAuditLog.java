@@ -7,17 +7,22 @@ import it.pagopa.pn.commons.utils.MetricUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
+import org.slf4j.Marker;
 import org.springframework.util.CollectionUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
 import static ch.qos.logback.classic.Level.*;
+import static net.logstash.logback.marker.Markers.appendEntries;
+import static net.logstash.logback.marker.Markers.appendRaw;
 
 public class PnAuditLog {
 
     public static final String AUDIT_TYPE = "aud_type";
     public static final String AUDIT_UUID = "aud_orig";
-    private static final ArrayList<String> keysToRemoveFromMDC = new ArrayList<>();
 
     private PnAuditLog() {
         throw new UnsupportedOperationException();
@@ -59,7 +64,7 @@ public class PnAuditLog {
                 arguments.addAll( Arrays.asList(eventArguments) );
             }
 
-            generateMetricsLog(pnAuditLogEvent.getMetricsArray(), pnAuditLogEvent.getMetricFormatType());
+            Marker metricsMarker = MetricUtils.generateMetricsMarker(pnAuditLogEvent.getMetricsArray(), pnAuditLogEvent.getMetricFormatType());
 
             Set<String> mdcKeySet = pnAuditLogEvent.getMdc().keySet();
             try {
@@ -70,55 +75,29 @@ public class PnAuditLog {
                 String originUuid =  (pnAuditLogEvent.getOriginEvent() == null ? pnAuditLogEvent.getUuid() : pnAuditLogEvent.getOriginEvent().getUuid());
                 MDC.put(AUDIT_UUID, originUuid);
 
-                setLogger(level, logger, format, arguments, auditLogEventType);
+                setLogger(level, logger, format, arguments, auditLogEventType, metricsMarker);
 
             } finally {
                 MDC.remove(AUDIT_TYPE);
                 MDC.remove(AUDIT_UUID);
-                keysToRemoveFromMDC.forEach(MDC::remove);
-                keysToRemoveFromMDC.clear();
+                auditLogEventType.marker.remove(metricsMarker);
                 // Non vengono più rimosse le altre eventuali chiavi, dato che sono in comune con quelle normalmente presenti nei log
             }
         }
     }
 
-    private static void generateMetricsLog(List<GeneralMetric> metricsArray, String metricFormatType) {
-        if (CollectionUtils.isEmpty(metricsArray)) {
-            return;
+    private static void setLogger(Level level, Logger logger, String format, ArrayList<Object> arguments, PnAuditLogEventType auditLogEventType, Marker metricsMarker) {
+        Marker marker = auditLogEventType.marker;
+        if (metricsMarker != null) {
+            marker.add(metricsMarker);
         }
-
-        if(metricFormatType.equals(PnAuditLogMetricFormatType.PNF.name())) {
-            addPNFMetric(metricsArray);
-        } else if (metricFormatType.equals(PnAuditLogMetricFormatType.EMF.name())) {
-            addEMFMetric(metricsArray);
-            addEMFMetricParameters(metricsArray);
-        }
-    }
-
-    private static void addEMFMetricParameters(List<GeneralMetric> metricsArray) {
-        Map<String, String> emfParameters = MetricUtils.generateJsonEMFMetricParameters(metricsArray);
-        emfParameters.forEach(MDC::put);
-        keysToRemoveFromMDC.addAll(emfParameters.keySet());
-    }
-
-    private static void addEMFMetric(List<GeneralMetric> metricsArray) {
-        MDC.put("_aws", MetricUtils.generateJsonEMFMetric(metricsArray));
-        keysToRemoveFromMDC.add("_aws");
-    }
-
-    private static void addPNFMetric(List<GeneralMetric> metricsArray) {
-        MDC.put("PNApplicationMetrics", MetricUtils.generateJsonPNFMetric(metricsArray));
-        keysToRemoveFromMDC.add("PNApplicationMetrics");
-    }
-
-    private static void setLogger(Level level, Logger logger, String format, ArrayList<Object> arguments, PnAuditLogEventType auditLogEventType) {
         if (WARN.equals(level)) {
-            logger.warn(auditLogEventType.marker, format, arguments.toArray());
+            logger.warn(marker, format, arguments.toArray());
         } else {
             if (ERROR.equals(level)) {
-                logger.error(auditLogEventType.marker, format, arguments.toArray());
+                logger.error(marker, format, arguments.toArray());
             } else {
-                logger.info(auditLogEventType.marker, format, arguments.toArray());
+                logger.info(marker, format, arguments.toArray());
             }
         }
     }
