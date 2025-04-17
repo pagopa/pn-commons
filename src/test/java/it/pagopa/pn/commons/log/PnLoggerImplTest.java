@@ -15,7 +15,9 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -513,49 +515,52 @@ class PnLoggerImplTest {
     void testMetrichePNF() {
         //Given
         List<GeneralMetric> metricsArray = List.of(getGeneralMetric("1"),getGeneralMetric("2"));
-        String str = "[{\"Namespace\":\"MultiNamespace_1\",\"Dimensions\":[{\"name\":\"Key1_1\",\"value\":\"Value1\"},{\"name\":\"Key2_1\",\"value\":\"Value2\"}],\"Timestamp\":\"2023-10-05T12:00:00Z\",\"Name\":\"Metric1_1\",\"Value\":\"100\"},{\"Namespace\":\"MultiNamespace_1\",\"Dimensions\":[{\"name\":\"Key1_1\",\"value\":\"Value1\"},{\"name\":\"Key2_1\",\"value\":\"Value2\"}],\"Timestamp\":\"2023-10-05T12:00:00Z\",\"Name\":\"Metric2_1\",\"Value\":\"200\"},{\"Namespace\":\"MultiNamespace_2\",\"Dimensions\":[{\"name\":\"Key1_2\",\"value\":\"Value1\"},{\"name\":\"Key2_2\",\"value\":\"Value2\"}],\"Timestamp\":\"2023-10-05T12:00:00Z\",\"Name\":\"Metric1_2\",\"Value\":\"100\"},{\"Namespace\":\"MultiNamespace_2\",\"Dimensions\":[{\"name\":\"Key1_2\",\"value\":\"Value1\"},{\"name\":\"Key2_2\",\"value\":\"Value2\"}],\"Timestamp\":\"2023-10-05T12:00:00Z\",\"Name\":\"Metric2_2\",\"Value\":\"200\"}]";
+        String str = "PNApplicationMetrics=[{\"Namespace\":\"MultiNamespace_1\",\"Dimensions\":[{\"name\":\"Key1_1\",\"value\":\"Value1\"},{\"name\":\"Key2_1\",\"value\":\"Value2\"}],\"Timestamp\":" + metricsArray.get(0).getTimestamp() + ",\"Name\":\"Metric1_1\",\"Value\":100},{\"Namespace\":\"MultiNamespace_1\",\"Dimensions\":[{\"name\":\"Key1_1\",\"value\":\"Value1\"},{\"name\":\"Key2_1\",\"value\":\"Value2\"}],\"Timestamp\":" + metricsArray.get(0).getTimestamp() + ",\"Name\":\"Metric2_1\",\"Value\":200},{\"Namespace\":\"MultiNamespace_2\",\"Dimensions\":[{\"name\":\"Key1_2\",\"value\":\"Value1\"},{\"name\":\"Key2_2\",\"value\":\"Value2\"}],\"Timestamp\":" + metricsArray.get(0).getTimestamp() + ",\"Name\":\"Metric1_2\",\"Value\":100},{\"Namespace\":\"MultiNamespace_2\",\"Dimensions\":[{\"name\":\"Key1_2\",\"value\":\"Value1\"},{\"name\":\"Key2_2\",\"value\":\"Value2\"}],\"Timestamp\":" + metricsArray.get(0).getTimestamp() + ",\"Name\":\"Metric2_2\",\"Value\":200}]";
 
         //When
-        fooLogger.logMetric(metricsArray, "metricTest" ,PnAuditLogMetricFormatType.PNF.name());
+        fooLogger.logMetric(metricsArray ,PnAuditLogMetricFormatType.PNF.name());
 
         //Then
         // JUnit assertions
         List<ILoggingEvent> logsList = listAppender.list;
         final ILoggingEvent loggingEvent = logsList.get(0);
-        assertNotNull(loggingEvent.getMDCPropertyMap().get("PNApplicationMetrics"));
-        assertEquals(str, loggingEvent.getMDCPropertyMap().get("PNApplicationMetrics"));
+        assertNotNull(loggingEvent.getMarker());
+        assertEquals(str, loggingEvent.getMarker().toString());
     }
 
     @Test
     void testMetricheEMF() {
         //Given
         List<GeneralMetric> metricsArray = List.of(getGeneralMetric("1"),getGeneralMetric("2"));
-        String str = "{\"Timestamp\": \"2023-10-05T12:00:00Z\", \"CloudWatchMetrics\": [{\"Namespace\":\"MultiNamespace_1\",\"Dimensions\":[[\"Key1_1\",\"Key2_1\"]],\"Metrics\":[{\"Name\":\"Metric1_1\"},{\"Name\":\"Metric2_1\"}]},{\"Namespace\":\"MultiNamespace_2\",\"Dimensions\":[[\"Key1_2\",\"Key2_2\"]],\"Metrics\":[{\"Name\":\"Metric1_2\"},{\"Name\":\"Metric2_2\"}]}]}";
 
         //When
-        fooLogger.logMetric(metricsArray, "metricTest", PnAuditLogMetricFormatType.EMF.name());
+        fooLogger.logMetric(metricsArray, PnAuditLogMetricFormatType.EMF.name());
 
         //Then
         // JUnit assertions
         List<ILoggingEvent> logsList = listAppender.list;
         final ILoggingEvent loggingEvent = logsList.get(0);
-        assertNotNull(loggingEvent.getMDCPropertyMap().get("_aws"));
-        assertEquals(str, loggingEvent.getMDCPropertyMap().get("_aws"));
+        ArrayList<Marker> markers = new ArrayList<>();
+        Iterator<Marker> iterator = loggingEvent.getMarker().iterator();
+        while(iterator.hasNext()) {
+            markers.add(iterator.next());
+        }
+        assertEquals("_aws={\"Timestamp\": " + metricsArray.get(0).getTimestamp() + ", \"CloudWatchMetrics\": [{\"Namespace\":\"MultiNamespace_1\",\"Dimensions\":[[\"Key1_1\",\"Key2_1\"]],\"Metrics\":[{\"Name\":\"Metric1_1\"},{\"Name\":\"Metric2_1\"}]},{\"Namespace\":\"MultiNamespace_2\",\"Dimensions\":[[\"Key1_2\",\"Key2_2\"]],\"Metrics\":[{\"Name\":\"Metric1_2\"},{\"Name\":\"Metric2_2\"}]}]}", markers.get(0).toString());
+
     }
 
     @NotNull
     private static GeneralMetric getGeneralMetric(String i) {
         GeneralMetric generalMetric = new GeneralMetric();
         generalMetric.setNamespace("MultiNamespace_" +i);
-        generalMetric.setTimestamp("2023-10-05T12:00:00Z");
-        generalMetric.setUnit("Milliseconds");
+        generalMetric.setTimestamp(Instant.now().getEpochSecond());
 
         Dimension dimension1 = new Dimension("Key1_" +i, "Value1");
         Dimension dimension2 = new Dimension("Key2_" +i, "Value2");
         generalMetric.setDimensions(List.of(dimension1, dimension2));
 
-        Metric metric1 = new Metric("Metric1_" +i, "100");
-        Metric metric2 = new Metric("Metric2_" +i, "200");
+        Metric metric1 = new Metric("Metric1_" +i, 100);
+        Metric metric2 = new Metric("Metric2_" +i, 200);
         generalMetric.setMetrics(List.of(metric1, metric2));
         return generalMetric;
     }
