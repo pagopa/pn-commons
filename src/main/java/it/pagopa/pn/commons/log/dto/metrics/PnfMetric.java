@@ -15,9 +15,9 @@ public class PnfMetric extends GeneralMetric {
 
             String metricsString = new MetricPnf(metric).toJson();
 
-            return String.format("{\"Namespace\":\"%s\",\"Dimensions\":[%s],%s,\"Unit\":\"%s\"}",
-                    getNamespace(), dimensionsString, metricsString, getUnit());
-        }).reduce((a, b) -> a + "," + b).orElse("");
+            return String.format("{\"Namespace\":\"%s\",\"Dimensions\":[%s],\"Timestamp\":%s,%s}",
+                    getNamespace(), dimensionsString, getTimestamp(), metricsString);
+            }).reduce((a, b) -> a + "," + b).orElse("");
     }
 
 }

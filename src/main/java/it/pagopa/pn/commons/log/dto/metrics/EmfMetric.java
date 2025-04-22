@@ -16,7 +16,7 @@ public class EmfMetric extends GeneralMetric {
 
         String metricsString = CollectionUtils.isEmpty(getMetrics()) ? "[]" :
                 getMetrics().stream()
-                        .map(metric -> new MetricEmf(metric).toJson(getUnit()))
+                        .map(metric -> new MetricEmf(metric).toJson())
                         .reduce((a, b) -> a + "," + b)
                         .orElse("");
 
