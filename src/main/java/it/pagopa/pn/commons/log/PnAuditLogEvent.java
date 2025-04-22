@@ -1,5 +1,6 @@
 package it.pagopa.pn.commons.log;
 
+import it.pagopa.pn.commons.configs.EnvironmentConfig;
 import it.pagopa.pn.commons.log.dto.metrics.GeneralMetric;
 
 import java.util.List;
@@ -14,6 +15,7 @@ public class PnAuditLogEvent {
     private PnAuditLogType level;
     private final String uuid;
     private final Map<String, String> mdc;
+    private String metricFormatType;
     private List<GeneralMetric> metricsArray;
 
     Object[] getArguments() {
@@ -42,6 +44,7 @@ public class PnAuditLogEvent {
         this.message = message;
         this.arguments = arguments;
         this.uuid = UUID.randomUUID().toString();
+        this.metricFormatType = EnvironmentConfig.getMetricFormatType();
     }
 
     public PnAuditLogEvent(PnAuditLogEventType type, Map<String, String> mdc, String message, List<GeneralMetric> metricsArray, Object... arguments) {
@@ -51,6 +54,7 @@ public class PnAuditLogEvent {
         this.metricsArray = metricsArray;
         this.arguments = arguments;
         this.uuid = UUID.randomUUID().toString();
+        this.metricFormatType = EnvironmentConfig.getMetricFormatType();
     }
 
     public PnAuditLogEvent generateSuccess() {
@@ -80,7 +84,7 @@ public class PnAuditLogEvent {
     public PnAuditLogEvent generateWarning(String message, List<GeneralMetric> metricsArray, Object... arguments) {
         return generateResult(PnAuditLogType.WARNING, message, metricsArray, arguments);
     }
-    
+
     public PnAuditLogEvent generateResult(PnAuditLogType level, String message, Object... arguments) {
         PnAuditLogEvent resultEvent = new PnAuditLogEvent(type, mdc, message, arguments);
         resultEvent.originEvent = this;
@@ -92,6 +96,7 @@ public class PnAuditLogEvent {
         PnAuditLogEvent resultEvent = new PnAuditLogEvent(type, mdc, message, metricsArray, arguments);
         resultEvent.originEvent = this;
         resultEvent.level = level;
+        resultEvent.setMetricFormatType(this.metricFormatType);
         return resultEvent;
     }
 
@@ -103,4 +108,13 @@ public class PnAuditLogEvent {
     public Map<String, String> getMdc() {
         return mdc;
     }
+
+    public String getMetricFormatType() {
+        return metricFormatType;
+    }
+
+    public void setMetricFormatType(String metricFormatType) {
+        this.metricFormatType = metricFormatType;
+    }
+
 }
