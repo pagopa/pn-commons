@@ -11,6 +11,5 @@ import org.apache.commons.lang3.StringUtils;
 public class Dimension {
     private String name;
     private String value;
-
     public String toJson() { return StringUtils.EMPTY; }
 }
