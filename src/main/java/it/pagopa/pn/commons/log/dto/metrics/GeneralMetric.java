@@ -13,7 +13,7 @@ import java.util.List;
 public class GeneralMetric {
     private String namespace;
     private List<Dimension> dimensions;
-    private String timestamp;
+    private long timestamp;
     private List<Metric> metrics;
     private String unit;
 
