@@ -34,6 +34,7 @@ public class PnAuditLogEvent {
     PnAuditLogType getLevel() {
         return level;
     }
+    List<GeneralMetric> getMetricsArray() { return metricsArray; }
 
     public PnAuditLogEvent(PnAuditLogEventType type, Map<String, String> mdc, String message, Object... arguments) {
         this.type = type;
@@ -60,16 +61,35 @@ public class PnAuditLogEvent {
         return generateResult(PnAuditLogType.SUCCESS, message, arguments);
     }
 
+    public PnAuditLogEvent generateSuccess(String message, List<GeneralMetric> metricsArray, Object... arguments) {
+        return generateResult(PnAuditLogType.SUCCESS, message, metricsArray, arguments);
+    }
+
     public PnAuditLogEvent generateFailure(String message, Object... arguments) {
         return generateResult(PnAuditLogType.FAILURE, message, arguments);
+    }
+
+    public PnAuditLogEvent generateFailure(String message, List<GeneralMetric> metricsArray, Object... arguments) {
+        return generateResult(PnAuditLogType.FAILURE, message, metricsArray, arguments);
     }
 
     public PnAuditLogEvent generateWarning(String message, Object... arguments) {
         return generateResult(PnAuditLogType.WARNING, message, arguments);
     }
+
+    public PnAuditLogEvent generateWarning(String message, List<GeneralMetric> metricsArray, Object... arguments) {
+        return generateResult(PnAuditLogType.WARNING, message, metricsArray, arguments);
+    }
     
     public PnAuditLogEvent generateResult(PnAuditLogType level, String message, Object... arguments) {
         PnAuditLogEvent resultEvent = new PnAuditLogEvent(type, mdc, message, arguments);
+        resultEvent.originEvent = this;
+        resultEvent.level = level;
+        return resultEvent;
+    }
+
+    public PnAuditLogEvent generateResult(PnAuditLogType level, String message, List<GeneralMetric> metricsArray, Object... arguments) {
+        PnAuditLogEvent resultEvent = new PnAuditLogEvent(type, mdc, message, metricsArray, arguments);
         resultEvent.originEvent = this;
         resultEvent.level = level;
         return resultEvent;
