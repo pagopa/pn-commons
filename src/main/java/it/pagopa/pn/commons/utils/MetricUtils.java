@@ -5,6 +5,9 @@ import it.pagopa.pn.commons.log.PnAuditLogMetricFormatType;
 import it.pagopa.pn.commons.log.dto.metrics.EmfMetric;
 import it.pagopa.pn.commons.log.dto.metrics.GeneralMetric;
 import it.pagopa.pn.commons.log.dto.metrics.PnfMetric;
+import net.logstash.logback.marker.RawJsonAppendingMarker;
+import org.slf4j.Marker;
+import org.slf4j.helpers.BasicMarker;
 import org.springframework.util.CollectionUtils;
 
 import java.util.HashMap;
@@ -28,6 +31,21 @@ public class MetricUtils {
         } else if (metricFormatType.equals(PnAuditLogMetricFormatType.EMF.name())) {
             addEMFMetric(metricsArray, logger);
         }
+    }
+
+
+    public static Marker generateMetricsMarker(List<GeneralMetric> metricsArray, String metricFormatType) {
+        if (CollectionUtils.isEmpty(metricsArray)) {
+            return null;
+        }
+
+        if(metricFormatType.equals(PnAuditLogMetricFormatType.PNF.name())) {
+            return appendRaw("PNApplicationMetrics", MetricUtils.generateJsonPNFMetric(metricsArray));
+        } else if (metricFormatType.equals(PnAuditLogMetricFormatType.EMF.name())) {
+            return appendEntries(MetricUtils.generateJsonEMFMetricParameters(metricsArray)).and(appendRaw("_aws", MetricUtils.generateJsonEMFMetric(metricsArray)));
+        }
+
+        return null;
     }
 
     private static void addEMFMetric(List<GeneralMetric> metricsArray, Logger logger) {
