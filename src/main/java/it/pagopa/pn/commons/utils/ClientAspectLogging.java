@@ -7,8 +7,11 @@ import org.aspectj.lang.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 
 @Aspect
@@ -22,12 +25,39 @@ public class ClientAspectLogging {
         // all client methods
     }
 
+    @Pointcut("execution(* it.pagopa.pn..generated.openapi.msclient..api.*.*(..))")
+    public void downstreamClient() {
+        // all client methods
+    }
+
+    @Around(value = "downstreamClient()")
+    public Object logAroundDownstreamClient(ProceedingJoinPoint joinPoint) throws Throwable {
+
+        String downstream = "<unknown>";
+        String downstreamRegex = "downstream\\.([^.]+)\\.";
+        if(joinPoint.toLongString().contains("downstream")){
+            Pattern pattern = Pattern.compile(downstreamRegex);
+            Matcher matcher = pattern.matcher(joinPoint.toLongString());
+            if (matcher.find()) {
+                downstream = matcher.group(1);
+                log.debug("[DOWNSTREAM] Sono il downstream {}", downstream);
+            }
+        }
+
+        Object[] arguments = joinPoint.getArgs();
+        ArrayList<Object> argsDefined = getEvaluableArguments(arguments);
+        long startTime = Instant.now().toEpochMilli();
+        String templateMessage = "[DOWNSTREAM {}]. Result {} - ExectutionTime: {} - Start: {} - Stop: {}";
+        var result = joinPoint.proceed();
+        return this.proceedWithTimeCompute(joinPoint, result, templateMessage, downstream, startTime);
+    }
+
     @Around(value = "client()")
     public Object logAroundClient(ProceedingJoinPoint joinPoint) throws Throwable {
         Object[] arguments = joinPoint.getArgs();
         ArrayList<Object> argsDefined = getEvaluableArguments(arguments);
         log.debug("Client method {} with args: {}", joinPoint.getSignature().toShortString(), argsDefined);
-        String endingMessage = "Return client method: {}() Result: {} ";
+        String endingMessage = "Return client method: {} Result: {} ";
         var result = joinPoint.proceed();
         return this.proceed(joinPoint, result, endingMessage);
     }
@@ -79,5 +109,31 @@ public class ClientAspectLogging {
             return result;
         }
     }
+
+    private Object proceedWithTimeCompute(ProceedingJoinPoint joinPoint, Object result, String templateMessage, String downstream, long startTime) {
+        if (result instanceof Mono<?> monoResult) {
+            return monoResult.doOnSuccess(res -> {
+                        long endTime = Instant.now().toEpochMilli();
+                        log.debug(templateMessage, downstream, endTime - startTime, startTime, endTime);
+                      //  logDebugMessage(joinPoint, res, templateMessage);
+                    }
+            );
+        }
+        else if (result instanceof Flux<?> fluxResult) {
+            return fluxResult.doOnNext(res -> {
+                        long endTime = Instant.now().toEpochMilli();
+                        log.debug(templateMessage, downstream, endTime - startTime, startTime, endTime);
+
+
+                //logDebugMessage(joinPoint, res, templateMessage)
+                    }
+            );
+        }
+        else {
+            logDebugMessage(joinPoint, result, templateMessage);
+            return result;
+        }
+    }
+
 }
 
