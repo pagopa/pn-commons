@@ -33,6 +33,7 @@ public class MetricUtils {
         }
     }
 
+
     public static Marker generateMetricsMarker(List<GeneralMetric> metricsArray, String metricFormatType) {
         if (CollectionUtils.isEmpty(metricsArray)) {
             return null;
