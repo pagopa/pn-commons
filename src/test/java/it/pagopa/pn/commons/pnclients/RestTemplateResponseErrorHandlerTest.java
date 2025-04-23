@@ -58,7 +58,7 @@ class RestTemplateResponseErrorHandlerTest {
     void handleError() throws IOException {
         ClientHttpResponse resp = new MockClientHttpResponse(new byte[0], HttpStatus.INTERNAL_SERVER_ERROR);
 
-        assertThrows(PnHttpResponseException.class, () -> restTemplateResponseErrorHandler.handleError(resp));
+        assertThrows(PnHttpResponseException.class, () -> restTemplateResponseErrorHandler.handleError(URI.create("http://localhost:8080"), HttpMethod.GET, resp));
     }
 
     @Test
@@ -73,7 +73,7 @@ class RestTemplateResponseErrorHandlerTest {
         ClientHttpResponse resp = new MockClientHttpResponse(problem.getBytes(StandardCharsets.UTF_8), HttpStatus.CONFLICT);
 
         try{
-            restTemplateResponseErrorHandler.handleError(resp);
+            restTemplateResponseErrorHandler.handleError(URI.create("http://localhost:8080"), HttpMethod.GET, resp);
             Assertions.fail("no exception thrown");
         } catch (PnHttpResponseException exc){
             assertEquals(HttpStatus.CONFLICT.value(), exc.getStatusCode());
@@ -101,7 +101,7 @@ class RestTemplateResponseErrorHandlerTest {
         ClientHttpResponse resp = new MockClientHttpResponse(problem.getBytes(StandardCharsets.UTF_8), HttpStatus.CONFLICT);
 
         try{
-            restTemplateResponseErrorHandler.handleError(resp);
+            restTemplateResponseErrorHandler.handleError(URI.create("http://localhost:8080"), HttpMethod.GET, resp);
             Assertions.fail("no exception thrown");
         } catch (PnHttpResponseException exc){
             assertEquals(HttpStatus.CONFLICT.value(), exc.getStatusCode());
