@@ -25,7 +25,7 @@ public class ClientAspectLogging {
         // all client methods
     }
 
-    @Pointcut("execution(* it.pagopa.pn..generated.openapi.msclient..api.*.*(..))")
+    @Pointcut("execution(* it.pagopa.pn.test.generated.openapi.msclient.test.api.TestApi.testCall())")
     public void downstreamClient() {
         // all client methods
     }
