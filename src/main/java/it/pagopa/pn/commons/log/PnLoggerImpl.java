@@ -1,10 +1,16 @@
 package it.pagopa.pn.commons.log;
 
+import it.pagopa.pn.commons.configs.EnvironmentConfig;
+import it.pagopa.pn.commons.log.dto.metrics.GeneralMetric;
+import it.pagopa.pn.commons.utils.MetricUtils;
 import org.slf4j.*;
+import org.springframework.util.CollectionUtils;
 import software.amazon.awssdk.enhanced.dynamodb.Key;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.TransactWriteItem;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 class PnLoggerImpl implements PnLogger {
@@ -145,6 +151,21 @@ class PnLoggerImpl implements PnLogger {
             logTransactionDynamoDBEntity("Update", transactWriteItem.update().tableName(), transactWriteItem.update().key());
         }
 
+    }
+
+    @Override
+    public void logMetric(List<GeneralMetric> metricsArray, String message) {
+        logMetric(metricsArray,message, EnvironmentConfig.getMetricFormatType());
+    }
+
+    @Override
+    public void logMetric(List<GeneralMetric> metricsArray, String message, String metricFormatType) {
+        if (CollectionUtils.isEmpty(metricsArray) || !(PnAuditLogMetricFormatType.EMF.name().equals(metricFormatType) || PnAuditLogMetricFormatType.PNF.name().equals(metricFormatType))) {
+            log.info(message);
+            return;
+        }
+
+        MetricUtils.generateMetricsLog((ch.qos.logback.classic.Logger) log, metricsArray, message, metricFormatType);
     }
 
     private void logTransactionDynamoDBEntity(String action, String tableName, Map<String, AttributeValue> keyOrItem) {

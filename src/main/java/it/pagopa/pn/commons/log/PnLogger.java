@@ -2,10 +2,13 @@ package it.pagopa.pn.commons.log;
 
 
 
+import it.pagopa.pn.commons.log.dto.metrics.GeneralMetric;
 import org.slf4j.Logger;
 import org.slf4j.Marker;
 import software.amazon.awssdk.enhanced.dynamodb.Key;
 import software.amazon.awssdk.services.dynamodb.model.TransactWriteItem;
+
+import java.util.List;
 
 public interface PnLogger extends Logger {
 
@@ -244,4 +247,12 @@ public interface PnLogger extends Logger {
      */
     void logTransactionDynamoDBEntity(TransactWriteItem transactWriteItem);
 
+    /**
+     * metodo per loggare una lista di metriche
+     *
+     * @param metricsArray la lista di metriche
+     */
+    void logMetric(List<GeneralMetric> metricsArray, String message);
+
+    void logMetric(List<GeneralMetric> metricsArray, String message, String metricFormatType);
 }
