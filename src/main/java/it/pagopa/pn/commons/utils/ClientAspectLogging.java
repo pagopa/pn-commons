@@ -9,6 +9,8 @@ import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 @Aspect
@@ -18,16 +20,53 @@ public class ClientAspectLogging {
     private static final String SENSITIVE_DATA = "<Hidden Data>";
 
     @Pointcut("execution(* it.pagopa.pn..generated.openapi.msclient..api.*.*(..))")
+    public void clientBase() {
+        // tutti i client, incluso downstream
+    }
+
+    @Pointcut("execution(* ..ResponseSpec it.pagopa.pn..generated.openapi.msclient.downstream..api.*.*(..))")
+    public void clientDownstream() {
+        // solo quelli nel package downstream
+    }
+
+    @Pointcut("clientBase() && !clientDownstream()")
     public void client() {
-        // all client methods
+        // tutti i client ECCETTO quelli downstream
     }
 
     @Around(value = "client()")
     public Object logAroundClient(ProceedingJoinPoint joinPoint) throws Throwable {
+        String downstream = null;
+        String downstreamRegex = "downstream\\.([^.]+)\\.";
+        if(joinPoint.toLongString().contains("downstream")){
+            Pattern pattern = Pattern.compile(downstreamRegex);
+            Matcher matcher = pattern.matcher(joinPoint.toLongString());
+            if (matcher.find()) {
+                downstream = matcher.group(1);
+                log.debug("[DOWNSTREAM] Sono il downstream {}", downstream);
+            }
+        }
         Object[] arguments = joinPoint.getArgs();
         ArrayList<Object> argsDefined = getEvaluableArguments(arguments);
         log.debug("Client method {} with args: {}", joinPoint.getSignature().toShortString(), argsDefined);
         String endingMessage = "Return client method: {}() Result: {} ";
+        var result = joinPoint.proceed();
+        return this.proceed(joinPoint, result, endingMessage);
+    }
+
+    @Around(value = "clientDownstream()")
+    public Object logAroundClientDownstream(ProceedingJoinPoint joinPoint) throws Throwable {
+        String downstream = null;
+        String downstreamRegex = "downstream\\.([^.]+)\\.";
+        Pattern pattern = Pattern.compile(downstreamRegex);
+        Matcher matcher = pattern.matcher(joinPoint.toLongString());
+        if (matcher.find()) {
+            downstream = matcher.group(1);
+        }
+
+        Object[] arguments = joinPoint.getArgs();
+        log.debug("[DOWNSTREAM] Sono il downstream {}", downstream);
+        String endingMessage = "[DOWNSTREAM] leReturn client method: {}() Result: {} ";
         var result = joinPoint.proceed();
         return this.proceed(joinPoint, result, endingMessage);
     }
