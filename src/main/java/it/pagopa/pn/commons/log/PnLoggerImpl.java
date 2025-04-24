@@ -154,18 +154,18 @@ class PnLoggerImpl implements PnLogger {
     }
 
     @Override
-    public void logMetric(List<GeneralMetric> metricsArray) {
-        logMetric(metricsArray, EnvironmentConfig.getMetricFormatType());
+    public void logMetric(List<GeneralMetric> metricsArray, String message) {
+        logMetric(metricsArray,message, EnvironmentConfig.getMetricFormatType());
     }
 
     @Override
-    public void logMetric(List<GeneralMetric> metricsArray, String metricFormatType) {
-        if (CollectionUtils.isEmpty(metricsArray)) {
-            log.info("No metrics to log");
+    public void logMetric(List<GeneralMetric> metricsArray, String message, String metricFormatType) {
+        if (CollectionUtils.isEmpty(metricsArray) || !(PnAuditLogMetricFormatType.EMF.name().equals(metricFormatType) || PnAuditLogMetricFormatType.PNF.name().equals(metricFormatType))) {
+            log.info(message);
             return;
         }
 
-        MetricUtils.generateMetricsLog((ch.qos.logback.classic.Logger) log, metricsArray, metricFormatType);
+        MetricUtils.generateMetricsLog((ch.qos.logback.classic.Logger) log, metricsArray, message, metricFormatType);
     }
 
     private void logTransactionDynamoDBEntity(String action, String tableName, Map<String, AttributeValue> keyOrItem) {

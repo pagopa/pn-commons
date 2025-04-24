@@ -5,9 +5,7 @@ import it.pagopa.pn.commons.log.PnAuditLogMetricFormatType;
 import it.pagopa.pn.commons.log.dto.metrics.EmfMetric;
 import it.pagopa.pn.commons.log.dto.metrics.GeneralMetric;
 import it.pagopa.pn.commons.log.dto.metrics.PnfMetric;
-import net.logstash.logback.marker.RawJsonAppendingMarker;
 import org.slf4j.Marker;
-import org.slf4j.helpers.BasicMarker;
 import org.springframework.util.CollectionUtils;
 
 import java.util.HashMap;
@@ -21,39 +19,23 @@ public class MetricUtils {
 
     private MetricUtils() {}
 
-    public static void generateMetricsLog(Logger logger, List<GeneralMetric> metricsArray, String metricFormatType) {
+    public static void generateMetricsLog(Logger logger, List<GeneralMetric> metricsArray, String message, String metricFormatType) {
         if (CollectionUtils.isEmpty(metricsArray)) {
             return;
         }
-
-        if(metricFormatType.equals(PnAuditLogMetricFormatType.PNF.name())) {
-            addPNFMetric(metricsArray, logger);
-        } else if (metricFormatType.equals(PnAuditLogMetricFormatType.EMF.name())) {
-            addEMFMetric(metricsArray, logger);
+        if(PnAuditLogMetricFormatType.PNF.name().equals(metricFormatType)) {
+            addPNFMetric(metricsArray, logger, message);
+        } else if (PnAuditLogMetricFormatType.EMF.name().equals(metricFormatType)) {
+            addEMFMetric(metricsArray, logger, message);
         }
     }
 
-
-    public static Marker generateMetricsMarker(List<GeneralMetric> metricsArray, String metricFormatType) {
-        if (CollectionUtils.isEmpty(metricsArray)) {
-            return null;
-        }
-
-        if(metricFormatType.equals(PnAuditLogMetricFormatType.PNF.name())) {
-            return appendRaw("PNApplicationMetrics", MetricUtils.generateJsonPNFMetric(metricsArray));
-        } else if (metricFormatType.equals(PnAuditLogMetricFormatType.EMF.name())) {
-            return appendEntries(MetricUtils.generateJsonEMFMetricParameters(metricsArray)).and(appendRaw("_aws", MetricUtils.generateJsonEMFMetric(metricsArray)));
-        }
-
-        return null;
+    private static void addEMFMetric(List<GeneralMetric> metricsArray, Logger logger, String message) {
+        logger.info(appendEntries(MetricUtils.generateJsonEMFMetricParameters(metricsArray)).and(appendRaw("_aws", MetricUtils.generateJsonEMFMetric(metricsArray))), message);
     }
 
-    private static void addEMFMetric(List<GeneralMetric> metricsArray, Logger logger) {
-        logger.info(appendEntries(MetricUtils.generateJsonEMFMetricParameters(metricsArray)).and(appendRaw("_aws", MetricUtils.generateJsonEMFMetric(metricsArray))), "Metrics log");
-    }
-
-    private static void addPNFMetric(List<GeneralMetric> metricsArray, Logger logger) {
-        logger.info(appendRaw("PNApplicationMetrics", MetricUtils.generateJsonPNFMetric(metricsArray)), "Metrics log");
+    private static void addPNFMetric(List<GeneralMetric> metricsArray, Logger logger, String message) {
+        logger.info(appendRaw("PNApplicationMetrics", MetricUtils.generateJsonPNFMetric(metricsArray)), message);
     }
 
     public static String generateJsonPNFMetric(List<GeneralMetric> metricsArray) {
@@ -65,6 +47,20 @@ public class MetricUtils {
                 .reduce((a, b) -> a + "," + b)
                 .orElse("");
         return String.format("[%s]", metricsObject);
+    }
+
+    public static Marker generateMetricsMarker(List<GeneralMetric> metricsArray, String metricFormatType) {
+        if (CollectionUtils.isEmpty(metricsArray)) {
+            return null;
+        }
+
+        if(PnAuditLogMetricFormatType.PNF.name().equals(metricFormatType)) {
+            return appendRaw("PNApplicationMetrics", MetricUtils.generateJsonPNFMetric(metricsArray));
+        } else if (PnAuditLogMetricFormatType.EMF.name().equals(metricFormatType)) {
+            return appendEntries(MetricUtils.generateJsonEMFMetricParameters(metricsArray)).and(appendRaw("_aws", MetricUtils.generateJsonEMFMetric(metricsArray)));
+        }
+
+        return null;
     }
 
     public static String generateJsonEMFMetric(List<GeneralMetric> metricsArray) {

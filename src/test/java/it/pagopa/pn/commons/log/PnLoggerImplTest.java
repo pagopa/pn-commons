@@ -518,7 +518,7 @@ class PnLoggerImplTest {
         String str = "PNApplicationMetrics=[{\"Namespace\":\"MultiNamespace_1\",\"Dimensions\":[{\"name\":\"Key1_1\",\"value\":\"Value1\"},{\"name\":\"Key2_1\",\"value\":\"Value2\"}],\"Timestamp\":" + metricsArray.get(0).getTimestamp() + ",\"Name\":\"Metric1_1\",\"Value\":100},{\"Namespace\":\"MultiNamespace_1\",\"Dimensions\":[{\"name\":\"Key1_1\",\"value\":\"Value1\"},{\"name\":\"Key2_1\",\"value\":\"Value2\"}],\"Timestamp\":" + metricsArray.get(0).getTimestamp() + ",\"Name\":\"Metric2_1\",\"Value\":200},{\"Namespace\":\"MultiNamespace_2\",\"Dimensions\":[{\"name\":\"Key1_2\",\"value\":\"Value1\"},{\"name\":\"Key2_2\",\"value\":\"Value2\"}],\"Timestamp\":" + metricsArray.get(0).getTimestamp() + ",\"Name\":\"Metric1_2\",\"Value\":100},{\"Namespace\":\"MultiNamespace_2\",\"Dimensions\":[{\"name\":\"Key1_2\",\"value\":\"Value1\"},{\"name\":\"Key2_2\",\"value\":\"Value2\"}],\"Timestamp\":" + metricsArray.get(0).getTimestamp() + ",\"Name\":\"Metric2_2\",\"Value\":200}]";
 
         //When
-        fooLogger.logMetric(metricsArray ,PnAuditLogMetricFormatType.PNF.name());
+        fooLogger.logMetric(metricsArray, "test message", PnAuditLogMetricFormatType.PNF.name());
 
         //Then
         // JUnit assertions
@@ -534,7 +534,7 @@ class PnLoggerImplTest {
         List<GeneralMetric> metricsArray = List.of(getGeneralMetric("1"),getGeneralMetric("2"));
 
         //When
-        fooLogger.logMetric(metricsArray, PnAuditLogMetricFormatType.EMF.name());
+        fooLogger.logMetric(metricsArray, "test message", PnAuditLogMetricFormatType.EMF.name());
 
         //Then
         // JUnit assertions
