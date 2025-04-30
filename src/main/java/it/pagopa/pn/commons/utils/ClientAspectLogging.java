@@ -4,6 +4,7 @@ import lombok.CustomLog;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
+import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -15,24 +16,20 @@ import java.util.regex.Matcher;
 
 
 @Aspect
+@Component
 @CustomLog
 public class ClientAspectLogging {
 
     private static final String SENSITIVE_DATA = "<Hidden Data>";
 
     @Pointcut("execution(* it.pagopa.pn..generated.openapi.msclient..api.*.*(..))")
-    public void client() {
+    public void clientDownStream() {
         // all client methods
     }
 
-    @Pointcut("execution(* it.pagopa.pn.test.generated.openapi.msclient.test.api.TestApi.testCall())")
-    public void downstreamClient() {
-        // all client methods
-    }
 
-    @Around(value = "downstreamClient()")
+    @Around(value = "clientDownStream()")
     public Object logAroundDownstreamClient(ProceedingJoinPoint joinPoint) throws Throwable {
-
         String downstream = "<unknown>";
         String downstreamRegex = "downstream\\.([^.]+)\\.";
         if(joinPoint.toLongString().contains("downstream")){
@@ -43,16 +40,17 @@ public class ClientAspectLogging {
                 log.debug("[DOWNSTREAM] Sono il downstream {}", downstream);
             }
         }
-
         Object[] arguments = joinPoint.getArgs();
-        ArrayList<Object> argsDefined = getEvaluableArguments(arguments);
         long startTime = Instant.now().toEpochMilli();
-        String templateMessage = "[DOWNSTREAM {}]. Result {} - ExectutionTime: {} - Start: {} - Stop: {}";
+        String templateMessage = "[DOWNSTREAM {}]. Result {} - Execution time: {} - Start: {} - Stop: {}";
         var result = joinPoint.proceed();
         return this.proceedWithTimeCompute(joinPoint, result, templateMessage, downstream, startTime);
+
+
+
     }
 
-    @Around(value = "client()")
+   // @Around(value = "client()")
     public Object logAroundClient(ProceedingJoinPoint joinPoint) throws Throwable {
         Object[] arguments = joinPoint.getArgs();
         ArrayList<Object> argsDefined = getEvaluableArguments(arguments);
