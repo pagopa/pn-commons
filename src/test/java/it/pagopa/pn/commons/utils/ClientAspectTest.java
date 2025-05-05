@@ -22,7 +22,6 @@ import java.io.PrintStream;
 @SpringBootTest(classes = {ClientAspectTest.SpringTestConfiguration.class})
 class ClientAspectTest {
 
-
     @Configuration
     public static class SpringTestConfiguration {
         @Bean
@@ -39,7 +38,7 @@ class ClientAspectTest {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PrintStream originalSystemOut = System.out;
         System.setOut(new PrintStream(baos));
-        t.testCall();
+        t.testCall().subscribe(x-> System.out.println(x));
         System.setOut(originalSystemOut);
 
         String logOutput = baos.toString();

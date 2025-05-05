@@ -44,12 +44,12 @@ public class ClientAspectLogging {
         ArrayList<Object> argsDefined = getEvaluableArguments(arguments);
 
 
-        String f1 = String.format("[DOWNSTREAM {}]. Client method {} with args: {}", downstreamName,
-                joinPoint.getSignature().toShortString(), argsDefined);
-        String templateMessage = f1.concat("- Result {} - Execution time: {} - Start: {} - Stop: {}");
+        String f1 = String.format("[DOWNSTREAM %s]. Client method {} with args: %s", downstreamName, argsDefined);
+        String templateMessage = f1.concat(" - Result {} - Execution time: %dms - Start: %d - Stop: %d");
+
         long startTime = Instant.now().toEpochMilli();
         var result = joinPoint.proceed();
-        return this.proceedWithTimeCompute(joinPoint, result, templateMessage, downstreamName, startTime);
+        return this.proceedWithTimeCompute(joinPoint, result, templateMessage, startTime);
 
 
 
@@ -60,14 +60,13 @@ public class ClientAspectLogging {
         Object[] arguments = joinPoint.getArgs();
         ArrayList<Object> argsDefined = getEvaluableArguments(arguments);
         log.debug("Client method {} with args: {}", joinPoint.getSignature().toShortString(), argsDefined);
-        String endingMessage = "Return client method: {} Result: {} ";
+        String endingMessage = " {} Result: {} ";
         var result = joinPoint.proceed();
         return this.proceed(joinPoint, result, endingMessage);
     }
 
     private void logDebugMessage(JoinPoint joinPoint, Object result, String message) {
         //Case: Mono
-        System.out.println("AAA-->" + message);
         if (result instanceof Mono<?> monoResult) {
             monoResult.doOnNext(o -> log.debug(message,
                     joinPoint.getSignature().toShortString(),
@@ -114,19 +113,15 @@ public class ClientAspectLogging {
         }
     }
 
-    private Object proceedWithTimeCompute(ProceedingJoinPoint joinPoint, Object result, String templateMessage, String downstream, long startTime) {
-        System.out.println("PROCEED");
+    private Object proceedWithTimeCompute(ProceedingJoinPoint joinPoint, Object result, String templateMessage, long startTime) {
         if (result instanceof Mono<?> monoResult) {
-            System.out.println("QUI");
             return monoResult.doOnSuccess(res -> {
-                System.out.println("TESTTTTTTTTTT");
                 long endTime = Instant.now().toEpochMilli();
                 logDebugMessage(joinPoint, res,
-                        String.format(templateMessage, endTime - startTime, startTime, endTime));
+                        String.format(templateMessage, (endTime - startTime), startTime, endTime));
             });
         }
         else if (result instanceof Flux<?> fluxResult) {
-            System.out.println("QUI FLUX");
             return fluxResult.doOnNext(res -> {
                 long endTime = Instant.now().toEpochMilli();
                 logDebugMessage(joinPoint, res,
@@ -135,7 +130,8 @@ public class ClientAspectLogging {
             );
         }
         else {
-            logDebugMessage(joinPoint, result, templateMessage);
+            long endTime = Instant.now().toEpochMilli();
+            logDebugMessage(joinPoint, result, String.format(templateMessage, endTime - startTime, startTime, endTime));
             return result;
         }
     }

@@ -19,6 +19,6 @@ public class TestApi {
 
     public Mono<String> testCall() {
         System.out.println("TESTCALL CALLED");
-        return Mono.defer(() -> Mono.just("test call"));
+        return Mono.just( "test call");
     }
 }
