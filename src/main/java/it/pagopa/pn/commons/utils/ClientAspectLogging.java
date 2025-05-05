@@ -1,6 +1,7 @@
 package it.pagopa.pn.commons.utils;
 
 import lombok.CustomLog;
+import org.apache.logging.log4j.message.StringFormattedMessage;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
@@ -30,21 +31,25 @@ public class ClientAspectLogging {
 
     @Around(value = "clientDownStream()")
     public Object logAroundDownstreamClient(ProceedingJoinPoint joinPoint) throws Throwable {
-        String downstream = "<unknown>";
+        String downstreamName = "<unknown>";
         String downstreamRegex = "downstream\\.([^.]+)\\.";
         if(joinPoint.toLongString().contains("downstream")){
             Pattern pattern = Pattern.compile(downstreamRegex);
             Matcher matcher = pattern.matcher(joinPoint.toLongString());
             if (matcher.find()) {
-                downstream = matcher.group(1);
-                log.debug("[DOWNSTREAM] Sono il downstream {}", downstream);
+                downstreamName = matcher.group(1);
             }
         }
         Object[] arguments = joinPoint.getArgs();
+        ArrayList<Object> argsDefined = getEvaluableArguments(arguments);
+
+
+        String f1 = String.format("[DOWNSTREAM {}]. Client method {} with args: {}", downstreamName,
+                joinPoint.getSignature().toShortString(), argsDefined);
+        String templateMessage = f1.concat("- Result {} - Execution time: {} - Start: {} - Stop: {}");
         long startTime = Instant.now().toEpochMilli();
-        String templateMessage = "[DOWNSTREAM {}]. Result {} - Execution time: {} - Start: {} - Stop: {}";
         var result = joinPoint.proceed();
-        return this.proceedWithTimeCompute(joinPoint, result, templateMessage, downstream, startTime);
+        return this.proceedWithTimeCompute(joinPoint, result, templateMessage, downstreamName, startTime);
 
 
 
@@ -62,6 +67,7 @@ public class ClientAspectLogging {
 
     private void logDebugMessage(JoinPoint joinPoint, Object result, String message) {
         //Case: Mono
+        System.out.println("AAA-->" + message);
         if (result instanceof Mono<?> monoResult) {
             monoResult.doOnNext(o -> log.debug(message,
                     joinPoint.getSignature().toShortString(),
@@ -109,21 +115,22 @@ public class ClientAspectLogging {
     }
 
     private Object proceedWithTimeCompute(ProceedingJoinPoint joinPoint, Object result, String templateMessage, String downstream, long startTime) {
+        System.out.println("PROCEED");
         if (result instanceof Mono<?> monoResult) {
+            System.out.println("QUI");
             return monoResult.doOnSuccess(res -> {
-                        long endTime = Instant.now().toEpochMilli();
-                        log.debug(templateMessage, downstream, endTime - startTime, startTime, endTime);
-                      //  logDebugMessage(joinPoint, res, templateMessage);
-                    }
-            );
+                System.out.println("TESTTTTTTTTTT");
+                long endTime = Instant.now().toEpochMilli();
+                logDebugMessage(joinPoint, res,
+                        String.format(templateMessage, endTime - startTime, startTime, endTime));
+            });
         }
         else if (result instanceof Flux<?> fluxResult) {
+            System.out.println("QUI FLUX");
             return fluxResult.doOnNext(res -> {
-                        long endTime = Instant.now().toEpochMilli();
-                        log.debug(templateMessage, downstream, endTime - startTime, startTime, endTime);
-
-
-                //logDebugMessage(joinPoint, res, templateMessage)
+                long endTime = Instant.now().toEpochMilli();
+                logDebugMessage(joinPoint, res,
+                        String.format(templateMessage, endTime - startTime, startTime, endTime));
                     }
             );
         }

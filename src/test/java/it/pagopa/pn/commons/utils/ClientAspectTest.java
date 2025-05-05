@@ -1,14 +1,12 @@
 package it.pagopa.pn.commons.utils;
 
 
-import it.pagopa.pn.commons.log.MDCWebFilter;
 import it.pagopa.pn.test.generated.openapi.msclient.test.api.TestApi;
-import lombok.CustomLog;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -28,7 +26,7 @@ class ClientAspectTest {
     @Configuration
     public static class SpringTestConfiguration {
         @Bean
-        public TestApi mdcTraceIdWebFilter(){
+        public TestApi initTestApiBean(){
             return new TestApi();
         }
     }
@@ -45,7 +43,7 @@ class ClientAspectTest {
         System.setOut(originalSystemOut);
 
         String logOutput = baos.toString();
-        System.out.println("YYYY" + logOutput + "XXXX");
+        System.out.println(logOutput);
         Assertions.assertTrue(logOutput.contains("Execution time:"));
     }
 }
