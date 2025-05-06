@@ -2,15 +2,22 @@ package it.pagopa.pn.commons.log;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
+import it.pagopa.pn.commons.log.dto.metrics.GeneralMetric;
+import it.pagopa.pn.commons.utils.MetricUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
+import org.slf4j.Marker;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 import static ch.qos.logback.classic.Level.*;
+import static net.logstash.logback.marker.Markers.appendEntries;
+import static net.logstash.logback.marker.Markers.appendRaw;
 
 public class PnAuditLog {
 
@@ -56,6 +63,9 @@ public class PnAuditLog {
             if ( eventArguments != null ) {
                 arguments.addAll( Arrays.asList(eventArguments) );
             }
+
+            Marker metricsMarker = MetricUtils.generateMetricsMarker(pnAuditLogEvent.getMetricsArray(), pnAuditLogEvent.getMetricFormatType());
+
             Set<String> mdcKeySet = pnAuditLogEvent.getMdc().keySet();
             try {
                 for (String key : mdcKeySet) {
@@ -65,24 +75,29 @@ public class PnAuditLog {
                 String originUuid =  (pnAuditLogEvent.getOriginEvent() == null ? pnAuditLogEvent.getUuid() : pnAuditLogEvent.getOriginEvent().getUuid());
                 MDC.put(AUDIT_UUID, originUuid);
 
-                setLogger(level, logger, format, arguments, auditLogEventType);
+                setLogger(level, logger, format, arguments, auditLogEventType, metricsMarker);
 
             } finally {
                 MDC.remove(AUDIT_TYPE);
                 MDC.remove(AUDIT_UUID);
+                auditLogEventType.marker.remove(metricsMarker);
                 // Non vengono più rimosse le altre eventuali chiavi, dato che sono in comune con quelle normalmente presenti nei log
             }
         }
     }
 
-    private static void setLogger(Level level, Logger logger, String format, ArrayList<Object> arguments, PnAuditLogEventType auditLogEventType) {
+    private static void setLogger(Level level, Logger logger, String format, ArrayList<Object> arguments, PnAuditLogEventType auditLogEventType, Marker metricsMarker) {
+        Marker marker = auditLogEventType.marker;
+        if (metricsMarker != null) {
+            marker.add(metricsMarker);
+        }
         if (WARN.equals(level)) {
-            logger.warn(auditLogEventType.marker, format, arguments.toArray());
+            logger.warn(marker, format, arguments.toArray());
         } else {
             if (ERROR.equals(level)) {
-                logger.error(auditLogEventType.marker, format, arguments.toArray());
+                logger.error(marker, format, arguments.toArray());
             } else {
-                logger.info(auditLogEventType.marker, format, arguments.toArray());
+                logger.info(marker, format, arguments.toArray());
             }
         }
     }
