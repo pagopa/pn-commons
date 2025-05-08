@@ -1,4 +1,4 @@
-package it.pagopa.pn.test.generated.openapi.msclient.test.api;
+package it.pagopa.pn.national.registries.generated.openapi.msclient.downstream.inad.v1.api;
 
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;

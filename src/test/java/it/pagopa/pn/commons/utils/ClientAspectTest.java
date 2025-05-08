@@ -1,7 +1,7 @@
 package it.pagopa.pn.commons.utils;
 
 
-import it.pagopa.pn.test.generated.openapi.msclient.test.api.TestApi;
+import it.pagopa.pn.national.registries.generated.openapi.msclient.downstream.inad.v1.api.TestApi;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -34,15 +34,15 @@ class ClientAspectTest {
     private TestApi t;
 
     @Test
-    public void testSendMetricToCloudWatch() {
+    void testSendMetricToCloudWatch() {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PrintStream originalSystemOut = System.out;
         System.setOut(new PrintStream(baos));
-        t.testCall().subscribe(x-> System.out.println(x));
+        t.testCall().subscribe(System.out::println);
         System.setOut(originalSystemOut);
 
         String logOutput = baos.toString();
         System.out.println(logOutput);
-        Assertions.assertTrue(logOutput.contains("Execution time:"));
+        Assertions.assertTrue(logOutput.contains("[DOWNSTREAM inad]. Client method TestApi.testCall() with args: []"));
     }
 }
