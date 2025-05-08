@@ -1,19 +1,17 @@
 package it.pagopa.pn.commons.utils;
 
 import lombok.CustomLog;
-import org.apache.logging.log4j.message.StringFormattedMessage;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.*;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 
 
 @Aspect
@@ -24,43 +22,26 @@ public class ClientAspectLogging {
     private static final String SENSITIVE_DATA = "<Hidden Data>";
 
     @Pointcut("execution(* it.pagopa.pn..generated.openapi.msclient..api.*.*(..))")
+    public void client() {
+        // all client methods
+    }
+
+    @Pointcut("execution(* it.pagopa.pn..generated.openapi.msclient.downstream..api.*.*(..))")
     public void clientDownStream() {
         // all client methods
     }
 
-
     @Around(value = "clientDownStream()")
-    public Object logAroundDownstreamClient(ProceedingJoinPoint joinPoint) throws Throwable {
-        String downstreamName = "<unknown>";
-        String downstreamRegex = "downstream\\.([^.]+)\\.";
-        if(joinPoint.toLongString().contains("downstream")){
-            Pattern pattern = Pattern.compile(downstreamRegex);
-            Matcher matcher = pattern.matcher(joinPoint.toLongString());
-            if (matcher.find()) {
-                downstreamName = matcher.group(1);
-            }
-        }
-        Object[] arguments = joinPoint.getArgs();
-        ArrayList<Object> argsDefined = getEvaluableArguments(arguments);
-
-
-        String f1 = String.format("[DOWNSTREAM %s]. Client method {} with args: %s", downstreamName, argsDefined);
-        String templateMessage = f1.concat(" - Result {} - Execution time: %dms - Start: %d - Stop: %d");
-
-        long startTime = Instant.now().toEpochMilli();
-        var result = joinPoint.proceed();
-        return this.proceedWithTimeCompute(joinPoint, result, templateMessage, startTime);
-
-
-
+    public Object logAroundDownstreamClient(ProceedingJoinPoint joinPoint) {
+        return null;
     }
 
-   // @Around(value = "client()")
+    @Around(value = "client()")
     public Object logAroundClient(ProceedingJoinPoint joinPoint) throws Throwable {
         Object[] arguments = joinPoint.getArgs();
         ArrayList<Object> argsDefined = getEvaluableArguments(arguments);
         log.debug("Client method {} with args: {}", joinPoint.getSignature().toShortString(), argsDefined);
-        String endingMessage = " {} Result: {} ";
+        String endingMessage = "Return client method: {}() Result: {} ";
         var result = joinPoint.proceed();
         return this.proceed(joinPoint, result, endingMessage);
     }
@@ -81,7 +62,6 @@ public class ClientAspectLogging {
             log.debug(message, joinPoint.getSignature().toShortString(), result instanceof String ? SENSITIVE_DATA : result);
         }
     }
-
 
     private ArrayList<Object> getEvaluableArguments(Object[] parameterValue){
         ArrayList<Object> result = new ArrayList<>();
@@ -109,29 +89,6 @@ public class ClientAspectLogging {
         }
         else {
             logDebugMessage(joinPoint, result, endingMessage);
-            return result;
-        }
-    }
-
-    private Object proceedWithTimeCompute(ProceedingJoinPoint joinPoint, Object result, String templateMessage, long startTime) {
-        if (result instanceof Mono<?> monoResult) {
-            return monoResult.doOnSuccess(res -> {
-                long endTime = Instant.now().toEpochMilli();
-                logDebugMessage(joinPoint, res,
-                        String.format(templateMessage, (endTime - startTime), startTime, endTime));
-            });
-        }
-        else if (result instanceof Flux<?> fluxResult) {
-            return fluxResult.doOnNext(res -> {
-                long endTime = Instant.now().toEpochMilli();
-                logDebugMessage(joinPoint, res,
-                        String.format(templateMessage, endTime - startTime, startTime, endTime));
-                    }
-            );
-        }
-        else {
-            long endTime = Instant.now().toEpochMilli();
-            logDebugMessage(joinPoint, result, String.format(templateMessage, endTime - startTime, startTime, endTime));
             return result;
         }
     }
