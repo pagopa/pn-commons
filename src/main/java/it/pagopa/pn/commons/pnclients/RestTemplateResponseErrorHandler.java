@@ -8,6 +8,7 @@ import it.pagopa.pn.commons.exceptions.mapper.DtoProblemToProblemErrorMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.client.ResponseErrorHandler;
@@ -33,31 +34,11 @@ public class RestTemplateResponseErrorHandler
     @Override
     public boolean hasError(ClientHttpResponse httpResponse)
             throws IOException {
-        return (httpResponse.getStatusCode().series() == CLIENT_ERROR
-                        || httpResponse.getStatusCode().series() == SERVER_ERROR);
+        HttpStatus httpStatus = HttpStatus.valueOf(httpResponse.getStatusCode().value());
+        return (httpStatus.series() == CLIENT_ERROR
+                        || httpStatus.series() == SERVER_ERROR);
     }
 
-    @Override
-    public void handleError(@NotNull ClientHttpResponse response) throws IOException {
-        String body = null;
-
-        try {
-            body = getBody(response);
-        }
-        catch (IOException e) {
-            log.trace("Empty body");
-        }
-        
-        String errorMsg = String.format(
-                "Error with statusCode=%s and body=%s",
-                response.getStatusCode(),
-                body
-        );
-        
-        log.error(errorMsg);
-
-        proceedWithThrowPnHttpResponseException(body, response.getRawStatusCode(), errorMsg);
-    }
 
     @Override
     public void handleError(@NotNull URI url, @NotNull HttpMethod method, @NotNull ClientHttpResponse response)
@@ -81,7 +62,7 @@ public class RestTemplateResponseErrorHandler
         
         log.error(errorMsg);
 
-        proceedWithThrowPnHttpResponseException(body, response.getRawStatusCode(), errorMsg);
+        proceedWithThrowPnHttpResponseException(body, response.getStatusCode().value(), errorMsg);
     }
 
     private void proceedWithThrowPnHttpResponseException(String body, int rawStatusCode, String errorMsg){
