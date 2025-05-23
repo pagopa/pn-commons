@@ -81,20 +81,24 @@ public class MetricUtils {
         HashMap<String, Object> resultMap = new HashMap<>();
         metricsArray.forEach(
                 generalMetric -> {
-                    generalMetric.getDimensions().forEach(
-                            dimension -> {
-                                String dimensionName = dimension.getName();
-                                String dimensionValue = dimension.getValue();
-                                resultMap.put(dimensionName, dimensionValue);
-                            }
-                    );
-                    generalMetric.getMetrics().forEach(
-                            metric -> {
-                                String metricName = metric.getName();
-                                int metricValue = metric.getValue();
-                                resultMap.put(metricName, metricValue);
-                            }
-                    );
+                    if (!CollectionUtils.isEmpty(generalMetric.getDimensions())) {
+                        generalMetric.getDimensions().forEach(
+                                dimension -> {
+                                    String dimensionName = dimension.getName();
+                                    String dimensionValue = dimension.getValue();
+                                    resultMap.put(dimensionName, dimensionValue);
+                                }
+                        );
+                    }
+                    if (!CollectionUtils.isEmpty(generalMetric.getMetrics())) {
+                        generalMetric.getMetrics().forEach(
+                                metric -> {
+                                    String metricName = metric.getName();
+                                    long metricValue = metric.getValue();
+                                    resultMap.put(metricName, metricValue);
+                                }
+                        );
+                    }
                 }
         );
         return resultMap;

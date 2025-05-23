@@ -10,7 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 @AllArgsConstructor
 public class Metric {
     private String name;
-    private int value;
+    private long value;
 
     public String toJson() { return StringUtils.EMPTY; }
 
