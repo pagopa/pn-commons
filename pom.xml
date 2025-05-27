@@ -10,7 +10,7 @@
 	</parent>
 
 	<artifactId>pn-commons</artifactId>
-	<version>2.12.0-SPRINGBOOT3</version>
+	<version>2.12.1-SPRINGBOOT3</version>
 	<name>pn-commons</name>
 	<description>Pn Common Utilities</description>
 	<scm>
@@ -67,27 +67,6 @@
 			<artifactId>jackson-datatype-jsr310</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>it.pagopa.tech.lollipop-consumer-java-sdk</groupId>
-			<artifactId>core</artifactId>
-			<version>1.0.0-RC7-hotfix</version>
-		</dependency>
-		<dependency>
-			<groupId>it.pagopa.tech.lollipop-consumer-java-sdk</groupId>
-			<artifactId>http-verifier</artifactId>
-			<version>1.0.0-RC7-hotfix</version>
-		</dependency>
-		<dependency>
-			<groupId>it.pagopa.tech.lollipop-consumer-java-sdk</groupId>
-			<artifactId>assertion-rest-client-native</artifactId>
-			<version>1.0.0-RC7-hotfix</version>
-		</dependency>
-		<dependency>
-			<groupId>it.pagopa.tech.lollipop-consumer-java-sdk</groupId>
-			<artifactId>identity-service-rest-client-native</artifactId>
-			<version>1.0.0-RC7-hotfix</version>
-		</dependency>
-
-		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
@@ -106,6 +85,11 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.janino</groupId>
+			<artifactId>janino</artifactId>
+			<version>3.1.12</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
