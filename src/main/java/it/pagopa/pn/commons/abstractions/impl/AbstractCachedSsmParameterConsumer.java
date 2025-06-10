@@ -35,10 +35,14 @@ public class AbstractCachedSsmParameterConsumer implements ParameterConsumer {
     public <T> Optional<T> getParameterValue( String parameterName, Class<T> clazz ) {
         Object optValue = valueCache.computeIfAbsent( parameterName, key -> new ExpiringValue())
                 .getValueCheckTimestamp();
+        log.info("Retrieved value from cache for {} is {}", parameterName, optValue);
         if ( optValue == null ) {
-            log.debug("Value for {} not in cache",parameterName);
+            log.info("Value for {} not in cache. Need to update cache",parameterName);
             optValue = getParameter( parameterName, clazz );
+            log.info("New value to insert in cache retrieved from SSM is: {}", optValue);
             valueCache.put( parameterName, new ExpiringValue(optValue, cacheExpiration));
+        }else {
+            log.info("Value for {} found in cache", parameterName);
         }
         return (Optional<T>) optValue;
     }
