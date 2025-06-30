@@ -78,7 +78,7 @@ public class MDCWebFilter implements OrderedWebFilter {
     public @NotNull Mono<Void> filter(@NotNull ServerWebExchange serverWebExchange, WebFilterChain webFilterChain) {
         final List<String> notFoundGeneratedTraceId = List.of("trace_id:" + UUID.randomUUID());
         HttpHeaders requestHeaders = serverWebExchange.getRequest().getHeaders();
-
+        log.info("MDCWEBFILTER - Request Headers: {}", requestHeaders);
         Runnable mdcSetter = () -> {
             List<String> traceIdHeaders = requestHeaders.get(traceIdHeader);
             List<String> traceIdHeaderValues = traceIdHeaders != null ? traceIdHeaders : notFoundGeneratedTraceId;
