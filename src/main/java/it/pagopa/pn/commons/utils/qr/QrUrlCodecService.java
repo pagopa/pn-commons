@@ -21,11 +21,11 @@ public class QrUrlCodecService {
         return registry;
     }
 
-    public String encode(String qrToken, UrlData urlData) throws IllegalArgumentException {
-        log.debug("Encoding QR token: {} with urlData: {}", qrToken, urlData);
+    public String encode(String qr, UrlData urlData) throws IllegalArgumentException {
+        log.debug("Encoding QR token: {} with urlData: {}", qr, urlData);
         QrUrlCodec qrUrlCodec = qrUrlCodecRegistry.getDefaultCodec();
         log.debug("Using default QrUrlCodec: {}", qrUrlCodec.getVersion());
-        return qrUrlCodec.encode(qrToken, urlData);
+        return qrUrlCodec.encode(qr, urlData);
     }
 
     public String decode(String url) throws IllegalArgumentException {
