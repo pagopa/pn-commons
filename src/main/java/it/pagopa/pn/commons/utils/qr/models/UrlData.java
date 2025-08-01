@@ -1,4 +1,4 @@
-package it.pagopa.pn.commons.utils.qr;
+package it.pagopa.pn.commons.utils.qr.models;
 
 import lombok.Data;
 

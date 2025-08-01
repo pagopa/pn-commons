@@ -2,6 +2,8 @@ package it.pagopa.pn.commons.utils.qr;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.commons.abstractions.ParameterConsumer;
+import it.pagopa.pn.commons.utils.qr.models.UrlData;
+import it.pagopa.pn.commons.utils.qr.models.Version;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -67,15 +69,7 @@ class QrUrlCodecRegistryTest {
         registry.register(codec2);
         // defaultVersion dovrebbe essere aggiornata a 2.0.0
 
-        // Reflection per accedere a defaultVersion (se non c'è un getter)
-        Version defaultVersion = null;
-        try {
-            var field = QrUrlCodecRegistry.class.getDeclaredField("defaultVersion");
-            field.setAccessible(true);
-            defaultVersion = (Version) field.get(registry);
-        } catch (Exception e) {
-            fail("Reflection error: " + e.getMessage());
-        }
+        Version defaultVersion = registry.getDefaultVersion();
 
         assertEquals(new Version(2, 0, 0), defaultVersion, "defaultVersion should be updated to the latest registered version");
     }

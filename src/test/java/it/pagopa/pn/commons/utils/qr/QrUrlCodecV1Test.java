@@ -2,6 +2,9 @@ package it.pagopa.pn.commons.utils.qr;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.commons.abstractions.ParameterConsumer;
+import it.pagopa.pn.commons.exceptions.PnInternalException;
+import it.pagopa.pn.commons.utils.qr.models.RecipientTypeInt;
+import it.pagopa.pn.commons.utils.qr.models.UrlData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -34,7 +37,6 @@ class QrUrlCodecV1Test {
         ObjectMapper objectMapper = new ObjectMapper();
         codec = new QrUrlCodecV1(parameterConsumer, objectMapper);
         urlData = mock(UrlData.class);
-        QrUrlConfigs urlConfigs = mock(QrUrlConfigs.class);
     }
 
     @Test
@@ -102,15 +104,34 @@ class QrUrlCodecV1Test {
     }
 
     @Test
-    void canHandle_shouldReturnTrueForValidUrl() {
-        String url = "http://physical/detail?token=abc123_VERSION_1.0.0";
-        assertTrue(codec.canHandle(url));
+    void decode_shouldThrowIfParameterMissing() {
+        when(parameterConsumer.getParameterValue(anyString(), eq(String.class)))
+                .thenReturn(Optional.empty());
+
+        String url = "http://physical/detail?token=abc123";
+
+        assertThrows(IllegalArgumentException.class, () -> codec.decode(url));
     }
 
     @Test
-    void canHandle_shouldReturnFalseForNull() {
-        String url="";
-        assertFalse(codec.canHandle(url));
+    void decode_shouldThrowIfUrlDoesNotMatchConfig() {
+        when(parameterConsumer.getParameterValue(anyString(), eq(String.class)))
+                .thenReturn(Optional.of(configJson));
+
+        String url = "http://physical/invalid?token=abc123";
+
+        assertThrows(IllegalArgumentException.class, () -> codec.decode(url));
+    }
+
+    @Test
+    void decode_shouldThrowIfConfigIsMalformed() {
+        String malformedConfigJson = "{invalid_json}";
+        when(parameterConsumer.getParameterValue(anyString(), eq(String.class)))
+                .thenReturn(Optional.of(malformedConfigJson));
+
+        String url = "http://physical/detail?token=abc123";
+
+        assertThrows(PnInternalException.class, () -> codec.decode(url));
     }
 
     @Test
@@ -140,7 +161,7 @@ class QrUrlCodecV1Test {
 
         when(urlData.getRecipientType()).thenReturn(RecipientTypeInt.PF);
 
-        assertThrows(NullPointerException.class, () -> codec.encode("token", urlData));
+        assertThrows(IllegalArgumentException.class, () -> codec.encode("token", urlData));
     }
 
     @Test
@@ -149,5 +170,22 @@ class QrUrlCodecV1Test {
                 .thenReturn(Optional.of(configJson));
         String url = "http://XXX/detail?token=abc123";
         assertThrows(IllegalArgumentException.class, () -> codec.decode(url));
+    }
+
+    @Test
+    void canHandle_shouldReturnTrueForValidUrl() {
+        String url = "http://physical/detail?token=abc123_VERSION_1.0.0";
+        assertTrue(codec.canHandle(url));
+    }
+
+    @Test
+    void canHandle_shouldReturnFalseForUnversionedUrl() {
+        String url = "http://physical/detail?token=abc123";
+        assertFalse(codec.canHandle(url));
+    }
+
+    @Test
+    void canHandle_shouldReturnFalseForNull() {
+        assertFalse(codec.canHandle(null));
     }
 }

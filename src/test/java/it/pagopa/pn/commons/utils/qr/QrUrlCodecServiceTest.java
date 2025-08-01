@@ -1,16 +1,15 @@
 package it.pagopa.pn.commons.utils.qr;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.commons.abstractions.ParameterConsumer;
+import it.pagopa.pn.commons.utils.qr.models.RecipientTypeInt;
+import it.pagopa.pn.commons.utils.qr.models.UrlData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-import java.util.Map;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 class QrUrlCodecServiceTest {
@@ -18,7 +17,6 @@ class QrUrlCodecServiceTest {
     private ParameterConsumer parameterConsumer;
     private QrUrlCodec codec;
     private UrlData urlData;
-    private Map<String, QrUrlConfigs> configsMap;
     private QrUrlCodecService qrUrlCodecService;
 
     @BeforeEach
@@ -27,7 +25,6 @@ class QrUrlCodecServiceTest {
         codec = mock(QrUrlCodec.class);
         urlData = mock(UrlData.class);
         ObjectMapper mapper = new ObjectMapper();
-        QrUrlCodecRegistry registry = new QrUrlCodecRegistry();
         qrUrlCodecService = new QrUrlCodecService(parameterConsumer, mapper);
     }
 
@@ -35,7 +32,7 @@ class QrUrlCodecServiceTest {
     void testEncode_DelegatesToDefaultCodec(){
         String qrToken = "token";
         String expected = "http://cittadini.dev"+"/appio/notifica?aarQr="+qrToken;
-//        String parameters = "{\"1.0.0\": {\"directAccessUrlTemplatePhysical\": \"http://cittadini.dev \", \"directAccessUrlTemplateLegal\": \"http://imprese.dev\", \"/appio/notifica?aarQr=\"}}";
+
         String parameters = "{\"1.0.0\":{\"directAccessUrlTemplatePhysical\":\"http://cittadini.dev\"" +
                 ", \"directAccessUrlTemplateLegal\":\"http://imprese.dev\"" +
                 ", \"quickAccessUrlAarDetailSuffix\":\"/appio/notifica?aarQr\"}}";

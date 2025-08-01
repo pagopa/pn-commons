@@ -1,10 +1,14 @@
 package it.pagopa.pn.commons.utils.qr;
 
+import it.pagopa.pn.commons.utils.qr.models.UrlData;
+import it.pagopa.pn.commons.utils.qr.models.Version;
+
 import java.util.regex.Pattern;
 
 public interface QrUrlCodec {
         String VERSION_MARKER = "_VERSION_";
         Pattern VERSION_PATTERN = Pattern.compile(VERSION_MARKER + "(\\d+\\.\\d+\\.\\d+)");
+        String PARAMETER_NAME = "AARQrUrlConfigs";
         /**
          * Costruisce una URL contenente il QR code
          */

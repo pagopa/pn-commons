@@ -3,6 +3,11 @@ package it.pagopa.pn.commons.utils.qr;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.commons.abstractions.ParameterConsumer;
+import it.pagopa.pn.commons.exceptions.PnInternalException;
+import it.pagopa.pn.commons.utils.qr.models.QrUrlConfigs;
+import it.pagopa.pn.commons.utils.qr.models.RecipientTypeInt;
+import it.pagopa.pn.commons.utils.qr.models.UrlData;
+import it.pagopa.pn.commons.utils.qr.models.Version;
 
 import java.io.IOException;
 import java.util.Map;
@@ -10,7 +15,6 @@ import java.util.Optional;
 
 public class QrUrlCodecV1 implements QrUrlCodec {
     ParameterConsumer parameterConsumer;
-    QrUrlConfigs urlConfigs;
     ObjectMapper objectMapper;
 
     public QrUrlCodecV1(ParameterConsumer parameterConsumer, ObjectMapper objectMapper) {
@@ -20,24 +24,7 @@ public class QrUrlCodecV1 implements QrUrlCodec {
 
     @Override
     public String encode(String qrToken, UrlData urlData) {
-        Optional<String> paramValue = parameterConsumer.getParameterValue("AARQrUrlConfigs",String.class);
-
-        Map<String, QrUrlConfigs> configsMap;
-        try{
-            if (paramValue.isEmpty()) {
-                throw new IllegalArgumentException("Parameter AARQrUrlConfigs not found");
-            } else {
-                configsMap = objectMapper.readValue(
-                        paramValue.get(),
-                        new TypeReference<>() {}
-                );
-            }
-        } catch (
-            IOException e) {
-        throw new RuntimeException("Errore nella deserializzazione della configurazione QR URL", e);
-        }
-
-        QrUrlConfigs urlConfigs = configsMap.get(this.getVersion().toString());
+        QrUrlConfigs urlConfigs = retrieveConfigs();
 
         String baseUrl;
         if (RecipientTypeInt.PF.equals(urlData.getRecipientType())) {
@@ -54,8 +41,33 @@ public class QrUrlCodecV1 implements QrUrlCodec {
     }
 
     public String decode(String url) {
-        // 1. Leggi il parametro dal parameter store e deserializza in una mappa
-        Optional<String> paramValue = parameterConsumer.getParameterValue("AARQrUrlConfigs",String.class);
+        QrUrlConfigs urlConfigs = retrieveConfigs();
+
+        boolean isPfUrl = url.startsWith(urlConfigs.getDirectAccessUrlTemplatePhysical());
+        boolean isPgUrl = url.startsWith(urlConfigs.getDirectAccessUrlTemplateLegal());
+        if (!isPfUrl && !isPgUrl) {
+            throw new IllegalArgumentException("Invalid url");
+        }
+        String prefix = isPfUrl ? urlConfigs.getDirectAccessUrlTemplatePhysical() : urlConfigs.getDirectAccessUrlTemplateLegal();
+
+        String urlWithSuffix = prefix + urlConfigs.getQuickAccessUrlAarDetailSuffix();
+
+        if (!url.startsWith(urlWithSuffix)) {
+            throw new IllegalArgumentException("URL does not match expected pattern");
+        }
+        return url.substring(urlWithSuffix.length()+1); // +1 to remove the '=' character
+    }
+
+    /**
+     * Recupera le configurazioni per la versione corrente del QR URL Codec.
+     *
+     * @return QrUrlConfigs per la versione corrente.
+     * @throws IllegalArgumentException se il parametro non è trovato o se non esiste una configurazione per la versione corrente.
+     * @throws PnInternalException se si verifica un errore durante la deserializzazione del parametro.
+     *
+     **/
+    private QrUrlConfigs retrieveConfigs() {
+        Optional<String> paramValue = parameterConsumer.getParameterValue(PARAMETER_NAME, String.class);
         Map<String, QrUrlConfigs> configsMap;
         try{
             if (paramValue.isEmpty()) {
@@ -66,33 +78,17 @@ public class QrUrlCodecV1 implements QrUrlCodec {
                         new TypeReference<>() {}
                 );
             }
-        } catch (
-                IOException e) {
-            throw new RuntimeException("Errore nella deserializzazione della configurazione QR URL", e);
+        } catch (IOException e) {
+            throw new PnInternalException("Error deserializing QR URL config", "DESERIALIZATION_ERROR", e);
         }
 
-        // 2. Recupera la configurazione per la versione corrente
+
         QrUrlConfigs urlConfigs = configsMap.get(this.getVersion().toString());
         if (urlConfigs == null) {
             throw new IllegalArgumentException("No config found for version: " + this.getVersion());
         }
 
-        // 3. Controlla se la URL è per PF o PG
-        boolean isPfUrl = url.startsWith(urlConfigs.getDirectAccessUrlTemplatePhysical());
-        boolean isPgUrl = url.startsWith(urlConfigs.getDirectAccessUrlTemplateLegal());
-        if (!isPfUrl && !isPgUrl) {
-            throw new IllegalArgumentException("Invalid url");
-        }
-        String prefix = isPfUrl ? urlConfigs.getDirectAccessUrlTemplatePhysical() : urlConfigs.getDirectAccessUrlTemplateLegal();
-
-        // 4. Concatena il suffisso
-        String urlWithSuffix = prefix + urlConfigs.getQuickAccessUrlAarDetailSuffix();
-
-        // 5. Rimuovi la parte iniziale dalla url
-        if (!url.startsWith(urlWithSuffix)) {
-            throw new IllegalArgumentException("URL does not match expected pattern");
-        }
-        return url.substring(urlWithSuffix.length()+1); // +1 to remove the '=' character
+        return urlConfigs;
     }
 
     @Override
