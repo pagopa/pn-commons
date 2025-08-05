@@ -2,6 +2,7 @@ package it.pagopa.pn.commons.utils.qr;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.commons.abstractions.ParameterConsumer;
+import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.commons.utils.qr.models.UrlData;
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,14 +22,14 @@ public class QrUrlCodecService {
         return registry;
     }
 
-    public String encode(String qr, UrlData urlData) throws IllegalArgumentException {
+    public String encode(String qr, UrlData urlData) throws IllegalArgumentException, PnInternalException {
         log.debug("Encoding QR token: {} with urlData: {}", qr, urlData);
         QrUrlCodec qrUrlCodec = qrUrlCodecRegistry.getDefaultCodec();
         log.debug("Using default QrUrlCodec: {}", qrUrlCodec.getVersion());
         return qrUrlCodec.encode(qr, urlData);
     }
 
-    public String decode(String url) throws IllegalArgumentException {
+    public String decode(String url) throws IllegalArgumentException, PnInternalException {
         log.debug("Decoding URL: {}", url);
         QrUrlCodec qrUrlCodec = qrUrlCodecRegistry.getDefaultCodec();
         log.debug("Using QrUrlCodec: {}", qrUrlCodec.getVersion());
