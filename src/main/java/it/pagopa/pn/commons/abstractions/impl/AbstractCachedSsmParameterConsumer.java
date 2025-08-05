@@ -38,7 +38,12 @@ public class AbstractCachedSsmParameterConsumer implements ParameterConsumer {
         log.trace("Retrieved value from cache for {} is {}", parameterName, optValue);
         if ( optValue == null ) {
             log.trace("Value for {} not in cache. Need to update cache",parameterName);
-            optValue = getParameter( parameterName, clazz );
+            // If the class is String, we can directly get the parameter value as a String without deserialization
+            if(clazz == String.class) {
+                optValue = Optional.ofNullable(getParameter( parameterName ));
+            } else {
+                optValue = getParameter( parameterName, clazz );
+            }
             log.trace("New value to insert in cache retrieved from SSM is: {}", optValue);
             valueCache.put( parameterName, new ExpiringValue(optValue, cacheExpiration));
         }else {
