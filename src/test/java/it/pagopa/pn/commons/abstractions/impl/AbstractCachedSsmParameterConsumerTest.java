@@ -1,6 +1,7 @@
 package it.pagopa.pn.commons.abstractions.impl;
 
 import it.pagopa.pn.commons.exceptions.PnInternalException;
+import lombok.Getter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,7 +35,7 @@ class AbstractCachedSsmParameterConsumerTest {
 
     @ExtendWith(MockitoExtension.class)
     @Test
-    void getParameterValueSuccess() {
+    void getParameterValueStringSuccess() {
 
         GetParameterResponse response = GetParameterResponse.builder()
                 .parameter( Parameter.builder()
@@ -47,6 +48,25 @@ class AbstractCachedSsmParameterConsumerTest {
         Optional<String> result = consumer.getParameterValue( "parameterName", String.class );
 
         assertNotNull( result );
+    }
+
+    @ExtendWith(MockitoExtension.class)
+    @Test
+    void getParameterValueObjectSuccess() {
+
+        GetParameterResponse response = GetParameterResponse.builder()
+                .parameter( Parameter.builder()
+                        .name( "parameterName" )
+                        .value( "{\"name\": \"parameterValue\"}" )
+                        .build() )
+                .build();
+
+        Mockito.when( ssmClient.getParameter( Mockito.any(GetParameterRequest.class) ) ).thenReturn( response );
+        Optional<Payload> result = consumer.getParameterValue( "parameterName", Payload.class );
+
+        assertNotNull( result );
+        assertTrue( result.isPresent() );
+        assertEquals("parameterValue", result.get().getName());
     }
 
     @ExtendWith(MockitoExtension.class)
@@ -86,7 +106,7 @@ class AbstractCachedSsmParameterConsumerTest {
                 .build();
 
         Mockito.when( ssmClient.getParameter( Mockito.any(GetParameterRequest.class) ) ).thenReturn( response );
-        Executable todo = () -> consumer.getParameterValue( "parameterName", String.class );
+        Executable todo = () -> consumer.getParameterValue( "parameterName", Payload.class );
 
         assertThrows(PnInternalException.class, todo);
     }
@@ -99,6 +119,11 @@ class AbstractCachedSsmParameterConsumerTest {
         Optional<String> result = consumer.getParameterValue( "parameterName", String.class );
 
         assertEquals( Optional.empty(), result );
+    }
+
+    @Getter
+    private static class Payload {
+        private String name;
     }
 
 }
