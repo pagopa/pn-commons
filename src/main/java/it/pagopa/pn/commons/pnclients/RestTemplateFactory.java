@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 public class RestTemplateFactory {
 
     @Bean
@@ -60,7 +61,6 @@ public class RestTemplateFactory {
     @Value("${pn.log.trace-id-header}")
     private String traceIdHeader;
 
-    @Slf4j
     public class RestTemplateHeaderModifierInterceptor
             implements ClientHttpRequestInterceptor {
 
