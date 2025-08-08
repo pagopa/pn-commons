@@ -76,6 +76,7 @@ public abstract class CommonBaseClient {
 
     private Mono<ClientRequest> traceIdFilter(ClientRequest request) {
         String traceId = MDC.get("trace_id");
+        log.info("Trace id in MDC: {}", traceId);
         if (StringUtils.hasText(traceIdHeader) && StringUtils.hasText(traceId))
         {
             return Mono.just(ClientRequest.from(request)

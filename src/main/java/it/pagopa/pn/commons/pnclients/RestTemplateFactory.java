@@ -1,5 +1,6 @@
 package it.pagopa.pn.commons.pnclients;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -59,6 +60,7 @@ public class RestTemplateFactory {
     @Value("${pn.log.trace-id-header}")
     private String traceIdHeader;
 
+    @Slf4j
     public class RestTemplateHeaderModifierInterceptor
             implements ClientHttpRequestInterceptor {
 
@@ -68,6 +70,7 @@ public class RestTemplateFactory {
                 byte[] body,
                 ClientHttpRequestExecution execution) throws IOException {
             String traceId = MDC.get("trace_id");
+            log.info("Adding traceId={} to request headers with key:{}", traceId, traceIdHeader);
             if (traceId != null) {
                 request.getHeaders().add(traceIdHeader, traceId);
             }

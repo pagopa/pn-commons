@@ -81,7 +81,9 @@ public class MDCWebFilter implements OrderedWebFilter {
 
         Runnable mdcSetter = () -> {
             List<String> traceIdHeaders = requestHeaders.get(traceIdHeader);
+            log.info("Found traceId: {}", traceIdHeaders);
             List<String> traceIdHeaderValues = traceIdHeaders != null ? traceIdHeaders : notFoundGeneratedTraceId;
+            log.info("Adding traceId={} to MDC with key:{}", traceIdHeaderValues.getFirst(), MDC_TRACE_ID_KEY);
 
             addToMDC(traceIdHeaderValues, MDC_TRACE_ID_KEY);
             addToMDC(requestHeaders.get(jtiHeader), MDC_JTI_KEY);
