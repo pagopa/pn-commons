@@ -1,12 +1,14 @@
 package it.pagopa.pn.commons.pnclients;
 
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpRequest;
-import org.springframework.http.client.*;
+import org.springframework.http.client.ClientHttpRequestExecution;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
+import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
@@ -15,7 +17,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-@Slf4j
 public class RestTemplateFactory {
 
     @Bean
@@ -70,7 +71,6 @@ public class RestTemplateFactory {
                 byte[] body,
                 ClientHttpRequestExecution execution) throws IOException {
             String traceId = MDC.get("trace_id");
-            log.info("Adding traceId={} to request headers with key:{}", traceId, traceIdHeader);
             if (traceId != null) {
                 request.getHeaders().add(traceIdHeader, traceId);
             }
