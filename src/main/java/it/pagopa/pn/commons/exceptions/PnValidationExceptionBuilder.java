@@ -4,7 +4,7 @@ import it.pagopa.pn.commons.exceptions.dto.ProblemError;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.FieldError;
 
-import javax.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolation;
 import java.util.List;
 import java.util.Set;
 
