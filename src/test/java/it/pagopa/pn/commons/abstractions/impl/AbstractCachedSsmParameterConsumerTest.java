@@ -114,11 +114,10 @@ class AbstractCachedSsmParameterConsumerTest {
     @ExtendWith(MockitoExtension.class)
     @Test
     void getParameterValueSuccessDefault() {
+        Mockito.when(ssmClient.getParameter(Mockito.any(GetParameterRequest.class)))
+                .thenThrow(SsmException.builder().message("Service unavailable").build());
 
-        Mockito.when( ssmClient.getParameter( Mockito.any(GetParameterRequest.class) ) ).thenThrow( SsmException.class );
-        Optional<String> result = consumer.getParameterValue( "parameterName", String.class );
-
-        assertEquals( Optional.empty(), result );
+        assertThrows(PnInternalException.class, () -> consumer.getParameterValue("parameterName", String.class));
     }
 
     @Getter
