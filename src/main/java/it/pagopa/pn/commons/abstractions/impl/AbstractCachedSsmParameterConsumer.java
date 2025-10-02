@@ -60,9 +60,9 @@ public class AbstractCachedSsmParameterConsumer implements ParameterConsumer {
         try {
             GetParameterResponse parameterResponse = ssmClient.getParameter(parameterRequest);
             return parameterResponse.parameter().value();
-        } catch ( SsmException ex) {
-            log.info( "Ssm Client exception for parameterName={}", parameterName, ex );
-            return null;
+        } catch (SsmException ex) {
+            log.error("Ssm Client exception for parameterName={}", parameterName, ex);
+            throw new PnInternalException("Failed to retrieve parameter from Ssm: " + parameterName, ERROR_CODE_PN_GENERIC_ERROR, ex);
         }
     }
 
