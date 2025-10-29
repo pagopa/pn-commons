@@ -10,20 +10,21 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class QrUrlCodecV1Test {
+class QrUrlCodecV09Test {
     private ParameterConsumer parameterConsumer;
-    private QrUrlCodecV1 codec;
+    private QrUrlCodecV09 codec;
     private UrlData urlData;
 
     private final String configJson = """
         {
-          "1.0.0": {
+          "0.9.0": {
             "directAccessUrlTemplatePhysical": "http://physical",
             "directAccessUrlTemplateLegal": "http://legal",
             "quickAccessUrlAarDetailSuffix": "/detail?token"
@@ -34,8 +35,7 @@ class QrUrlCodecV1Test {
     @BeforeEach
     void setUp() {
         parameterConsumer = mock(ParameterConsumer.class);
-        ObjectMapper objectMapper = new ObjectMapper();
-        codec = new QrUrlCodecV1(parameterConsumer, objectMapper);
+        codec = new QrUrlCodecV09(parameterConsumer, new ObjectMapper());
         urlData = mock(UrlData.class);
     }
 

@@ -2,11 +2,14 @@ package it.pagopa.pn.commons.utils.qr;
 
 import it.pagopa.pn.commons.utils.qr.models.Version;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeMap;
 
 @Getter
+@Slf4j
 public class QrUrlCodecRegistry {
     private final Map<Version, QrUrlCodec> codecs = new TreeMap<>();
     private Version defaultVersion;
@@ -32,18 +35,31 @@ public class QrUrlCodecRegistry {
      * @return la versione di default
      **/
     public QrUrlCodec getDefaultCodec() {
-        // Attualmente ritorna il codec per la versione 1.0.0, ma può essere modificato per supportare versioni future.
-        // return codecs.get(defaultVersion);
-        return codecs.get(new Version(1, 0, 0));
+        return codecs.get(defaultVersion);
     }
 
-//    Metodo da utilizzare in caso si decida di versionare il sistema di codifica.
-//    public QrUrlCodec findCodecForUrl(String url) {
-//        // Cerca il codec più adatto per l'URL, partendo dalla versione più recente
-//        return codecs.values().stream()
-//                .sorted((a, b) -> b.getVersion().compareTo(a.getVersion()))
-//                .filter(codec -> codec.canHandle(url))
-//                .findFirst()
-//                .orElse(null);
-//    }
+    /**
+     * Decodifica l'URL utilizzando tutti i codec censiti nel registro partendo dalla versione più recente.
+     *
+     * @param url l'URL da decodificare
+     * @return la stringa decodificata
+     * @throws IllegalArgumentException se nessun codec può gestire l'URL fornito
+     **/
+    public String decodeWithAppropriateCodec(String url) {
+        return codecs.values().stream()
+                .sorted((a, b) -> b.getVersion().compareTo(a.getVersion()))
+                .map(codec -> {
+                    try {
+                        String qr = codec.decode(url);
+                        log.debug("URL {} decoded successfully with codec version {}", url, codec.getVersion());
+                        return qr;
+                    } catch (IllegalArgumentException e) {
+                        log.debug("Codec for version {} cannot decode the URL {}: {}", codec.getVersion(), url, e.getMessage());
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("No codec version can handle given URL: " + url));
+    }
 }
