@@ -7,7 +7,6 @@ import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.commons.utils.qr.models.QrUrlConfigs;
 import it.pagopa.pn.commons.utils.qr.models.RecipientTypeInt;
 import it.pagopa.pn.commons.utils.qr.models.UrlData;
-import it.pagopa.pn.commons.utils.qr.models.Version;
 
 import java.io.IOException;
 import java.util.Map;
@@ -17,7 +16,7 @@ public abstract class VersionedQrUrlCodec implements QrUrlCodec {
     ParameterConsumer parameterConsumer;
     ObjectMapper objectMapper;
 
-    public VersionedQrUrlCodec(ParameterConsumer parameterConsumer, ObjectMapper objectMapper) {
+    protected VersionedQrUrlCodec(ParameterConsumer parameterConsumer, ObjectMapper objectMapper) {
         this.parameterConsumer = parameterConsumer;
         this.objectMapper = objectMapper;
     }
@@ -91,7 +90,4 @@ public abstract class VersionedQrUrlCodec implements QrUrlCodec {
 
         return urlConfigs;
     }
-
-    @Override
-    public abstract Version getVersion();
 }
