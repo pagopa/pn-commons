@@ -26,6 +26,7 @@ public interface PnLogger extends Logger {
         private EXTERNAL_SERVICES(){}
 
         public static final String PN_NATIONAL_REGISTRIES = "pn-national-registries";
+        public static final String PN_RADD_ALT = "pn-radd-alt";
         public static final String PN_USER_ATTRIBUTES= "pn-user-attributes";
         public static final String PN_MANDATE = "pn-mandate";
         public static final String PN_DELIVERY = "pn-delivery";
