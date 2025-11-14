@@ -56,12 +56,13 @@ class QrUrlCodecRegistryTest {
         registry.register(codec1);
         assertThrows(IllegalArgumentException.class, () -> registry.register(codec2));
     }
+
     @Test
     void register_shouldUpdateDefaultVersionIfNewer() {
         QrUrlCodecRegistry registry = new QrUrlCodecRegistry();
 
         QrUrlCodec codec1 = new QrUrlCodecV1(mock(ParameterConsumer.class), mock(ObjectMapper.class));
-        QrUrlCodec codec2 = new QrUrlCodecV2();
+        QrUrlCodec codec2 = new MockCodecV2();
 
         registry.register(codec1);
         // defaultVersion dovrebbe essere 1.0.0
@@ -74,7 +75,7 @@ class QrUrlCodecRegistryTest {
         assertEquals(new Version(2, 0, 0), defaultVersion, "defaultVersion should be updated to the latest registered version");
     }
 
-    public static class QrUrlCodecV2 implements QrUrlCodec{
+    public static class MockCodecV2 implements QrUrlCodec{
 
         @Override
         public String encode(String qrToken, UrlData data) {
@@ -89,9 +90,5 @@ class QrUrlCodecRegistryTest {
             return new Version(2, 0, 0);
         }
 
-        @Override
-        public boolean canHandle(String url) {
-            return false;
-        }
     }
 }
