@@ -16,10 +16,11 @@ public class LogUtils {
         if (strEmail == null)
             return "null";
 
-        String[] parts = strEmail.split("@");
+        String[] parts = strEmail.split("@", 2);
 
-        if (parts.length == 1) {
-            return parts[0];
+        if (parts.length < 2) {
+            // No @ found, mask the whole string
+            return maskGeneric(strEmail);
         }
 
         //mask first part
