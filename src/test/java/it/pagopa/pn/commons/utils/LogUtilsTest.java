@@ -10,7 +10,14 @@ import org.junit.jupiter.params.provider.CsvSource;
 class LogUtilsTest {
 
     @ParameterizedTest
-    @CsvSource(value ={ "email@email.it, e***l@email.it", "em@email.it, ***@email.it", "NULL, null", "test, ***" }, nullValues={"NULL"})
+    @CsvSource(value ={
+            "email@email.it, e***l@email.it",
+            "em@email.it, ***@email.it",
+            "NULL, null",
+            "test, ***",
+            "'', ''",
+            "'  ', '  '"
+    }, nullValues={"NULL"})
     void maskEmailAddress(String str, String expected) {
         //Given
 
@@ -18,7 +25,6 @@ class LogUtilsTest {
         String result = LogUtils.maskEmailAddress(str);
 
         //Then
-        Assertions.assertNotEquals( str, result);
         Assertions.assertEquals(expected, result);
     }
 

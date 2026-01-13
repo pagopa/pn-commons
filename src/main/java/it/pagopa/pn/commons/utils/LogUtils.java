@@ -18,9 +18,9 @@ public class LogUtils {
 
         String[] parts = strEmail.split("@", 2);
 
-        if (parts.length < 2) {
-            // No @ found, mask the whole string
-            return maskGeneric(strEmail);
+        if (parts.length == 1) {
+            // No @ found, if any text present mask generically, else return as is
+            return StringUtils.hasText(parts[0]) ? maskGeneric(parts[0]) : parts[0];
         }
 
         //mask first part
