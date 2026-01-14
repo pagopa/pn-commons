@@ -22,21 +22,31 @@ import java.time.OffsetDateTime;
  *
  * @Component
  * @Order(-2)
- * @Import(ExceptionHelper.class
+ * @Import(ExceptionHelper.class)
  *
  */
 @Slf4j
 public class PnErrorWebExceptionHandler implements ErrorWebExceptionHandler {
 
   private final ExceptionHelper exceptionHelper;
-  private final ObjectMapper objectMapper = new ObjectMapper();
+  private final ObjectMapper objectMapper;
 
   public PnErrorWebExceptionHandler(ExceptionHelper exceptionHelper){
+    this.objectMapper = new ObjectMapper();
     this.exceptionHelper = exceptionHelper;
     objectMapper.findAndRegisterModules();
     objectMapper
       .configOverride(OffsetDateTime.class)
       .setFormat(JsonFormat.Value.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX"));
+  }
+
+  public PnErrorWebExceptionHandler(ExceptionHelper exceptionHelper,ObjectMapper objectMapper){
+    this.exceptionHelper = exceptionHelper;
+    this.objectMapper = objectMapper;
+    objectMapper.findAndRegisterModules();
+    objectMapper
+            .configOverride(OffsetDateTime.class)
+            .setFormat(JsonFormat.Value.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX"));
   }
 
   @Override
