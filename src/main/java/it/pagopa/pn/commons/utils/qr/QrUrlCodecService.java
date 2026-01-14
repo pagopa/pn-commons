@@ -18,12 +18,13 @@ public class QrUrlCodecService {
         QrUrlCodecRegistry registry = new QrUrlCodecRegistry();
         // Qui vanno registrati i codec per le versioni supportate
         registry.register(new QrUrlCodecV1(parameterConsumer, objectMapper));
-        //ES: registry.register(new QrUrlCodecV2(parameterConsumer, objectMapper));
+        registry.register(new QrUrlCodecV09(parameterConsumer, objectMapper));
         return registry;
     }
 
     public String encode(String qr, UrlData urlData) throws IllegalArgumentException, PnInternalException {
         log.debug("Encoding QR token: {} with urlData: {}", qr, urlData);
+        // Per la codifica, utilizziamo il codec di default (l'ultima versione).
         QrUrlCodec qrUrlCodec = qrUrlCodecRegistry.getDefaultCodec();
         log.debug("Using default QrUrlCodec: {}", qrUrlCodec.getVersion());
         return qrUrlCodec.encode(qr, urlData);
@@ -31,8 +32,6 @@ public class QrUrlCodecService {
 
     public String decode(String url) throws IllegalArgumentException, PnInternalException {
         log.debug("Decoding URL: {}", url);
-        QrUrlCodec qrUrlCodec = qrUrlCodecRegistry.getDefaultCodec();
-        log.debug("Using QrUrlCodec: {}", qrUrlCodec.getVersion());
-        return qrUrlCodec.decode(url);
+        return qrUrlCodecRegistry.decodeWithAppropriateCodec(url);
     }
 }
