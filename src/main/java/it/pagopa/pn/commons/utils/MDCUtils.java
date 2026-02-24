@@ -27,6 +27,13 @@ public class MDCUtils {
     public static final String MDC_PN_IUN_KEY = "iun";
     public static final String MDC_PN_MANDATEID_KEY = "mandateid";
 
+    public static final String MDC_PN_RECIPIENT_ID_KEY = "recipient_id";
+    public static final String MDC_PN_DELEGATOR_ID_KEY = "delegator_id";
+    public static final String MDC_PN_DELEGATE_ID_KEY = "delegate_id";
+    public static final String MDC_PN_MANDATE_WORKFLOW_TYPE_KEY = "mandate_workflow_type";
+    public static final String MDC_PN_MANDATE_CIE_NIS_KEY = "nis";
+    public static final String MDC_PN_ERROR_CATEGORY_KEY = "error_category";
+
     public static final String MDC_PN_CTX_RECIPIENT_INDEX = "ctx_recipient_index";
     public static final String MDC_PN_CTX_REQUEST_ID = "ctx_request_id";
     public static final String MDC_PN_CTX_SAFESTORAGE_FILEKEY = "ctx_safestorage_filekey";
@@ -63,7 +70,9 @@ public class MDCUtils {
                 , MDC_PN_CTX_TOPIC, MDC_PN_CTX_MESSAGE_ID, MDC_PN_SET_ID
                 , MDC_PN_LP_ORIGINAL_URL, MDC_PN_LP_ORIGINAL_METHOD, MDC_PN_LP_PUBLIC_KEY
                 , MDC_PN_LP_ASSERTION_REF, MDC_PN_LP_ASSERTION_TYPE
-                , MDC_PN_LP_SIGNATURE_INPUT, MDC_PN_LP_SIGNATURE);
+                , MDC_PN_LP_SIGNATURE_INPUT, MDC_PN_LP_SIGNATURE
+                , MDC_PN_RECIPIENT_ID_KEY, MDC_PN_DELEGATOR_ID_KEY, MDC_PN_DELEGATE_ID_KEY
+                , MDC_PN_MANDATE_WORKFLOW_TYPE_KEY, MDC_PN_MANDATE_CIE_NIS_KEY, MDC_PN_ERROR_CATEGORY_KEY);
     }
 
     /**
