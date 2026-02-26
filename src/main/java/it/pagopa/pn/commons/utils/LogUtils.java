@@ -3,8 +3,8 @@ package it.pagopa.pn.commons.utils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
+import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.NotNull;
 
 @Slf4j
 public class LogUtils {

@@ -86,7 +86,7 @@ class PnLoggerImplTest {
 
 
         //When
-        fooLogger.logEndingProcess(str, false, "test");
+        fooLogger.logEndingProcess(str, false, "test", new RuntimeException("test"));
 
         //Then
         // JUnit assertions
@@ -218,7 +218,7 @@ class PnLoggerImplTest {
         String str = "processo";
 
         //When
-        fooLogger.logInvokationResultDownstreamFailed(str, null);
+        fooLogger.logInvokationResultDownstreamFailed(str, null, null);
 
         //Then
         // JUnit assertions

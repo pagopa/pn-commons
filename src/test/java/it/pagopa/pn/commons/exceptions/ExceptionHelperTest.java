@@ -15,8 +15,8 @@ import org.springframework.web.bind.support.WebExchangeBindException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.server.MethodNotAllowedException;
 
-import javax.validation.*;
-import javax.validation.constraints.Max;
+import jakarta.validation.*;
+import jakarta.validation.constraints.Max;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -257,7 +257,7 @@ class ExceptionHelperTest {
     }
 
     private class TestValidation{
-        public @javax.validation.constraints.NotNull String notnullvalue;
+        public @jakarta.validation.constraints.NotNull String notnullvalue;
         @Valid
         public TestValidation[] innerobjects;
     }
