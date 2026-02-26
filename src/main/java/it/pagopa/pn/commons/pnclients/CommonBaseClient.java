@@ -23,6 +23,7 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.time.Duration;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -153,7 +154,8 @@ public abstract class CommonBaseClient {
                         .filter(this::isRetryableException)
                         .onRetryExhaustedThrow((retryBackoffSpec, retrySignal) -> {
                             Throwable lastExceptionInRetry = retrySignal.failure();
-                            log.warn("Retries exhausted {}, with last Exception: {}", retrySignal.totalRetries(), lastExceptionInRetry.getMessage(), lastExceptionInRetry);
+                            var message = Optional.ofNullable(lastExceptionInRetry.getMessage()).orElse(lastExceptionInRetry.getClass().getName());
+                            log.warn("Retries exhausted {}, with last Exception: {}", retrySignal.totalRetries(), message, lastExceptionInRetry);
                             return lastExceptionInRetry;
                         })
                 );
