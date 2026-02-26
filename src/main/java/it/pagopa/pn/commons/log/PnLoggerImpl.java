@@ -46,15 +46,15 @@ class PnLoggerImpl implements PnLogger {
 
     @Override
     public void logEndingProcess(String process) {
-        logEndingProcess(process, true, null);
+        logEndingProcess(process, true, null, null);
     }
 
     @Override
-    public void logEndingProcess(String process, boolean success, String description) {
+    public void logEndingProcess(String process, boolean success, String description, Throwable t) {
         if (success)
             log.info("Ending process {}", process);
         else
-            log.warn("Ending process {} with errors={}", process, description==null?"<not specified>":description);
+            log.warn("Ending process {} with errors={}", process, description==null?"<not specified>":description, t);
     }
 
     @Override
@@ -95,8 +95,8 @@ class PnLoggerImpl implements PnLogger {
     }
 
     @Override
-    public void logInvokationResultDownstreamFailed(String service, String description) {
-        log.error("[DOWNSTREAM] Service {} returned errors={}", service, description==null?"<not specified>":description);
+    public void logInvokationResultDownstreamFailed(String service, String description, Throwable t) {
+        log.error("[DOWNSTREAM] Service {} returned errors={}", service, description==null?"<not specified>":description, t);
     }
 
     @Override

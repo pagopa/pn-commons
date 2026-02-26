@@ -102,14 +102,14 @@ public class ServerAspectLogging {
                         log.logEndingProcess(process);
                     })
                     .doOnError(o ->
-                            log.logEndingProcess(process, false, o.getMessage())
+                            log.logEndingProcess(process, false, o.getMessage(), o)
                     );
         } else if (result instanceof Flux<?> fluxResult) {
             return fluxResult.doOnNext(o -> {
                 this.logDebugMessage(endingMessage, joinPoint.getSignature().toShortString(), o);
                 log.logEndingProcess(process);
             }).doOnError(o ->
-                    log.logEndingProcess(process, false, o.getMessage())
+                    log.logEndingProcess(process, false, o.getMessage(), o)
             );
         } else {
             this.logDebugMessage(endingMessage, joinPoint.getSignature().toShortString(), result);
