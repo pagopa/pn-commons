@@ -34,7 +34,7 @@ public interface PnLogger extends Logger {
         public static final String PN_F24 = "pn-f24";
         public static final String PN_EXTERNAL_REGISTRIES = "pn-external-registries";
         public static final String PN_EXTERNAL_CHANNELS = "pn-external-channels";
-        public static final String PN_NOTIFICATION_DELIVERY_COST_SERVICE = "pn-notification-delivery-cost-service";
+        public static final String PN_NOTIFICATION_COST_SERVICE = "pn-notification-cost-service";
         public static final String PN_PAPER_CHANNEL = "pn-paper-channel";
         public static final String PN_DATA_VAULT = "pn-data-vault";
         public static final String PN_LOGEXTRACTOR_BE = "pn-logextractor-be";

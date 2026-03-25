@@ -194,10 +194,10 @@ class PnLoggerImplTest {
     }
 
     @Test
-    void infoInvokingNotificationDeliveryCost() {
+    void infoInvokingNotificationCost() {
         //Given
         String str = "processo";
-        String service = PnLogger.EXTERNAL_SERVICES.PN_NOTIFICATION_DELIVERY_COST_SERVICE;
+        String service = PnLogger.EXTERNAL_SERVICES.PN_NOTIFICATION_COST_SERVICE;
 
 
         //When
