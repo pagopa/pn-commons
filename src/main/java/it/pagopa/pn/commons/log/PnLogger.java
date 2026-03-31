@@ -26,6 +26,7 @@ public interface PnLogger extends Logger {
         private EXTERNAL_SERVICES(){}
 
         public static final String PN_NATIONAL_REGISTRIES = "pn-national-registries";
+        public static final String PN_RADD_ALT = "pn-radd-alt";
         public static final String PN_USER_ATTRIBUTES= "pn-user-attributes";
         public static final String PN_MANDATE = "pn-mandate";
         public static final String PN_DELIVERY = "pn-delivery";
@@ -33,11 +34,13 @@ public interface PnLogger extends Logger {
         public static final String PN_F24 = "pn-f24";
         public static final String PN_EXTERNAL_REGISTRIES = "pn-external-registries";
         public static final String PN_EXTERNAL_CHANNELS = "pn-external-channels";
+        public static final String PN_NOTIFICATION_COST_SERVICE = "pn-notification-cost-service";
         public static final String PN_PAPER_CHANNEL = "pn-paper-channel";
         public static final String PN_DATA_VAULT = "pn-data-vault";
         public static final String PN_LOGEXTRACTOR_BE = "pn-logextractor-be";
         public static final String PN_APIKEY_MANAGER = "pn-apikey-manager";
         public static final String PN_ADDRESS_MANAGER = "pn-address-manager";
+        public static final String PN_ACTION_MANAGER = "pn-action-manager";
         public static final String PN_SAFE_STORAGE = "pn-safe-storage";
         public static final String CHECKOUT = "Checkout";
         public static final String SELFCARE_PG = "SelfcarePG";
@@ -59,6 +62,8 @@ public interface PnLogger extends Logger {
         public static final String EMD_CORE = "EMD_CORE";
         public static final String MIL_AUTH = "MIL_AUTH";
         public static final String PN_EMD_INTEGRATION = "PN_EMD_INTEGRATION";
+        public static final String PN_TIMELINE_SERVICE = "pn-timeline-service";
+        public static final String PN_PAPER_TRACKER = "pn-paper-tracker";
     }
 
     /**
@@ -103,7 +108,7 @@ public interface PnLogger extends Logger {
      * @param success indica l'esito del processo
      * @param description eventuale descrizione nel caso di success negativo
      */
-    void logEndingProcess(String process, boolean success, String description);
+    void logEndingProcess(String process, boolean success, String description, Throwable t);
 
     /**
      * Logga a info lo start della validazione di uno step logico
@@ -166,8 +171,9 @@ public interface PnLogger extends Logger {
      *
      * @param service     nome servizio, possibilmente usare quelli definiti in PnLogger.EXTERNAL_SERVICES
      * @param description eventuale descrizione dell'errore
+     * @param t eventuale eccezione
      */
-    void logInvokationResultDownstreamFailed(String service, String description);
+    void logInvokationResultDownstreamFailed(String service, String description,  Throwable t);
 
     /**
      * metodo per loggare l'esito di not found per una invocazione ad un servizio di downstream

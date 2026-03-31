@@ -86,7 +86,7 @@ class PnLoggerImplTest {
 
 
         //When
-        fooLogger.logEndingProcess(str, false, "test");
+        fooLogger.logEndingProcess(str, false, "test", new RuntimeException("test"));
 
         //Then
         // JUnit assertions
@@ -194,6 +194,25 @@ class PnLoggerImplTest {
     }
 
     @Test
+    void infoInvokingNotificationCost() {
+        //Given
+        String str = "processo";
+        String service = PnLogger.EXTERNAL_SERVICES.PN_NOTIFICATION_COST_SERVICE;
+
+
+        //When
+        fooLogger.logInvokingExternalService(service, str);
+
+        //Then
+        // JUnit assertions
+        List<ILoggingEvent> logsList = listAppender.list;
+        Assertions.assertEquals("Invoking external service " + service + " " + str + ". Waiting Sync response.", logsList.get(0)
+                .getFormattedMessage());
+        Assertions.assertEquals(Level.INFO, logsList.get(0)
+                .getLevel());
+    }
+
+    @Test
     void infoInvokingDownstreamExternalServiceD() {
         //Given
         String str = "processo";
@@ -218,7 +237,7 @@ class PnLoggerImplTest {
         String str = "processo";
 
         //When
-        fooLogger.logInvokationResultDownstreamFailed(str, null);
+        fooLogger.logInvokationResultDownstreamFailed(str, null, null);
 
         //Then
         // JUnit assertions

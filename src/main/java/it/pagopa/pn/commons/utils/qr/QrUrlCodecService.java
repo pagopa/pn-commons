@@ -1,0 +1,37 @@
+package it.pagopa.pn.commons.utils.qr;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import it.pagopa.pn.commons.abstractions.ParameterConsumer;
+import it.pagopa.pn.commons.exceptions.PnInternalException;
+import it.pagopa.pn.commons.utils.qr.models.UrlData;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+public class QrUrlCodecService {
+    private final QrUrlCodecRegistry qrUrlCodecRegistry;
+
+    public QrUrlCodecService(ParameterConsumer parameterConsumer, ObjectMapper objectMapper) {
+        this.qrUrlCodecRegistry = initializeRegistry(parameterConsumer, objectMapper);
+    }
+
+    private QrUrlCodecRegistry initializeRegistry(ParameterConsumer parameterConsumer, ObjectMapper objectMapper) {
+        QrUrlCodecRegistry registry = new QrUrlCodecRegistry();
+        // Qui vanno registrati i codec per le versioni supportate
+        registry.register(new QrUrlCodecV1(parameterConsumer, objectMapper));
+        registry.register(new QrUrlCodecV09(parameterConsumer, objectMapper));
+        return registry;
+    }
+
+    public String encode(String qr, UrlData urlData) throws IllegalArgumentException, PnInternalException {
+        log.debug("Encoding QR token: {} with urlData: {}", qr, urlData);
+        // Per la codifica, utilizziamo il codec di default (l'ultima versione).
+        QrUrlCodec qrUrlCodec = qrUrlCodecRegistry.getDefaultCodec();
+        log.debug("Using default QrUrlCodec: {}", qrUrlCodec.getVersion());
+        return qrUrlCodec.encode(qr, urlData);
+    }
+
+    public String decode(String url) throws IllegalArgumentException, PnInternalException {
+        log.debug("Decoding URL: {}", url);
+        return qrUrlCodecRegistry.decodeWithAppropriateCodec(url);
+    }
+}
