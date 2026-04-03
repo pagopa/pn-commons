@@ -35,10 +35,19 @@ public class AbstractCachedSsmParameterConsumer implements ParameterConsumer {
     public <T> Optional<T> getParameterValue( String parameterName, Class<T> clazz ) {
         Object optValue = valueCache.computeIfAbsent( parameterName, key -> new ExpiringValue())
                 .getValueCheckTimestamp();
+        log.trace("Retrieved value from cache for {} is {}", parameterName, optValue);
         if ( optValue == null ) {
-            log.debug("Value for {} not in cache",parameterName);
-            optValue = getParameter( parameterName, clazz );
+            log.trace("Value for {} not in cache. Need to update cache",parameterName);
+            // If the class is String, we can directly get the parameter value as a String without deserialization
+            if(clazz == String.class) {
+                optValue = Optional.ofNullable(getParameter( parameterName ));
+            } else {
+                optValue = getParameter( parameterName, clazz );
+            }
+            log.trace("New value to insert in cache retrieved from SSM is: {}", optValue);
             valueCache.put( parameterName, new ExpiringValue(optValue, cacheExpiration));
+        }else {
+            log.trace("Value for {} found in cache", parameterName);
         }
         return (Optional<T>) optValue;
     }
@@ -51,9 +60,9 @@ public class AbstractCachedSsmParameterConsumer implements ParameterConsumer {
         try {
             GetParameterResponse parameterResponse = ssmClient.getParameter(parameterRequest);
             return parameterResponse.parameter().value();
-        } catch ( SsmException ex) {
-            log.info( "Ssm Client exception for parameterName={}", parameterName, ex );
-            return null;
+        } catch (SsmException ex) {
+            log.error("Ssm Client exception for parameterName={}", parameterName, ex);
+            throw new PnInternalException("Failed to retrieve parameter from Ssm: " + parameterName, ERROR_CODE_PN_GENERIC_ERROR, ex);
         }
     }
 
