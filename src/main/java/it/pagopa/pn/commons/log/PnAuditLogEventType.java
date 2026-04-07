@@ -108,7 +108,6 @@ public enum PnAuditLogEventType {
     AUD_NT_DISCARD_ANALOG_EVENTS(PnAuditLogMarker.AUDIT10Y),
     AUD_NT_UPDATE_COST(PnAuditLogMarker.AUDIT10Y);
 
-
     final org.slf4j.Marker marker;
 
     PnAuditLogEventType(PnAuditLogMarker auditMarker) {
