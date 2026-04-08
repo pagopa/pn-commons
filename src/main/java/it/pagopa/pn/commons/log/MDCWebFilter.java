@@ -99,8 +99,6 @@ public class MDCWebFilter implements OrderedWebFilter {
             addToMDC(requestHeaders.get(LOLLIPOP_ASSERTION_TYPE), MDC_PN_LP_ASSERTION_TYPE);
             addToMDC(requestHeaders.get(LOLLIPOP_SIGNATURE_INPUT), MDC_PN_LP_SIGNATURE_INPUT);
             addToMDC(requestHeaders.get(LOLLIPOP_SIGNATURE), MDC_PN_LP_SIGNATURE);
-
-            log.info("requestHeaders: {}", requestHeaders);
         };
 
         Consumer<SignalType> mdcCleaner = ignored -> MDCUtils.clearMDCKeys();
