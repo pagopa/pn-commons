@@ -76,8 +76,6 @@ public class MDCWebFilter implements OrderedWebFilter {
 
     @Override
     public @NotNull Mono<Void> filter(@NotNull ServerWebExchange serverWebExchange, WebFilterChain webFilterChain) {
-        log.info("Sono dentro il filter MdCWebFilter");
-
         final List<String> notFoundGeneratedTraceId = List.of("trace_id:" + UUID.randomUUID());
         HttpHeaders requestHeaders = serverWebExchange.getRequest().getHeaders();
 
