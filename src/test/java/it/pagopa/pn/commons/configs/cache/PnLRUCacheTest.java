@@ -9,6 +9,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.Cache.ValueWrapper;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+
 class PnLRUCacheTest {
 
     PnLRUCache<String,String> pnLRUCache;
@@ -90,5 +93,38 @@ class PnLRUCacheTest {
         pnLRUCache.evict("chiave");
         assertNull( pnLRUCache.get("chiave"));
 
+    }
+
+    @Test
+    void retrieve() throws Exception {
+        pnLRUCache.put("chiave", "valore");
+        CompletableFuture<?> future = pnLRUCache.retrieve("chiave");
+        assertNotNull(future);
+        assertEquals("valore", future.get());
+    }
+
+    @Test
+    void retrieveWithLoader() throws Exception {
+        pnLRUCache.put("chiave", "valore");
+        CompletableFuture<String> future = pnLRUCache.retrieve(
+                "chiave", () -> CompletableFuture.completedFuture("valore_loader"));
+        assertEquals("valore", future.get());
+    }
+
+    @Test
+    void retrieveWithLoaderMiss() throws Exception {
+        CompletableFuture<String> future = pnLRUCache.retrieve(
+                "chiave", () -> CompletableFuture.completedFuture("valore_loader"));
+        assertEquals("valore_loader", future.get());
+        assertEquals("valore_loader", pnLRUCache.get("chiave", String.class));
+    }
+
+    @Test
+    void retrieveWithLoaderException() {
+        CompletableFuture<String> future = pnLRUCache.retrieve(
+                "chiave", () -> CompletableFuture.failedFuture(new RuntimeException("errore")));
+        assertNotNull(future);
+        assertThrows(ExecutionException.class, () -> future.get());
+        assertNull(pnLRUCache.get("chiave"));
     }
 }
