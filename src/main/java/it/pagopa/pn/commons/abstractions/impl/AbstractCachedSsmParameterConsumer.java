@@ -25,10 +25,14 @@ import static it.pagopa.pn.commons.exceptions.PnExceptionsCodes.ERROR_CODE_PN_GE
 public class AbstractCachedSsmParameterConsumer implements ParameterConsumer {
 
     private final SsmClient ssmClient;
+    private final ObjectMapper objectMapper;
     private final Duration cacheExpiration = Duration.of(5, ChronoUnit.MINUTES);
 
     public AbstractCachedSsmParameterConsumer(SsmClient ssmClient) {
         this.ssmClient = ssmClient;
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+        this.objectMapper = objectMapper;
     }
 
     private final ConcurrentHashMap<String, ExpiringValue> valueCache = new ConcurrentHashMap<>();
@@ -71,7 +75,6 @@ public class AbstractCachedSsmParameterConsumer implements ParameterConsumer {
         Optional<T> result = Optional.empty();
         String json = getParameter( parameterName );
         if (StringUtils.hasText( json )) {
-            ObjectMapper objectMapper = new ObjectMapper();
             try {
                 result = Optional.of( objectMapper.readValue( json, clazz ) );
             } catch (JsonProcessingException e) {
