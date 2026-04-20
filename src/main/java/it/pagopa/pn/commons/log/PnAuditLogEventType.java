@@ -109,7 +109,8 @@ public enum PnAuditLogEventType {
     AUD_NT_UPDATE_COST(PnAuditLogMarker.AUDIT10Y),
     AUD_COM_INSERT(PnAuditLogMarker.AUDIT10Y),
     AUD_COM_ATCHOPEN_SND(PnAuditLogMarker.AUDIT10Y),
-    AUD_COM_DOCOPEN_SND(PnAuditLogMarker.AUDIT10Y);
+    AUD_COM_DOCOPEN_SND(PnAuditLogMarker.AUDIT10Y),
+    AUD_COM_MSG_INSERT(PnAuditLogMarker.AUDIT10Y);
 
     
     final org.slf4j.Marker marker;
