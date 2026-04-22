@@ -6,7 +6,6 @@ import it.pagopa.pn.commons.exceptions.PnInternalException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.Cache.ValueWrapper;
 
 import java.util.concurrent.CompletableFuture;
@@ -101,6 +100,12 @@ class PnLRUCacheTest {
         CompletableFuture<?> future = pnLRUCache.retrieve("chiave");
         assertNotNull(future);
         assertEquals("valore", future.get());
+    }
+
+    @Test
+    void retrieveMiss() throws Exception {
+        CompletableFuture<?> future = pnLRUCache.retrieve("missing");
+        assertNull(future.get());
     }
 
     @Test

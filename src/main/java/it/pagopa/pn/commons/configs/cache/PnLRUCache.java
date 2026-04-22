@@ -72,7 +72,7 @@ public class PnLRUCache<K,V> implements Cache{
 	@Override
 	public CompletableFuture<?> retrieve(Object key) {
 		Object value = this.cache.get(key);
-		return (value != null) ? CompletableFuture.completedFuture(value) : null;
+		return CompletableFuture.completedFuture(value);
 	}
 
 	@Override
