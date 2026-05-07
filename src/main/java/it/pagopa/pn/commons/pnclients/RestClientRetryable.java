@@ -10,20 +10,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.*;
 import org.springframework.retry.RetryPolicy;
-import org.springframework.retry.backoff.ExponentialRandomBackOffPolicy;
-import org.springframework.retry.policy.ExceptionClassifierRetryPolicy;
 import org.springframework.retry.policy.NeverRetryPolicy;
 import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.util.StreamUtils;
 
-import javax.net.ssl.SSLHandshakeException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
-import java.net.UnknownHostException;
 
 /**
  * Interceptor per la gestione delle retry del RestClient.
@@ -37,7 +31,7 @@ public class RestClientRetryable implements ClientHttpRequestInterceptor {
 
     public RestClientRetryable(int retryMaxAttempts, ClientHttpRequestFactory requestFactory) {
         this.requestFactory = requestFactory;
-        this.retryTemplate = createRetryTemplate(retryMaxAttempts);
+        this.retryTemplate = RetryTemplateFactory.create(configureStatusCodeBasedRetryPolicy(retryMaxAttempts));
     }
 
     @Override
@@ -73,19 +67,6 @@ public class RestClientRetryable implements ClientHttpRequestInterceptor {
         };
     }
 
-    private RetryTemplate createRetryTemplate(int retryMaxAttempts) {
-        RetryTemplate retry = new RetryTemplate();
-        ExceptionClassifierRetryPolicy policy = new ExceptionClassifierRetryPolicy();
-        policy.setExceptionClassifier(configureStatusCodeBasedRetryPolicy(retryMaxAttempts));
-        ExponentialRandomBackOffPolicy exponentialRandomBackOffPolicy = new ExponentialRandomBackOffPolicy();
-        exponentialRandomBackOffPolicy.setInitialInterval(20);
-        exponentialRandomBackOffPolicy.setMaxInterval(30000L);
-        exponentialRandomBackOffPolicy.setMultiplier(2);
-        retry.setBackOffPolicy(exponentialRandomBackOffPolicy);
-        retry.setRetryPolicy(policy);
-        return retry;
-    }
-
     private Classifier<Throwable, RetryPolicy> configureStatusCodeBasedRetryPolicy(int retryMaxAttempts) {
         SimpleRetryPolicy simpleRetryPolicy = new SimpleRetryPolicy(retryMaxAttempts);
         NeverRetryPolicy neverRetryPolicy = new NeverRetryPolicy();
@@ -95,7 +76,7 @@ public class RestClientRetryable implements ClientHttpRequestInterceptor {
             if (throwable instanceof PnHttpResponseException pnEx && pnEx.getStatusCode() > 0) {
                 HttpStatus httpStatus = HttpStatus.resolve(pnEx.getStatusCode());
                 retryPolicy = (httpStatus != null && isRetryableStatus(httpStatus)) ? simpleRetryPolicy : neverRetryPolicy;
-            } else if (isIOExceptionRetryable(throwable)) {
+            } else if (RetryTemplateFactory.isIOExceptionRetryable(throwable)) {
                 retryPolicy = simpleRetryPolicy;
             } else {
                 retryPolicy = neverRetryPolicy;
@@ -105,13 +86,6 @@ public class RestClientRetryable implements ClientHttpRequestInterceptor {
             }
             return retryPolicy;
         };
-    }
-
-    private boolean isIOExceptionRetryable(Throwable throwable) {
-        return throwable instanceof SocketTimeoutException ||
-            throwable instanceof SSLHandshakeException ||
-            throwable instanceof UnknownHostException ||
-            throwable instanceof SocketException;
     }
 
     /**

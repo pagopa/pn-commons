@@ -1,5 +1,6 @@
 package it.pagopa.pn.commons.pnclients;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.commons.exceptions.PnHttpResponseException;
 import okhttp3.HttpUrl;
 import okhttp3.mockwebserver.MockResponse;
@@ -25,22 +26,26 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class RestClientFactoryTest {
 
+    ObjectMapper objectMapper;
     RestClientFactory restClientFactory;
+    RestClient.Builder restClientBuilder;
 
     @BeforeEach
     void init() {
+        restClientBuilder = RestClient.builder();
         restClientFactory = new RestClientFactory();
+        objectMapper = new ObjectMapper();
     }
 
     @Test
     void restClientWithTracing() {
-        RestClient res = restClientFactory.restClientWithTracing(3, 3000, 8000);
+        RestClient res = restClientFactory.restClientWithTracing(3, 3000, 8000, restClientBuilder, objectMapper);
         assertNotNull(res);
     }
 
     @Test
     void testRetryWithThreeFails() throws IOException {
-        RestClient restClient = restClientFactory.restClientWithTracing(3, 3000, 8000);
+        RestClient restClient = restClientFactory.restClientWithTracing(3, 3000, 8000, restClientBuilder, objectMapper);
         MockWebServer mockWebServer = new MockWebServer();
         String expectedResponse = "expect that it works";
         mockWebServer.enqueue(new MockResponse().setResponseCode(429));
@@ -59,7 +64,8 @@ class RestClientFactoryTest {
 
     @Test
     void testRetryWithTwoFails() throws IOException {
-        RestClient restClient = restClientFactory.restClientWithTracing(3, 3000, 8000);
+        RestClient restClient =
+            restClientFactory.restClientWithTracing(3, 3000, 8000, restClientBuilder, objectMapper);
         MockWebServer mockWebServer = new MockWebServer();
         String expectedResponse = "expect that it works";
         mockWebServer.enqueue(new MockResponse().setResponseCode(429));
@@ -77,7 +83,8 @@ class RestClientFactoryTest {
 
     @Test
     void testRetryWithOneFail() throws IOException {
-        RestClient restClient = restClientFactory.restClientWithTracing(3, 3000, 8000);
+        RestClient restClient =
+            restClientFactory.restClientWithTracing(3, 3000, 8000, restClientBuilder, objectMapper);
         MockWebServer mockWebServer = new MockWebServer();
         String expectedResponse = "expect that it works";
         mockWebServer.enqueue(new MockResponse().setResponseCode(502));
@@ -94,7 +101,8 @@ class RestClientFactoryTest {
 
     @Test
     void testRetryFourTimesButParameterIsSetToThree() throws IOException {
-        RestClient restClient = restClientFactory.restClientWithTracing(3, 3000, 8000);
+        RestClient restClient =
+            restClientFactory.restClientWithTracing(3, 3000, 8000, restClientBuilder, objectMapper);
         MockWebServer mockWebServer = new MockWebServer();
         String expectedResponse = "expect that it works";
         mockWebServer.enqueue(new MockResponse().setResponseCode(429));
@@ -114,7 +122,8 @@ class RestClientFactoryTest {
 
     @Test
     void testExceptionNotRetryable() throws IOException {
-        RestClient restClient = restClientFactory.restClientWithTracing(3, 3000, 8000);
+        RestClient restClient =
+            restClientFactory.restClientWithTracing(3, 3000, 8000, restClientBuilder, objectMapper);
         MockWebServer mockWebServer = new MockWebServer();
         String expectedResponse = "expect that it works";
         mockWebServer.enqueue(new MockResponse().setResponseCode(500));
@@ -131,7 +140,8 @@ class RestClientFactoryTest {
 
     @Test
     void testRetryWithConnectionException() throws IOException {
-        RestClient restClient = restClientFactory.restClientWithTracing(3, 10000, 10000);
+        RestClient restClient =
+            restClientFactory.restClientWithTracing(3, 10000, 10000, restClientBuilder, objectMapper);
         MockWebServer mockWebServer = new MockWebServer();
         mockWebServer.enqueue(new MockResponse().setSocketPolicy(SocketPolicy.DISCONNECT_AT_START));
         mockWebServer.enqueue(new MockResponse().setResponseCode(200));
@@ -146,7 +156,8 @@ class RestClientFactoryTest {
 
     @Test
     void testSocketTimeoutException() throws IOException {
-        RestClient restClient = restClientFactory.restClientWithTracing(3, 1000, 1000);
+        RestClient restClient =
+            restClientFactory.restClientWithTracing(3, 1000, 1000, restClientBuilder, objectMapper);
         MockWebServer mockWebServer = new MockWebServer();
         String expectedResponse = "expect that it works";
         mockWebServer.enqueue(new MockResponse().setResponseCode(200).setBody(expectedResponse).setBodyDelay(1, TimeUnit.HOURS));
@@ -183,7 +194,8 @@ class RestClientFactoryTest {
         mockWebServer.start();
 
         HttpUrl url = mockWebServer.url("/test");
-        RestClient restClient = restClientFactory.restClientWithTracing(3, 10000, 10000);
+        RestClient restClient =
+            restClientFactory.restClientWithTracing(3, 10000, 10000, restClientBuilder, objectMapper);
 
         ResponseEntity<String> response = restClient.post().uri(url.uri()).body("myRequest").retrieve().toEntity(String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);

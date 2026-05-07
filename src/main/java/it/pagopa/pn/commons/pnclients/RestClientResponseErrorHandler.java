@@ -1,7 +1,6 @@
 package it.pagopa.pn.commons.pnclients;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import it.pagopa.pn.common.rest.error.v1.dto.Problem;
 import it.pagopa.pn.commons.exceptions.PnHttpResponseException;
 import it.pagopa.pn.commons.exceptions.mapper.DtoProblemToProblemErrorMapper;
@@ -21,8 +20,8 @@ public class RestClientResponseErrorHandler implements RestClient.ResponseSpec.E
 
     private final ObjectMapper objectMapper;
 
-    public RestClientResponseErrorHandler() {
-        this.objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+    public RestClientResponseErrorHandler(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
     }
 
     @Override

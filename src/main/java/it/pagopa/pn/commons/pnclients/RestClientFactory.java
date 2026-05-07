@@ -1,7 +1,7 @@
 package it.pagopa.pn.commons.pnclients;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.MDC;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpRequest;
@@ -16,19 +16,19 @@ import java.io.IOException;
 public class RestClientFactory {
 
     @Bean
-    @Qualifier("withTracing")
     public RestClient restClientWithTracing(
             @Value("${pn.commons.retry.max-attempts}") int retryMaxAttempts,
             @Value("${pn.commons.connection-timeout-millis}") int connectionTimeout,
-            @Value("${pn.commons.read-timeout-millis}") int readTimeout
+            @Value("${pn.commons.read-timeout-millis}") int readTimeout,
+            RestClient.Builder restClientBuilder,
+            ObjectMapper objectMapper
     ) {
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
         requestFactory.setConnectTimeout(connectionTimeout);
         requestFactory.setReadTimeout(readTimeout);
-
         RestClientRetryable retryInterceptor = new RestClientRetryable(retryMaxAttempts + 1, requestFactory);
 
-        return RestClient.builder()
+        return restClientBuilder
                 .requestFactory(requestFactory)
                 .requestInterceptors(interceptors -> {
                     interceptors.add(new RestClientHeaderModifierInterceptor());
@@ -36,7 +36,7 @@ public class RestClientFactory {
                 })
                 .defaultStatusHandler(
                         status -> status.is4xxClientError() || status.is5xxServerError(),
-                        new RestClientResponseErrorHandler()
+                        new RestClientResponseErrorHandler(objectMapper)
                 )
                 .build();
     }
