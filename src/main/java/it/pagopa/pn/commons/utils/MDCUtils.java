@@ -40,6 +40,8 @@ public class MDCUtils {
     public static final String MDC_PN_CTX_TOPIC = "ctx_topic";
     public static final String MDC_PN_CTX_MESSAGE_ID = "ctx_awsMessageId";
     public static final String MDC_PN_SET_ID = "set_id";
+    public static final String MDC_PN_CTX_COMMUNICATION_TYPE = "cxt_communication_type";
+
 
     public static final String MDC_PN_LP_ORIGINAL_URL = "lollipop_original_url";
     public static final String MDC_PN_LP_ORIGINAL_METHOD = "lollipop_original_method";
@@ -72,7 +74,8 @@ public class MDCUtils {
                 , MDC_PN_LP_ASSERTION_REF, MDC_PN_LP_ASSERTION_TYPE
                 , MDC_PN_LP_SIGNATURE_INPUT, MDC_PN_LP_SIGNATURE
                 , MDC_PN_RECIPIENT_ID_KEY, MDC_PN_DELEGATOR_ID_KEY, MDC_PN_DELEGATE_ID_KEY
-                , MDC_PN_MANDATE_WORKFLOW_TYPE_KEY, MDC_PN_MANDATE_CIE_NIS_KEY, MDC_PN_ERROR_CATEGORY_KEY);
+                , MDC_PN_MANDATE_WORKFLOW_TYPE_KEY, MDC_PN_MANDATE_CIE_NIS_KEY, MDC_PN_ERROR_CATEGORY_KEY
+                , MDC_PN_CTX_COMMUNICATION_TYPE);
     }
 
     /**
