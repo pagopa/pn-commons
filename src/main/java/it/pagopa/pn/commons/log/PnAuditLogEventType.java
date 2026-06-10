@@ -116,8 +116,9 @@ public enum PnAuditLogEventType {
     AUD_COM_VALID(PnAuditLogMarker.AUDIT10Y),
     AUD_DELAYER_RESCHEDULED_NEXT_WEEK(PnAuditLogMarker.AUDIT10Y),
     AUD_COM_DOCOPEN_RCP(PnAuditLogMarker.AUDIT10Y),
-    AUD_COM_ATCHOPEN_RCP(PnAuditLogMarker.AUDIT5Y);
-
+    AUD_COM_ATCHOPEN_RCP(PnAuditLogMarker.AUDIT5Y),
+    AUD_COM_VIEW_SND(PnAuditLogMarker.AUDIT5Y),
+    AUD_COM_VIEW_RCP(PnAuditLogMarker.AUDIT10Y);
     
     final org.slf4j.Marker marker;
 
