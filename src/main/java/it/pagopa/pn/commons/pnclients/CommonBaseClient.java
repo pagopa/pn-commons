@@ -17,6 +17,7 @@ import reactor.netty.http.client.HttpClient;
 import reactor.netty.resources.ConnectionProvider;
 import reactor.netty.transport.logging.AdvancedByteBufFormat;
 import reactor.util.retry.Retry;
+import it.pagopa.pn.commons.pnclients.filters.DownstreamCallLoggingFilterFactory;
 
 import javax.net.ssl.SSLHandshakeException;
 import java.net.SocketException;
@@ -59,6 +60,8 @@ public abstract class CommonBaseClient {
 
     private Boolean wireTapActivation;
 
+    private DownstreamCallLoggingFilterFactory filterFactory;
+
     protected CommonBaseClient() {}
 
 
@@ -67,7 +70,11 @@ public abstract class CommonBaseClient {
     }
 
     public WebClient initWebClient(WebClient.Builder builder, String downstreamClientName) {        
-        return enrichBuilder(builder).build().filter(filterFactory.create(downstreamClientName)); ;
+        WebClient.Builder builderEnriched = enrichBuilder(builder);
+        if (filterFactory != null) {
+            builderEnriched = builderEnriched.filter(filterFactory.create(downstreamClientName));
+        }
+        return builderEnriched.build();
     }
 
     protected WebClient.Builder enrichBuilder(WebClient.Builder builder){
@@ -209,5 +216,9 @@ public abstract class CommonBaseClient {
         this.wireTapActivation = wireTapActivation;
     }
 
+    @Autowired
+    public void setFilterFactory(DownstreamCallLoggingFilterFactory filterFactory) {
+        this.filterFactory = filterFactory;
+    }
 
 }

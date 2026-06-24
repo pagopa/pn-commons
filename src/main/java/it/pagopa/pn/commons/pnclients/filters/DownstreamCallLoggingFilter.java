@@ -2,7 +2,6 @@ package it.pagopa.pn.commons.pnclients.filters;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.pagopa.pn.national.registries.utils.MaskTaxIdInPathUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -36,7 +35,6 @@ public class DownstreamCallLoggingFilter implements ExchangeFilterFunction {
         Instant timestamp = Instant.now();
         String httpMethod = request.method().name();
         String rawUrl = request.url().toString();
-        String maskedUrl = MaskTaxIdInPathUtils.maskTaxIdInPath(rawUrl);
         String host = request.url().getHost();
         String traceId = MDC.get("traceId");
         String spanId = MDC.get("spanId");
@@ -47,16 +45,15 @@ public class DownstreamCallLoggingFilter implements ExchangeFilterFunction {
                     int status = response.statusCode().value();
                     boolean success = response.statusCode().is2xxSuccessful();
                     String outcome = resolveOutcome(response);
-                    log(timestamp, httpMethod, maskedUrl, host, status, success, outcome, durationMs,
+                    log(timestamp, httpMethod, rawUrl, host, status, success, outcome, durationMs,
                             traceId, spanId, null, null);
                 })
                 .doOnError(throwable -> {
                     long durationMs = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNano);
                     int status = extractStatus(throwable);
                     String outcome = "ERROR";
-                    String errorMessage = MaskTaxIdInPathUtils.maskTaxIdInPath(
-                            throwable.getMessage() != null ? throwable.getMessage() : "unknown");
-                    log(timestamp, httpMethod, maskedUrl, host, status, false, outcome, durationMs,
+                    String errorMessage = throwable.getMessage() != null ? throwable.getMessage() : "unknown";
+                    log(timestamp, httpMethod, rawUrl, host, status, false, outcome, durationMs,
                             traceId, spanId, throwable.getClass().getSimpleName(), errorMessage);
                 });
     }
