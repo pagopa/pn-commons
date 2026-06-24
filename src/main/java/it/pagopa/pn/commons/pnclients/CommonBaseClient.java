@@ -70,9 +70,13 @@ public abstract class CommonBaseClient {
     }
 
     public WebClient initWebClient(WebClient.Builder builder, String downstreamClientName) {        
+        return initWebClient(builder, downstreamClientName, filterFactory);
+    }
+
+    public WebClient initWebClient(WebClient.Builder builder, String downstreamClientName, DownstreamCallLoggingFilterFactory downstreamCallLoggingFilterFactory) {
         WebClient.Builder builderEnriched = enrichBuilder(builder);
-        if (filterFactory != null) {
-            builderEnriched = builderEnriched.filter(filterFactory.create(downstreamClientName));
+        if (downstreamCallLoggingFilterFactory != null) {
+            builderEnriched = builderEnriched.filter(downstreamCallLoggingFilterFactory.create(downstreamClientName));
         }
         return builderEnriched.build();
     }
