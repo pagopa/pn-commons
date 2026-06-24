@@ -65,6 +65,11 @@ public abstract class CommonBaseClient {
     public WebClient initWebClient(WebClient.Builder builder) {
         return enrichBuilder(builder).build();
     }
+
+    public WebClient initWebClient(WebClient.Builder builder, String downstreamClientName) {        
+        return enrichBuilder(builder).build().filter(filterFactory.create(downstreamClientName)); ;
+    }
+
     protected WebClient.Builder enrichBuilder(WebClient.Builder builder){
         WebClient.Builder builderEnriched = enrichBuilderWithTraceId(builder);
         return enrichWithDefaultProps(builderEnriched);
