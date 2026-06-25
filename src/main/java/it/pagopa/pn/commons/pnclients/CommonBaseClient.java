@@ -220,7 +220,7 @@ public abstract class CommonBaseClient {
         this.wireTapActivation = wireTapActivation;
     }
 
-    @Autowired
+    @Autowired(required = false)
     public void setFilterFactory(DownstreamCallLoggingFilterFactory filterFactory) {
         this.filterFactory = filterFactory;
     }
