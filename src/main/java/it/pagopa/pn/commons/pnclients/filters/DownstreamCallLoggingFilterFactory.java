@@ -1,9 +1,7 @@
 package it.pagopa.pn.commons.pnclients.filters;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.stereotype.Component;
 
-@Component
 public class DownstreamCallLoggingFilterFactory {
 
     private final ObjectMapper objectMapper;

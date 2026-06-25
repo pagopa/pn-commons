@@ -7,7 +7,7 @@ import io.netty.handler.timeout.TimeoutException;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.MDC;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.    Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.util.StringUtils;
@@ -220,7 +220,7 @@ public abstract class CommonBaseClient {
         this.wireTapActivation = wireTapActivation;
     }
 
-    @Autowired
+    @Autowired(required = false)
     public void setFilterFactory(DownstreamCallLoggingFilterFactory filterFactory) {
         this.filterFactory = filterFactory;
     }
