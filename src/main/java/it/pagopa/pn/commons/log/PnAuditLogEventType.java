@@ -118,7 +118,12 @@ public enum PnAuditLogEventType {
     AUD_COM_DOCOPEN_RCP(PnAuditLogMarker.AUDIT10Y),
     AUD_COM_ATCHOPEN_RCP(PnAuditLogMarker.AUDIT5Y),
     AUD_COM_VIEW_SND(PnAuditLogMarker.AUDIT5Y),
-    AUD_COM_VIEW_RCP(PnAuditLogMarker.AUDIT10Y);
+    AUD_COM_VIEW_RCP(PnAuditLogMarker.AUDIT10Y),
+    AUD_COM_SEND_IO(PnAuditLogMarker.AUDIT10Y),
+    AUD_COM_SEND_EMAIL(PnAuditLogMarker.AUDIT10Y),
+    AUD_COM_SEND_SMS(PnAuditLogMarker.AUDIT10Y),
+    AUD_COM_SEND_PEC(PnAuditLogMarker.AUDIT10Y),
+    AUD_COM_DD_RECEIVE(PnAuditLogMarker.AUDIT10Y);
     
     final org.slf4j.Marker marker;
 
