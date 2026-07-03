@@ -42,6 +42,8 @@ public interface PnLogger extends Logger {
         public static final String PN_ADDRESS_MANAGER = "pn-address-manager";
         public static final String PN_ACTION_MANAGER = "pn-action-manager";
         public static final String PN_SAFE_STORAGE = "pn-safe-storage";
+        public static final String PN_TEMPLATE_ENGINE = "pn-template-engine";
+        public static final String PN_IO_CONNECTOR = "pn-io-connector";
         public static final String CHECKOUT = "Checkout";
         public static final String SELFCARE_PG = "SelfcarePG";
         public static final String SELFCARE_PA = "SelfcarePA";
