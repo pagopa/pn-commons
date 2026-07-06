@@ -19,6 +19,7 @@ import software.amazon.awssdk.services.cloudwatch.CloudWatchAsyncClient;
 import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.eventbridge.EventBridgeAsyncClient;
+import software.amazon.awssdk.services.eventbridge.EventBridgeClient;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.ssm.SsmClient;
 
@@ -73,8 +74,13 @@ public class AwsServicesClientsConfig {
     }
 
     @Bean
-    public EventBridgeAsyncClient eventBridgeClient() {
+    public EventBridgeAsyncClient eventBridgeAsyncClient() {
         return configureBuilder(EventBridgeAsyncClient.builder());
+    }
+
+    @Bean
+    public EventBridgeClient eventBridgeClient() {
+        return configureBuilder(EventBridgeClient.builder());
     }
 
     private <C> C configureBuilder(AwsClientBuilder<?, C> builder) {
