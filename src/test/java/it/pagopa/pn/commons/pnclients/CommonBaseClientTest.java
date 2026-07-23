@@ -1,11 +1,13 @@
 package it.pagopa.pn.commons.pnclients;
 
+import it.pagopa.pn.commons.pnclients.filters.DownstreamCallLoggingFilterFactory;
 import okhttp3.HttpUrl;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.SocketPolicy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -30,6 +32,9 @@ class CommonBaseClientTest {
         commonBaseClient.setReadTimeoutMillis(8000);
         commonBaseClient.setRetryMaxAttempts(3);
         commonBaseClient.setWireTapActivation(false);
+        
+        DownstreamCallLoggingFilterFactory mockFilterFactory = Mockito.mock(DownstreamCallLoggingFilterFactory.class);
+        commonBaseClient.setFilterFactory(mockFilterFactory);
     }
 
     @Test

@@ -84,7 +84,7 @@ public class AwsServicesClientsConfig {
     }
 
     private <C> C configureBuilder(AwsClientBuilder<?, C> builder) {
-        if( props != null ) {
+        if( props != null && isLocal() ) {
 
             String profileName = props.getProfileName();
             if( StringUtils.isNotBlank( profileName ) ) {
@@ -120,6 +120,10 @@ public class AwsServicesClientsConfig {
         return DynamoDbEnhancedClient.builder()
                 .dynamoDbClient( baseClient )
                 .build();
+    }
+
+    private boolean isLocal() {
+        return System.getenv("AWS_REGIONCODE") == null;
     }
 
 }

@@ -34,6 +34,7 @@ public interface PnLogger extends Logger {
         public static final String PN_F24 = "pn-f24";
         public static final String PN_EXTERNAL_REGISTRIES = "pn-external-registries";
         public static final String PN_EXTERNAL_CHANNELS = "pn-external-channels";
+        public static final String PN_NOTIFICATION_COST_SERVICE = "pn-notification-cost-service";
         public static final String PN_PAPER_CHANNEL = "pn-paper-channel";
         public static final String PN_DATA_VAULT = "pn-data-vault";
         public static final String PN_LOGEXTRACTOR_BE = "pn-logextractor-be";
@@ -65,7 +66,6 @@ public interface PnLogger extends Logger {
         public static final String PN_EMD_INTEGRATION = "PN_EMD_INTEGRATION";
         public static final String PN_TIMELINE_SERVICE = "pn-timeline-service";
         public static final String PN_PAPER_TRACKER = "pn-paper-tracker";
-        public static final String PN_NOTIFICATION_COST_SERVICE = "pn-notification-cost-service";
     }
 
     /**
@@ -110,7 +110,7 @@ public interface PnLogger extends Logger {
      * @param success indica l'esito del processo
      * @param description eventuale descrizione nel caso di success negativo
      */
-    void logEndingProcess(String process, boolean success, String description);
+    void logEndingProcess(String process, boolean success, String description, Throwable t);
 
     /**
      * Logga a info lo start della validazione di uno step logico
@@ -173,8 +173,9 @@ public interface PnLogger extends Logger {
      *
      * @param service     nome servizio, possibilmente usare quelli definiti in PnLogger.EXTERNAL_SERVICES
      * @param description eventuale descrizione dell'errore
+     * @param t eventuale eccezione
      */
-    void logInvokationResultDownstreamFailed(String service, String description);
+    void logInvokationResultDownstreamFailed(String service, String description,  Throwable t);
 
     /**
      * metodo per loggare l'esito di not found per una invocazione ad un servizio di downstream

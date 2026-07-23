@@ -7,7 +7,7 @@ import io.netty.handler.timeout.TimeoutException;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.MDC;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.    Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.util.StringUtils;
@@ -17,12 +17,14 @@ import reactor.netty.http.client.HttpClient;
 import reactor.netty.resources.ConnectionProvider;
 import reactor.netty.transport.logging.AdvancedByteBufFormat;
 import reactor.util.retry.Retry;
+import it.pagopa.pn.commons.pnclients.filters.DownstreamCallLoggingFilterFactory;
 
 import javax.net.ssl.SSLHandshakeException;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.time.Duration;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -58,12 +60,27 @@ public abstract class CommonBaseClient {
 
     private Boolean wireTapActivation;
 
+    private DownstreamCallLoggingFilterFactory filterFactory;
+
     protected CommonBaseClient() {}
 
 
     public WebClient initWebClient(WebClient.Builder builder) {
         return enrichBuilder(builder).build();
     }
+
+    public WebClient initWebClient(WebClient.Builder builder, String downstreamClientName) {        
+        return initWebClient(builder, downstreamClientName, filterFactory);
+    }
+
+    public WebClient initWebClient(WebClient.Builder builder, String downstreamClientName, DownstreamCallLoggingFilterFactory downstreamCallLoggingFilterFactory) {
+        WebClient.Builder builderEnriched = enrichBuilder(builder);
+        if (downstreamCallLoggingFilterFactory != null) {
+            builderEnriched = builderEnriched.filter(downstreamCallLoggingFilterFactory.create(downstreamClientName));
+        }
+        return builderEnriched.build();
+    }
+
     protected WebClient.Builder enrichBuilder(WebClient.Builder builder){
         WebClient.Builder builderEnriched = enrichBuilderWithTraceId(builder);
         return enrichWithDefaultProps(builderEnriched);
@@ -95,6 +112,11 @@ public abstract class CommonBaseClient {
     {
         try {
             String message = x.getMessage()==null?"":x.getMessage();
+
+            if(x.getMessage() == null && x instanceof WebClientException we && we.getCause() != null) {
+                message = we.getCause().toString();
+            }
+
             if (x instanceof WebClientResponseException webClientResponseException)
             {
                 message += ";" + webClientResponseException.getResponseBodyAsString();
@@ -148,7 +170,8 @@ public abstract class CommonBaseClient {
                         .filter(this::isRetryableException)
                         .onRetryExhaustedThrow((retryBackoffSpec, retrySignal) -> {
                             Throwable lastExceptionInRetry = retrySignal.failure();
-                            log.warn("Retries exhausted {}, with last Exception: {}", retrySignal.totalRetries(), lastExceptionInRetry.getMessage());
+                            var message = Optional.ofNullable(lastExceptionInRetry.getMessage()).orElse(lastExceptionInRetry.getClass().getName());
+                            log.warn("Retries exhausted {}, with last Exception: {}", retrySignal.totalRetries(), message, lastExceptionInRetry);
                             return lastExceptionInRetry;
                         })
                 );
@@ -197,5 +220,9 @@ public abstract class CommonBaseClient {
         this.wireTapActivation = wireTapActivation;
     }
 
+    @Autowired(required = false)
+    public void setFilterFactory(DownstreamCallLoggingFilterFactory filterFactory) {
+        this.filterFactory = filterFactory;
+    }
 
 }
