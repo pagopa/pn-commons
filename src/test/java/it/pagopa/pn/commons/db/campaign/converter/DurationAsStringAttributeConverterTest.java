@@ -1,53 +1,72 @@
 package it.pagopa.pn.commons.db.campaign.converter;
 
 import org.junit.jupiter.api.Test;
-import software.amazon.awssdk.enhanced.dynamodb.AttributeValueType;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 
 import java.time.Duration;
-import java.time.format.DateTimeParseException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DurationAsStringAttributeConverterTest {
-
     private final DurationAsStringAttributeConverter converter = new DurationAsStringAttributeConverter();
 
     @Test
-    void shouldTransformFromDurationToStringAttribute() {
-        AttributeValue result = converter.transformFrom(Duration.ofHours(3));
-        assertEquals("PT3H", result.s());
+    void shouldParseIsoDuration() {
+        Duration duration = converter.transformTo(AttributeValue.builder().s("PT24H").build());
+        assertEquals(Duration.ofHours(24), duration);
     }
 
     @Test
-    void shouldTransformFromNullDurationToNullAttribute() {
-        AttributeValue result = converter.transformFrom(null);
-        assertTrue(result.nul());
+    void shouldParseSimpleDurationWithUnit() {
+        Duration duration = converter.transformTo(AttributeValue.builder().s("24H").build());
+        assertEquals(Duration.ofHours(24), duration);
     }
 
     @Test
-    void shouldTransformToDurationFromStringAttribute() {
-        Duration result = converter.transformTo(AttributeValue.builder().s("PT45M").build());
-        assertEquals(Duration.ofMinutes(45), result);
+    void shouldParsePtDurationWithoutUnitAsSeconds() {
+        Duration duration = converter.transformTo(AttributeValue.builder().s("PT5").build());
+        assertEquals(Duration.ofSeconds(5), duration);
     }
 
     @Test
-    void shouldTransformToNullForEmptyOrNullAttribute() {
-        assertNull(converter.transformTo(null));
-        assertNull(converter.transformTo(AttributeValue.builder().s("").build()));
+    void shouldParseNumericDurationAsSeconds() {
+        Duration duration = converter.transformTo(AttributeValue.builder().s("120").build());
+        assertEquals(Duration.ofSeconds(120), duration);
+    }
+
+    @Test
+    void shouldParseNumericAttributeAsSeconds() {
+        Duration duration = converter.transformTo(AttributeValue.builder().n("180").build());
+        assertEquals(Duration.ofSeconds(180), duration);
+    }
+
+    @Test
+    void shouldWriteDurationAsIsoString() {
+        AttributeValue value = converter.transformFrom(Duration.ofMinutes(8));
+        assertEquals("PT8M", value.s());
+    }
+
+    @Test
+    void shouldWriteNullDurationAsNullAttribute() {
+        AttributeValue value = converter.transformFrom(null);
+        assertTrue(value.nul());
+    }
+
+    @Test
+    void shouldReturnNullWhenNoDurationValuePresent() {
         assertNull(converter.transformTo(AttributeValue.builder().nul(true).build()));
     }
 
     @Test
-    void shouldThrowForMalformedDuration() {
-        assertThrows(DateTimeParseException.class, () -> converter.transformTo(AttributeValue.builder().s("abc").build()));
+    void shouldReturnNullForUnsupportedUnit() {
+        assertNull(converter.transformTo(AttributeValue.builder().s("PT2Q").build()));
     }
 
     @Test
-    void shouldExposeStringAttributeValueType() {
-        assertEquals(AttributeValueType.S, converter.attributeValueType());
+    void shouldParseQuotedIsoDuration() {
+        Duration duration = converter.transformTo(AttributeValue.builder().s("\"PT8M\"").build());
+        assertEquals(Duration.ofMinutes(8), duration);
     }
 }
