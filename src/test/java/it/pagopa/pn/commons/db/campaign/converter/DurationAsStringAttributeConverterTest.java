@@ -27,8 +27,8 @@ class DurationAsStringAttributeConverterTest {
 
     @Test
     void shouldParseIsoDurationWithHours() {
-        Duration duration = converter.transformTo(AttributeValue.builder().s("PT24H").build());
-        assertEquals(Duration.ofHours(24), duration);
+        Duration duration = converter.transformTo(AttributeValue.builder().s("PT12H").build());
+        assertEquals(Duration.ofHours(12), duration);
     }
 
     @Test
