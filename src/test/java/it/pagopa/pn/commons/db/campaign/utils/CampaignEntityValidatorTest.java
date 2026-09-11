@@ -2,13 +2,18 @@ package it.pagopa.pn.commons.db.campaign.utils;
 
 import it.pagopa.pn.commons.db.campaign.entity.CampaignChannel;
 import it.pagopa.pn.commons.db.campaign.entity.CampaignEntity;
+import it.pagopa.pn.commons.db.campaign.entity.DesiredFeedback;
 import it.pagopa.pn.commons.db.campaign.entity.CampaignStatus;
 import it.pagopa.pn.commons.db.campaign.entity.WorkflowEntity;
 import it.pagopa.pn.commons.utils.qr.models.RecipientTypeInt;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -47,11 +52,132 @@ class CampaignEntityValidatorTest {
         assertFalse(CampaignEntityValidator.isValid(campaign));
     }
 
+    @Test
+    void shouldReturnFalseForBlankCampaignId() {
+        CampaignEntity campaign = validCampaign();
+        campaign.setCampaignId(" ");
+        assertFalse(CampaignEntityValidator.isValid(campaign));
+    }
+
+    @Test
+    void shouldReturnFalseForBlankTitle() {
+        CampaignEntity campaign = validCampaign();
+        campaign.setTitle(" ");
+        assertFalse(CampaignEntityValidator.isValid(campaign));
+    }
+
+    @Test
+    void shouldReturnFalseForBlankDescriptionScope() {
+        CampaignEntity campaign = validCampaign();
+        campaign.setDescriptionScope(" ");
+        assertFalse(CampaignEntityValidator.isValid(campaign));
+    }
+
+    @Test
+    void shouldReturnFalseForNullStartDate() {
+        CampaignEntity campaign = validCampaign();
+        campaign.setStartDate(null);
+        assertFalse(CampaignEntityValidator.isValid(campaign));
+    }
+
+    @Test
+    void shouldReturnFalseForNullEndDate() {
+        CampaignEntity campaign = validCampaign();
+        campaign.setEndDate(null);
+        assertFalse(CampaignEntityValidator.isValid(campaign));
+    }
+
+    @Test
+    void shouldReturnFalseForNullStatus() {
+        CampaignEntity campaign = validCampaign();
+        campaign.setStatus(null);
+        assertFalse(CampaignEntityValidator.isValid(campaign));
+    }
+
+    @Test
+    void shouldReturnFalseForBlankServiceId() {
+        CampaignEntity campaign = validCampaign();
+        campaign.setServiceId(" ");
+        assertFalse(CampaignEntityValidator.isValid(campaign));
+    }
+
+    @Test
+    void shouldReturnFalseForNullWorkflow() {
+        CampaignEntity campaign = validCampaign();
+        campaign.setWorkflow(null);
+        assertFalse(CampaignEntityValidator.isValid(campaign));
+    }
+
+    @Test
+    void shouldReturnTrueForEmptyWorkflow() {
+        CampaignEntity campaign = validCampaign();
+        campaign.setWorkflow(List.of());
+        assertTrue(CampaignEntityValidator.isValid(campaign));
+    }
+
+    @Test
+    void shouldReturnFalseForWorkflowStepWithNullRecipientTypeElement() {
+        CampaignEntity campaign = validCampaign();
+        Set<RecipientTypeInt> recipientTypes = new HashSet<>(Arrays.asList(RecipientTypeInt.PF, null));
+        WorkflowEntity step = WorkflowEntity.builder()
+                .channel(CampaignChannel.IO)
+                .recipientType(recipientTypes)
+                .timeout(Duration.ofMinutes(5))
+                .includeAttachment(true)
+                .build();
+        campaign.setWorkflow(List.of(step));
+        assertFalse(CampaignEntityValidator.isValid(campaign));
+    }
+
+    @Test
+    void hasValidWorkflowStepShouldReturnFalseForNullStep() throws Exception {
+        assertFalse(invokeHasValidWorkflowStep(null));
+    }
+
+    @Test
+    void hasValidWorkflowStepShouldReturnFalseForNullChannel() throws Exception {
+        WorkflowEntity step = WorkflowEntity.builder()
+                .channel(null)
+                .recipientType(Set.of(RecipientTypeInt.PF))
+                .build();
+        assertFalse(invokeHasValidWorkflowStep(step));
+    }
+
+    @Test
+    void hasValidWorkflowStepShouldReturnFalseForNullRecipientType() throws Exception {
+        WorkflowEntity step = WorkflowEntity.builder()
+                .channel(CampaignChannel.EMAIL)
+                .recipientType(null)
+                .build();
+        assertFalse(invokeHasValidWorkflowStep(step));
+    }
+
+    @Test
+    void hasValidWorkflowStepShouldReturnFalseForEmptyRecipientType() throws Exception {
+        WorkflowEntity step = WorkflowEntity.builder()
+                .channel(CampaignChannel.EMAIL)
+                .recipientType(Set.of())
+                .build();
+        assertFalse(invokeHasValidWorkflowStep(step));
+    }
+
+    @Test
+    void hasValidWorkflowStepShouldReturnTrueForValidStep() throws Exception {
+        WorkflowEntity step = WorkflowEntity.builder()
+                .channel(CampaignChannel.PEC)
+                .recipientType(Set.of(RecipientTypeInt.PG))
+                .desiredFeedback(Set.of(DesiredFeedback.RECEIVED))
+                .timeout(Duration.ofMinutes(3))
+                .build();
+        assertTrue(invokeHasValidWorkflowStep(step));
+    }
+
     private CampaignEntity validCampaign() {
         WorkflowEntity workflow = WorkflowEntity.builder()
                 .channel(CampaignChannel.IO)
                 .recipientType(Set.of(RecipientTypeInt.PF))
                 .timeout(Duration.ofHours(2))
+                .desiredFeedback(Set.of(DesiredFeedback.READ))
                 .includeAttachment(false)
                 .build();
 
@@ -70,5 +196,11 @@ class CampaignEntityValidatorTest {
                 .workflow(List.of(workflow))
                 .build();
     }
-}
 
+    private boolean invokeHasValidWorkflowStep(WorkflowEntity workflowEntity)
+            throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Method method = CampaignEntityValidator.class.getDeclaredMethod("hasValidWorkflowStep", WorkflowEntity.class);
+        method.setAccessible(true);
+        return (boolean) method.invoke(null, workflowEntity);
+    }
+}
