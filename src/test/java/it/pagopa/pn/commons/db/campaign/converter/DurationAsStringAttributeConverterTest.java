@@ -9,6 +9,7 @@ import java.time.Duration;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class DurationAsStringAttributeConverterTest {
     private final DurationAsStringAttributeConverter converter = new DurationAsStringAttributeConverter();
@@ -83,13 +84,43 @@ class DurationAsStringAttributeConverterTest {
     }
 
     @Test
-    void shouldReturnNullForInvalidIsoDuration() {
-        assertNull(converter.transformTo(AttributeValue.builder().s("INVALID").build()));
+    void shouldThrowExceptionForInvalidIsoDuration() {
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+                () -> converter.transformTo(AttributeValue.builder().s("INVALID").build()));
+        assertEquals("Cannot parse duration string: INVALID", ex.getMessage());
     }
 
     @Test
-    void shouldReturnNullForInvalidNumericAttribute() {
-        assertNull(converter.transformTo(AttributeValue.builder().n("abc").build()));
+    void shouldThrowExceptionForInvalidNumericAttribute() {
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+                () -> converter.transformTo(AttributeValue.builder().n("abc").build()));
+        assertEquals("Cannot parse duration number: abc", ex.getMessage());
+    }
+
+    @Test
+    void shouldThrowExceptionForNonNumericValue() {
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+                () -> converter.transformTo(AttributeValue.builder().n("12.34.56").build()));
+        assertTrue(ex.getMessage().startsWith("Cannot parse duration number:"));
+    }
+
+    @Test
+    void shouldThrowExceptionForInvalidStringWithExtraCharacters() {
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+                () -> converter.transformTo(AttributeValue.builder().s("PT24H EXTRA").build()));
+        assertTrue(ex.getMessage().startsWith("Cannot parse duration string:"));
+    }
+
+    @Test
+    void shouldParseValidIsoDurationWith25Hours() {
+        Duration duration = converter.transformTo(AttributeValue.builder().s("PT25H30M").build());
+        assertEquals(Duration.ofHours(25).plusMinutes(30), duration);
+    }
+
+    @Test
+    void shouldParseNegativeDurationFromNumber() {
+        Duration duration = converter.transformTo(AttributeValue.builder().n("-3600").build());
+        assertEquals(Duration.ofSeconds(-3600), duration);
     }
 
     @Test
