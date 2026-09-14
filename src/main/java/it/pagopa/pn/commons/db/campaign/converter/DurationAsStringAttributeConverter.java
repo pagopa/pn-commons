@@ -29,8 +29,7 @@ public class DurationAsStringAttributeConverter implements AttributeConverter<Du
             try {
                 return Duration.parse(attributeValue.s().trim());
             } catch (Exception ex) {
-                log.warn("Cannot parse duration string: {}", attributeValue.s());
-                return null;
+                throw new IllegalArgumentException("Cannot parse duration string: " + attributeValue.s(), ex);
             }
         }
 
@@ -38,8 +37,7 @@ public class DurationAsStringAttributeConverter implements AttributeConverter<Du
             try {
                 return Duration.ofSeconds(Long.parseLong(attributeValue.n().trim()));
             } catch (NumberFormatException ex) {
-                log.warn("Cannot parse duration number: {}", attributeValue.n());
-                return null;
+                throw new IllegalArgumentException("Cannot parse duration number: " + attributeValue.n(), ex);
             }
         }
 
