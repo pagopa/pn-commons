@@ -85,29 +85,33 @@ class DurationAsStringAttributeConverterTest {
 
     @Test
     void shouldThrowExceptionForInvalidIsoDuration() {
+        AttributeValue invalidAttribute = AttributeValue.builder().s("INVALID").build();
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> converter.transformTo(AttributeValue.builder().s("INVALID").build()));
+                () -> converter.transformTo(invalidAttribute));
         assertEquals("Cannot parse duration string: INVALID", ex.getMessage());
     }
 
     @Test
     void shouldThrowExceptionForInvalidNumericAttribute() {
+        AttributeValue invalidAttribute = AttributeValue.builder().n("abc").build();
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> converter.transformTo(AttributeValue.builder().n("abc").build()));
+                () -> converter.transformTo(invalidAttribute));
         assertEquals("Cannot parse duration number: abc", ex.getMessage());
     }
 
     @Test
     void shouldThrowExceptionForNonNumericValue() {
+        AttributeValue invalidAttribute = AttributeValue.builder().n("12.34.56").build();
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> converter.transformTo(AttributeValue.builder().n("12.34.56").build()));
+                () -> converter.transformTo(invalidAttribute));
         assertTrue(ex.getMessage().startsWith("Cannot parse duration number:"));
     }
 
     @Test
     void shouldThrowExceptionForInvalidStringWithExtraCharacters() {
+        AttributeValue invalidAttribute = AttributeValue.builder().s("PT24H EXTRA").build();
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> converter.transformTo(AttributeValue.builder().s("PT24H EXTRA").build()));
+                () -> converter.transformTo(invalidAttribute));
         assertTrue(ex.getMessage().startsWith("Cannot parse duration string:"));
     }
 
