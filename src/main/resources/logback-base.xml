@@ -2,7 +2,30 @@
 <!DOCTYPE xml>
 <configuration>
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <timestamp/>
+                <version/>
+                <message/>
+                <loggerName/>
+                <threadName/>
+                <logLevel/>
+                <stackTrace/>
+                <mdc/>
+                <pattern>
+                    <omitEmptyFields>true</omitEmptyFields>
+                    <pattern>
+                        {
+                        "PNApplicationMetrics": "#asJson{%mdc{PNApplicationMetrics}}",
+                        "_aws": "#asJson{%mdc{_aws}}"
+                        }
+                    </pattern>
+                </pattern>
+                <arguments/>
+                <logstashMarkers/>
+                <contextName/>
+            </providers>
+        </encoder>
     </appender>
     <if condition='${WIRE_TAP_LOG:-false}'>
         <then>
