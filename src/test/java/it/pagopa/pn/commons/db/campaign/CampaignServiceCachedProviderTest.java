@@ -9,7 +9,6 @@ import it.pagopa.pn.commons.exceptions.PnCampaignNotFoundException;
 import it.pagopa.pn.commons.utils.qr.models.RecipientTypeInt;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
-import org.mockito.Mockito;
 import software.amazon.awssdk.core.pagination.sync.SdkIterable;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
@@ -23,6 +22,9 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.eq;
 
 class CampaignServiceCachedProviderTest {
 
@@ -66,13 +68,13 @@ class CampaignServiceCachedProviderTest {
 
     @Test
     void shouldThrowForBlankTableName() {
-        DynamoDbEnhancedClient client = Mockito.mock(DynamoDbEnhancedClient.class);
+        DynamoDbEnhancedClient client = mock(DynamoDbEnhancedClient.class);
         assertThrows(IllegalArgumentException.class, () -> new CampaignServiceCachedProvider(client, " "));
     }
 
     @Test
     void shouldThrowForNullTableName() {
-        DynamoDbEnhancedClient client = Mockito.mock(DynamoDbEnhancedClient.class);
+        DynamoDbEnhancedClient client = mock(DynamoDbEnhancedClient.class);
         assertThrows(IllegalArgumentException.class, () -> new CampaignServiceCachedProvider(client, null));
     }
 
@@ -83,15 +85,15 @@ class CampaignServiceCachedProviderTest {
 
     @SuppressWarnings("unchecked")
     private CampaignServiceCachedProvider createProviderWithCampaigns(List<CampaignEntity> campaigns) {
-        DynamoDbEnhancedClient client = Mockito.mock(DynamoDbEnhancedClient.class);
-        DynamoDbTable<CampaignEntity> table = Mockito.mock(DynamoDbTable.class);
-        PageIterable<CampaignEntity> pageIterable = Mockito.mock(PageIterable.class);
+        DynamoDbEnhancedClient client = mock(DynamoDbEnhancedClient.class);
+        DynamoDbTable<CampaignEntity> table = mock(DynamoDbTable.class);
+        PageIterable<CampaignEntity> pageIterable = mock(PageIterable.class);
         SdkIterable<CampaignEntity> sdkIterable = campaigns::iterator;
 
-        Mockito.when(client.table(Mockito.eq("Campaigns"), ArgumentMatchers.<TableSchema<CampaignEntity>>any()))
+        when(client.table(eq("Campaigns"), ArgumentMatchers.<TableSchema<CampaignEntity>>any()))
                 .thenReturn(table);
-        Mockito.when(table.scan()).thenReturn(pageIterable);
-        Mockito.when(pageIterable.items()).thenReturn(sdkIterable);
+        when(table.scan()).thenReturn(pageIterable);
+        when(pageIterable.items()).thenReturn(sdkIterable);
 
         return new CampaignServiceCachedProvider(client, "Campaigns");
     }

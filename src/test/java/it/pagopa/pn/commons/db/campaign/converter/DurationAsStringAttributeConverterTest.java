@@ -9,6 +9,7 @@ import java.time.Duration;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class DurationAsStringAttributeConverterTest {
     private final DurationAsStringAttributeConverter converter = new DurationAsStringAttributeConverter();
@@ -21,44 +22,32 @@ class DurationAsStringAttributeConverterTest {
 
     @Test
     void shouldParseIsoDurationWithSpacesAndLowercase() {
-        Duration duration = converter.transformTo(AttributeValue.builder().s("  pt8m ").build());
+        Duration duration = converter.transformTo(AttributeValue.builder().s("  PT8M ").build());
         assertEquals(Duration.ofMinutes(8), duration);
     }
 
     @Test
-    void shouldParseSimpleDurationWithHoursUnit() {
-        Duration duration = converter.transformTo(AttributeValue.builder().s("24H").build());
-        assertEquals(Duration.ofHours(24), duration);
+    void shouldParseIsoDurationWithHours() {
+        Duration duration = converter.transformTo(AttributeValue.builder().s("PT12H").build());
+        assertEquals(Duration.ofHours(12), duration);
     }
 
     @Test
-    void shouldParseSimpleDurationWithMinutesUnit() {
-        Duration duration = converter.transformTo(AttributeValue.builder().s("15M").build());
+    void shouldParseIsoDurationWithMinutes() {
+        Duration duration = converter.transformTo(AttributeValue.builder().s("PT15M").build());
         assertEquals(Duration.ofMinutes(15), duration);
     }
 
     @Test
-    void shouldParseSimpleDurationWithSecondsUnit() {
-        Duration duration = converter.transformTo(AttributeValue.builder().s("45S").build());
+    void shouldParseIsoDurationWithSeconds() {
+        Duration duration = converter.transformTo(AttributeValue.builder().s("PT45S").build());
         assertEquals(Duration.ofSeconds(45), duration);
     }
 
     @Test
-    void shouldParseSimpleDurationWithDaysUnit() {
-        Duration duration = converter.transformTo(AttributeValue.builder().s("2D").build());
+    void shouldParseIsoDurationWithDays() {
+        Duration duration = converter.transformTo(AttributeValue.builder().s("P2D").build());
         assertEquals(Duration.ofDays(2), duration);
-    }
-
-    @Test
-    void shouldParsePtWithoutUnitAsSeconds() {
-        Duration duration = converter.transformTo(AttributeValue.builder().s("PT5").build());
-        assertEquals(Duration.ofSeconds(5), duration);
-    }
-
-    @Test
-    void shouldParseNumericDurationAsSeconds() {
-        Duration duration = converter.transformTo(AttributeValue.builder().s("120").build());
-        assertEquals(Duration.ofSeconds(120), duration);
     }
 
     @Test
@@ -95,19 +84,47 @@ class DurationAsStringAttributeConverterTest {
     }
 
     @Test
-    void shouldReturnNullForUnsupportedUnit() {
-        assertNull(converter.transformTo(AttributeValue.builder().s("PT2Q").build()));
+    void shouldThrowExceptionForInvalidIsoDuration() {
+        AttributeValue invalidAttribute = AttributeValue.builder().s("INVALID").build();
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+                () -> converter.transformTo(invalidAttribute));
+        assertEquals("Cannot parse duration string: INVALID", ex.getMessage());
     }
 
     @Test
-    void shouldReturnNullForInvalidNumericAttribute() {
-        assertNull(converter.transformTo(AttributeValue.builder().n("12.3").build()));
+    void shouldThrowExceptionForInvalidNumericAttribute() {
+        AttributeValue invalidAttribute = AttributeValue.builder().n("abc").build();
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+                () -> converter.transformTo(invalidAttribute));
+        assertEquals("Cannot parse duration number: abc", ex.getMessage());
     }
 
     @Test
-    void shouldParseQuotedIsoDuration() {
-        Duration duration = converter.transformTo(AttributeValue.builder().s("\"PT8M\"").build());
-        assertEquals(Duration.ofMinutes(8), duration);
+    void shouldThrowExceptionForNonNumericValue() {
+        AttributeValue invalidAttribute = AttributeValue.builder().n("12.34.56").build();
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+                () -> converter.transformTo(invalidAttribute));
+        assertTrue(ex.getMessage().startsWith("Cannot parse duration number:"));
+    }
+
+    @Test
+    void shouldThrowExceptionForInvalidStringWithExtraCharacters() {
+        AttributeValue invalidAttribute = AttributeValue.builder().s("PT24H EXTRA").build();
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+                () -> converter.transformTo(invalidAttribute));
+        assertTrue(ex.getMessage().startsWith("Cannot parse duration string:"));
+    }
+
+    @Test
+    void shouldParseValidIsoDurationWith25Hours() {
+        Duration duration = converter.transformTo(AttributeValue.builder().s("PT25H30M").build());
+        assertEquals(Duration.ofHours(25).plusMinutes(30), duration);
+    }
+
+    @Test
+    void shouldParseNegativeDurationFromNumber() {
+        Duration duration = converter.transformTo(AttributeValue.builder().n("-3600").build());
+        assertEquals(Duration.ofSeconds(-3600), duration);
     }
 
     @Test
