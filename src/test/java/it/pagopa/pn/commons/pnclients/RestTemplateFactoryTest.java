@@ -130,10 +130,30 @@ class RestTemplateFactoryTest {
         MockWebServer mockWebServer = new MockWebServer();
 
         String expectedResponse = "expect that it works";
-        mockWebServer.enqueue(new MockResponse().setResponseCode(429));
-        mockWebServer.enqueue(new MockResponse().setResponseCode(502));
-        mockWebServer.enqueue(new MockResponse().setResponseCode(429));
-        mockWebServer.enqueue(new MockResponse().setResponseCode(429));
+        String erroMessageOne = """
+                {
+                "errorMessage": "error messageOne"
+                }
+                """;
+        String erroMessageTwo = """
+                {
+                "errorMessage": "error messageTwo"
+                }
+                """;
+        String erroMessageThree = """
+                {
+                "errorMessage": "error messageThree"
+                }
+                """;
+        String erroMessageFour = """
+                {
+                "errorMessage": "error messageFour"
+                }
+                """;
+        mockWebServer.enqueue(new MockResponse().setResponseCode(429).setBody(erroMessageOne));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(502).setBody(erroMessageTwo));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(429).setBody(erroMessageThree));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(503).setBody(erroMessageFour));
         mockWebServer.enqueue(new MockResponse().setResponseCode(200)
                 .setBody(expectedResponse));
 

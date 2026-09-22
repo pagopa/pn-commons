@@ -157,10 +157,30 @@ class CommonBaseClientTest {
         MockWebServer mockWebServer = new MockWebServer();
 
         String expectedResponse = "expect that it works";
-        mockWebServer.enqueue(new MockResponse().setResponseCode(429));
-        mockWebServer.enqueue(new MockResponse().setResponseCode(502));
-        mockWebServer.enqueue(new MockResponse().setResponseCode(429));
-        mockWebServer.enqueue(new MockResponse().setResponseCode(503));
+        String erroMessageOne = """
+                {
+                "errorMessage": "error messageOne"
+                }
+                """;
+        String erroMessageTwo = """
+                {
+                "errorMessage": "error messageTwo"
+                }
+                """;
+        String erroMessageThree = """
+                {
+                "errorMessage": "error messageThree"
+                }
+                """;
+        String erroMessageFour = """
+                {
+                "errorMessage": "error messageFour"
+                }
+                """;
+        mockWebServer.enqueue(new MockResponse().setResponseCode(429).setBody(erroMessageOne));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(502).setBody(erroMessageTwo));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(429).setBody(erroMessageThree));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(503).setBody(erroMessageFour));
         mockWebServer.enqueue(new MockResponse().setResponseCode(200)
                 .setBody(expectedResponse));
 
@@ -188,7 +208,8 @@ class CommonBaseClientTest {
         MockWebServer mockWebServer = new MockWebServer();
 
         String expectedResponse = "expect that it works";
-        mockWebServer.enqueue(new MockResponse().setResponseCode(500));
+        String expectedErrorResponse = "The server not  responding";
+        mockWebServer.enqueue(new MockResponse().setResponseCode(500).setBody(expectedErrorResponse));
         mockWebServer.enqueue(new MockResponse().setResponseCode(200)
                 .setBody(expectedResponse));
 
