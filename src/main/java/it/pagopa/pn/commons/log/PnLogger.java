@@ -173,8 +173,9 @@ public interface PnLogger extends Logger {
      *
      * @param service     nome servizio, possibilmente usare quelli definiti in PnLogger.EXTERNAL_SERVICES
      * @param description eventuale descrizione dell'errore
+     * @param t eventuale eccezione
      */
-    void logInvokationResultDownstreamFailed(String service, String description);
+    void logInvokationResultDownstreamFailed(String service, String description,  Throwable t);
 
     /**
      * metodo per loggare l'esito di not found per una invocazione ad un servizio di downstream

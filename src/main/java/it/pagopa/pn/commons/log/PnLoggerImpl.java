@@ -5,6 +5,7 @@ import it.pagopa.pn.commons.log.dto.metrics.GeneralMetric;
 import it.pagopa.pn.commons.utils.MetricUtils;
 import org.slf4j.*;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import software.amazon.awssdk.enhanced.dynamodb.Key;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.TransactWriteItem;
@@ -95,8 +96,9 @@ class PnLoggerImpl implements PnLogger {
     }
 
     @Override
-    public void logInvokationResultDownstreamFailed(String service, String description) {
-        log.error("[DOWNSTREAM] Service {} returned errors={}", service, description==null?"<not specified>":description);
+    public void logInvokationResultDownstreamFailed(String service, String description, Throwable t) {
+        String details = elabExceptionMessage(t);
+        log.error("[DOWNSTREAM] Service {} returned errors={} details={}", service, description == null ? "<not specified>" : description, details == null ? "<not specified>" : details, t);
     }
 
     @Override
@@ -513,5 +515,23 @@ class PnLoggerImpl implements PnLogger {
     @Override
     public void error(Marker marker, String s, Throwable throwable) {
         log.error(marker, s, throwable);
+    }
+
+    private String elabExceptionMessage(Throwable x)
+    {
+        try {
+            if(x == null){
+                return null;
+            }
+            String message = x.getMessage() == null ? "" : x.getMessage();
+            if (x instanceof WebClientResponseException webClientResponseException)
+            {
+                message += "; " + webClientResponseException.getResponseBodyAsString();
+            }
+            return  message;
+        } catch (Exception e) {
+            log.error("exception reading body", e);
+            return x.getMessage();
+        }
     }
 }

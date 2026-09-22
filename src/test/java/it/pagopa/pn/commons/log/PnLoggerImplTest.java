@@ -14,7 +14,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -231,18 +235,57 @@ class PnLoggerImplTest {
                 .getLevel());
     }
 
+    /*
+    {
+      "@timestamp": "2026-09-22T17:41:46.886+02:00",
+      "@version": "1",
+      "message": "[DOWNSTREAM] Service processo returned errors=<not specified> details=404 Not Found; {\n\"detailError\": \"detail\",\n\"error\": \"an error\"\n}\n",
+      "logger_name": "it.pagopa.pn.commons.log.PnLoggerImplTest",
+      "thread_name": "main",
+      "level": "ERROR",
+      "level_value": 40000,
+      "stack_trace": "org.springframework.web.reactive.function.client.WebClientResponseException$NotFound: 404 Not Found\n at org.springframework.web.reactive.function.client.WebClientResponseException.create(WebClientResponseException.java:223)\n at org.springframework.web.reactive.function.client.WebClientResponseException.create(WebClientResponseException.java:202)\n at it.pagopa.pn.commons.log.PnLoggerImplTest.logEndingDownstreamProcessFailWhenExceptionExists(PnLoggerImplTest.java:248)\n at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)\n at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)\n at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)\n at java.base/java.lang.reflect.Method.invoke(Method.java:569)\n at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:725)\n at org.junit.jupiter.engine.execution.MethodInvocation.proceed(MethodInvocation.java:60)\n at org.junit.jupiter.engine.execution.InvocationInterceptorChain$ValidatingInvocation.proceed(InvocationInterceptorChain.java:131)\n at org.junit.jupiter.engine.extension.TimeoutExtension.intercept(TimeoutExtension.java:149)\n at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestableMethod(TimeoutExtension.java:140)\n at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestMethod(TimeoutExtension.java:84)\n at org.junit.jupiter.engine.execution.ExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(ExecutableInvoker.java:115)\n at org.junit.jupiter.engine.execution.ExecutableInvoker.lambda$invoke$0(ExecutableInvoker.java:105)\n at org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:106)\n at org.junit.jupiter.engine.execution.InvocationInterceptorChain.proceed(InvocationInterceptorChain.java:64)\n at org.junit.jupiter.engine.execution.InvocationInterceptorChain.chainAndInvoke(InvocationInterceptorChain.java:45)\n at org.junit.jupiter.engine.execution.InvocationInterceptorChain.invoke(InvocationInterceptorChain.java:37)\n at org.junit.jupiter.engine.execution.ExecutableInvoker.invoke(ExecutableInvoker.java:104)\n at org.junit.jupiter.engine.execution.ExecutableInvoker.invoke(ExecutableInvoker.java:98)\n at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$invokeTestMethod$7(TestMethodTestDescriptor.java:214)\n at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)\n at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.invokeTestMethod(TestMethodTestDescriptor.java:210)\n at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:135)\n at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:66)\n at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:151)\n at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)\n at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)\n at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)\n at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)\n at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)\n at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)\n at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)\n at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)\n at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)\n at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:155)\n at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)\n at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)\n at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)\n at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)\n at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)\n at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)\n at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)\n at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)\n at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)\n at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:155)\n at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)\n at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)\n at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)\n at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)\n at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)\n at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)\n at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)\n at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35)\n at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57)\n at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54)\n at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:107)\n at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:88)\n at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:54)\n at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:67)\n at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:52)\n at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:114)\n at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:86)\n at org.junit.platform.launcher.core.DefaultLauncherSession$DelegatingLauncher.execute(DefaultLauncherSession.java:86)\n at org.junit.platform.launcher.core.SessionPerRequestLauncher.execute(SessionPerRequestLauncher.java:53)\n at com.intellij.junit5.JUnit5TestRunnerHelper.execute(JUnit5TestRunnerHelper.java:134)\n at com.intellij.junit5.JUnit5IdeaTestRunner.startRunnerWithArgs(JUnit5IdeaTestRunner.java:70)\n at com.intellij.rt.junit.IdeaTestRunner$Repeater$1.execute(IdeaTestRunner.java:38)\n at com.intellij.rt.execution.junit.TestsRepeater.repeat(TestsRepeater.java:11)\n at com.intellij.rt.junit.IdeaTestRunner$Repeater.startRunnerWithArgs(IdeaTestRunner.java:35)\n at com.intellij.rt.junit.JUnitStarter.prepareStreamsAndStart(JUnitStarter.java:226)\n at com.intellij.rt.junit.JUnitStarter.main(JUnitStarter.java:62)\n"
+    }
+     */
     @Test
-    void logEndingDownstreamProcessFail() {
+    void logEndingDownstreamProcessFailWhenExceptionExists() {
         //Given
         String str = "processo";
+        byte[] errorBodyMessage = """
+                {
+                "detailError": "detail",
+                "error": "an error"
+                }
+                """.getBytes(StandardCharsets.UTF_8);
+        WebClientResponseException notFound = WebClientResponseException.create(404, "Not Found", new HttpHeaders(), errorBodyMessage, Charset.defaultCharset());
 
         //When
-        fooLogger.logInvokationResultDownstreamFailed(str, null);
+        fooLogger.logInvokationResultDownstreamFailed(str, null, notFound);
 
         //Then
         // JUnit assertions
         List<ILoggingEvent> logsList = listAppender.list;
-        Assertions.assertEquals("[DOWNSTREAM] Service " + str + " returned errors=<not specified>", logsList.get(0)
+        Assertions.assertEquals("[DOWNSTREAM] Service " + str + " returned errors=<not specified> details=404 Not Found; {\n" +
+                "\"detailError\": \"detail\",\n" +
+                "\"error\": \"an error\"\n" +
+                "}\n", logsList.get(0)
+                .getFormattedMessage());
+        Assertions.assertEquals(Level.ERROR, logsList.get(0)
+                .getLevel());
+    }
+
+    @Test
+    void logEndingDownstreamProcessFailWhenExceptionNull() {
+        //Given
+        String str = "processo";
+
+        //When
+        fooLogger.logInvokationResultDownstreamFailed(str, null, null);
+
+        //Then
+        // JUnit assertions
+        List<ILoggingEvent> logsList = listAppender.list;
+        Assertions.assertEquals("[DOWNSTREAM] Service " + str + " returned errors=<not specified> details=<not specified>", logsList.get(0)
                 .getFormattedMessage());
         Assertions.assertEquals(Level.ERROR, logsList.get(0)
                 .getLevel());

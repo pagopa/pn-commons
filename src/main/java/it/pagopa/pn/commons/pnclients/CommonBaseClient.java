@@ -148,7 +148,7 @@ public abstract class CommonBaseClient {
                         .filter(this::isRetryableException)
                         .onRetryExhaustedThrow((retryBackoffSpec, retrySignal) -> {
                             Throwable lastExceptionInRetry = retrySignal.failure();
-                            log.warn("Retries exhausted {}, with last Exception: {}", retrySignal.totalRetries(),elabExceptionMessage(lastExceptionInRetry));
+                            log.warn("Retries exhausted {}, with last Exception: {}", retrySignal.totalRetries(), lastExceptionInRetry.getMessage());
                             return lastExceptionInRetry;
                         })
                 );
@@ -167,10 +167,7 @@ public abstract class CommonBaseClient {
                 throwable instanceof WebClientResponseException.ServiceUnavailable
                 ;
         if(retryable) {
-            log.warn("Exception caught by retry: {}", elabExceptionMessage(throwable));
-        }
-        else {
-            log.warn(elabExceptionMessage(throwable));
+            log.warn("Exception caught by retry", throwable);
         }
         return retryable;
     }
