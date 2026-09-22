@@ -188,8 +188,7 @@ class CommonBaseClientTest {
         MockWebServer mockWebServer = new MockWebServer();
 
         String expectedResponse = "expect that it works";
-        String expectedErrorResponse = "The server not  responding";
-        mockWebServer.enqueue(new MockResponse().setResponseCode(500).setBody(expectedErrorResponse));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(500));
         mockWebServer.enqueue(new MockResponse().setResponseCode(200)
                 .setBody(expectedResponse));
 
