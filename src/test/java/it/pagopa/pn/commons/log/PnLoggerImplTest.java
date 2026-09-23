@@ -14,7 +14,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -231,18 +235,57 @@ class PnLoggerImplTest {
                 .getLevel());
     }
 
+    /*
+    {
+      "@timestamp": "2026-09-22T17:41:46.886+02:00",
+      "@version": "1",
+      "message": "[DOWNSTREAM] Service processo returned errors=<not specified> details=404 Not Found; {\n\"detailError\": \"detail\",\n\"error\": \"an error\"\n}\n",
+      "logger_name": "it.pagopa.pn.commons.log.PnLoggerImplTest",
+      "thread_name": "main",
+      "level": "ERROR",
+      "level_value": 40000,
+      "stack_trace": "org.springframework.web.reactive.function.client.WebClientResponseException$NotFound: 404 Not Found\n ...\n"
+    }
+     */
     @Test
-    void logEndingDownstreamProcessFail() {
+    void logEndingDownstreamProcessFailWhenExceptionExists() {
         //Given
         String str = "processo";
+        byte[] errorBodyMessage = """
+                {
+                "detailError": "detail",
+                "error": "an error"
+                }
+                """.getBytes(StandardCharsets.UTF_8);
+        WebClientResponseException notFound = WebClientResponseException.create(404, "Not Found", new HttpHeaders(), errorBodyMessage, Charset.defaultCharset());
 
         //When
-        fooLogger.logInvokationResultDownstreamFailed(str, null);
+        fooLogger.logInvokationResultDownstreamFailed(str, null, notFound);
 
         //Then
         // JUnit assertions
         List<ILoggingEvent> logsList = listAppender.list;
-        Assertions.assertEquals("[DOWNSTREAM] Service " + str + " returned errors=<not specified>", logsList.get(0)
+        Assertions.assertEquals("[DOWNSTREAM] Service " + str + " returned errors=<not specified> details=404 Not Found; {\n" +
+                "\"detailError\": \"detail\",\n" +
+                "\"error\": \"an error\"\n" +
+                "}\n", logsList.get(0)
+                .getFormattedMessage());
+        Assertions.assertEquals(Level.ERROR, logsList.get(0)
+                .getLevel());
+    }
+
+    @Test
+    void logEndingDownstreamProcessFailWhenExceptionNull() {
+        //Given
+        String str = "processo";
+
+        //When
+        fooLogger.logInvokationResultDownstreamFailed(str, null, null);
+
+        //Then
+        // JUnit assertions
+        List<ILoggingEvent> logsList = listAppender.list;
+        Assertions.assertEquals("[DOWNSTREAM] Service " + str + " returned errors=<not specified> details=<not specified>", logsList.get(0)
                 .getFormattedMessage());
         Assertions.assertEquals(Level.ERROR, logsList.get(0)
                 .getLevel());
