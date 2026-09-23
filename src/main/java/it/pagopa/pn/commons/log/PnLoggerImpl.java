@@ -10,7 +10,6 @@ import software.amazon.awssdk.enhanced.dynamodb.Key;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.TransactWriteItem;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
