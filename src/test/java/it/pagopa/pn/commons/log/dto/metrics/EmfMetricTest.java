@@ -20,6 +20,19 @@ class EmfMetricTest {
         assertEquals(expectedJson, emfMetric.toJson());
     }
 
+    @Test
+    void toJsonHandlesEmptyDimensionsAndMetrics() {
+        GeneralMetric generalMetric = new GeneralMetric();
+        generalMetric.setNamespace("EmptyNamespace");
+        generalMetric.setTimestamp(Instant.now().getEpochSecond());
+        generalMetric.setUnit("Seconds");
+
+        EmfMetric emfMetric = new EmfMetric(generalMetric);
+
+        String expectedJson = "{\"Namespace\":\"EmptyNamespace\",\"Dimensions\":[],\"Metrics\":[[]]}";
+        assertEquals(expectedJson, emfMetric.toJson());
+    }
+
     @NotNull
     private static GeneralMetric getGeneralMetric() {
         GeneralMetric generalMetric = new GeneralMetric();

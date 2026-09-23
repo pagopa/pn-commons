@@ -1,26 +1,15 @@
 package it.pagopa.pn.commons.pnclients;
 
-import java.net.SocketTimeoutException;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
-import javax.validation.constraints.AssertTrue;
 import okhttp3.HttpUrl;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
-import okhttp3.mockwebserver.SocketPolicy;
-import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
-import org.springframework.web.client.ResourceAccessException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

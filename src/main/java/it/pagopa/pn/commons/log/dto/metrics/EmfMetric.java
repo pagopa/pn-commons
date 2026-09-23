@@ -10,11 +10,11 @@ public class EmfMetric extends GeneralMetric {
 
     @Override
     public String toJson() {
-        String dimensionsString = CollectionUtils.isEmpty(getMetrics()) ? "" :
+        String dimensionsString = CollectionUtils.isEmpty(getDimensions()) ? "" : "[" +
                 getDimensions().stream()
                         .map( dimension -> new DimensionEmf(dimension).toJson())
                         .reduce((a, b) -> a + "," + b)
-                        .orElse("");
+                        .orElse("") + "]";
 
         String metricsString = CollectionUtils.isEmpty(getMetrics()) ? "[]" :
                 getMetrics().stream()
@@ -22,7 +22,7 @@ public class EmfMetric extends GeneralMetric {
                         .reduce((a, b) -> a + "," + b)
                         .orElse("");
 
-        return String.format("{\"Namespace\":\"%s\",\"Dimensions\":[[%s]],\"Metrics\":[%s]}",
+        return String.format("{\"Namespace\":\"%s\",\"Dimensions\":[%s],\"Metrics\":[%s]}",
                 getNamespace(), dimensionsString, metricsString);
     }
 

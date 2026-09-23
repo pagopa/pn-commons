@@ -3,7 +3,7 @@ package it.pagopa.pn.commons.exceptions;
 import it.pagopa.pn.commons.exceptions.dto.ProblemError;
 import org.springframework.http.HttpStatus;
 
-import javax.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolation;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;

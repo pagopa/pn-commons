@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.ParameterizedTypeReference;
@@ -40,10 +40,10 @@ class RestTemplateFactoryTestIT {
     @Autowired
     private RestTemplate restTemplate;
 
-    @MockBean
+    @MockitoBean
     private MVPParameterConsumer mvpParameterConsumer;
 
-    @MockBean
+    @MockitoBean
     private RuntimeModeHolder runtimeModeHolder;
 
 

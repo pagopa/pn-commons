@@ -1,6 +1,6 @@
 package it.pagopa.pn.commons.exceptions;
 
-import javax.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolation;
 
 public interface ConstraintViolationTest extends ConstraintViolation<Object> {
 
