@@ -5,6 +5,7 @@ import it.pagopa.pn.commons.log.dto.metrics.GeneralMetric;
 import it.pagopa.pn.commons.utils.MetricUtils;
 import org.slf4j.*;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.reactive.function.client.WebClientException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import software.amazon.awssdk.enhanced.dynamodb.Key;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
@@ -46,15 +47,15 @@ class PnLoggerImpl implements PnLogger {
 
     @Override
     public void logEndingProcess(String process) {
-        logEndingProcess(process, true, null);
+        logEndingProcess(process, true, null, null);
     }
 
     @Override
-    public void logEndingProcess(String process, boolean success, String description) {
+    public void logEndingProcess(String process, boolean success, String description, Throwable t) {
         if (success)
             log.info("Ending process {}", process);
         else
-            log.warn("Ending process {} with errors={}", process, description==null?"<not specified>":description);
+            log.warn("Ending process {} with errors={}", process, description==null?"<not specified>":description, t);
     }
 
     @Override
@@ -523,6 +524,11 @@ class PnLoggerImpl implements PnLogger {
                 return null;
             }
             String message = x.getMessage() == null ? "" : x.getMessage();
+
+            if(x.getMessage() == null && x instanceof WebClientException we && we.getCause() != null) {
+                message = we.getCause().toString();
+            }
+
             if (x instanceof WebClientResponseException webClientResponseException)
             {
                 message += "; " + webClientResponseException.getResponseBodyAsString();

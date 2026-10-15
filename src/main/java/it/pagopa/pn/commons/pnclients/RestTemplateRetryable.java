@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.classify.Classifier;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.lang.Nullable;
 import org.springframework.retry.RetryPolicy;
 import org.springframework.retry.backoff.ExponentialRandomBackOffPolicy;
 import org.springframework.retry.policy.ExceptionClassifierRetryPolicy;
@@ -29,8 +30,9 @@ public class RestTemplateRetryable extends RestTemplate {
     }
 
     @Override
-    protected <T> T doExecute(URI url, HttpMethod method, RequestCallback requestCallback, ResponseExtractor<T> responseExtractor) throws RestClientException {
-        return retryTemplate.execute(context -> super.doExecute(url, method, requestCallback, responseExtractor));
+    protected <T> T doExecute(URI url, @Nullable String uriTemplate, @Nullable HttpMethod method, @Nullable RequestCallback requestCallback,
+                              @Nullable ResponseExtractor<T> responseExtractor) throws RestClientException {
+        return retryTemplate.execute(context -> super.doExecute(url, uriTemplate, method, requestCallback, responseExtractor));
     }
 
     private RetryTemplate createRetryTemplate(int retryMaxAttempts) {
@@ -54,7 +56,8 @@ public class RestTemplateRetryable extends RestTemplate {
         return throwable -> {
             RetryPolicy retryPolicy;
             if (throwable instanceof HttpStatusCodeException httpException) {
-                retryPolicy = getRetryPolicyForStatus(httpException.getStatusCode(), simpleRetryPolicy, neverRetryPolicy);
+                HttpStatus httpStatus = HttpStatus.resolve(httpException.getStatusCode().value());
+                retryPolicy = getRetryPolicyForStatus(httpStatus, simpleRetryPolicy, neverRetryPolicy);
             }
             else if(throwable instanceof PnHttpResponseException pnHttpResponseException && pnHttpResponseException.getStatusCode() > 0) {
                 retryPolicy = getRetryPolicyForStatus(HttpStatus.valueOf(pnHttpResponseException.getStatusCode()), simpleRetryPolicy, neverRetryPolicy);

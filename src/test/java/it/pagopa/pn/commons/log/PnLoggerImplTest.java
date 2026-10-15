@@ -90,7 +90,7 @@ class PnLoggerImplTest {
 
 
         //When
-        fooLogger.logEndingProcess(str, false, "test");
+        fooLogger.logEndingProcess(str, false, "test", new RuntimeException("test"));
 
         //Then
         // JUnit assertions
