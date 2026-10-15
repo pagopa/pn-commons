@@ -90,22 +90,6 @@ public abstract class CommonBaseClient {
 
     }
 
-
-    public static String elabExceptionMessage(Throwable x)
-    {
-        try {
-            String message = x.getMessage()==null?"":x.getMessage();
-            if (x instanceof WebClientResponseException webClientResponseException)
-            {
-                message += ";" + webClientResponseException.getResponseBodyAsString();
-            }
-            return  message;
-        } catch (Exception e) {
-            log.error("exception reading body", e);
-            return x.getMessage();
-        }
-    }
-
     protected WebClient.Builder enrichWithDefaultProps(WebClient.Builder builder){
         HttpClient httpClient = buildHttpClient();
 
