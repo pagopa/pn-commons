@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class DesiredFeedbackTest {
 
@@ -19,7 +20,7 @@ class DesiredFeedbackTest {
         assertEquals(5, values.size());
         assertTrue(values.contains("READ"));
         assertTrue(values.contains("RECEIVED"));
-        assertTrue(values.contains("PAID"));
+        assertFalse(values.contains("PAID"));
         assertTrue(values.contains("SENT"));
         assertTrue(values.contains("SKIP"));
     }
@@ -28,7 +29,6 @@ class DesiredFeedbackTest {
     void shouldResolveEnumFromValue() {
         assertEquals(DesiredFeedback.READ, DesiredFeedback.valueOf("READ"));
         assertEquals(DesiredFeedback.RECEIVED, DesiredFeedback.valueOf("RECEIVED"));
-        assertEquals(DesiredFeedback.PAID, DesiredFeedback.valueOf("PAID"));
         assertEquals(DesiredFeedback.SENT, DesiredFeedback.valueOf("SENT"));
         assertEquals(DesiredFeedback.SKIP, DesiredFeedback.valueOf("SKIP"));
     }
