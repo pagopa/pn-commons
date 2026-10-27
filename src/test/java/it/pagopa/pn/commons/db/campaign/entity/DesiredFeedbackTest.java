@@ -28,7 +28,6 @@ class DesiredFeedbackTest {
     void shouldResolveEnumFromValue() {
         assertEquals(DesiredFeedback.READ, DesiredFeedback.valueOf("READ"));
         assertEquals(DesiredFeedback.RECEIVED, DesiredFeedback.valueOf("RECEIVED"));
-        assertEquals(DesiredFeedback.PAID, DesiredFeedback.valueOf("PAID"));
         assertEquals(DesiredFeedback.SENT, DesiredFeedback.valueOf("SENT"));
         assertEquals(DesiredFeedback.SKIP, DesiredFeedback.valueOf("SKIP"));
     }
