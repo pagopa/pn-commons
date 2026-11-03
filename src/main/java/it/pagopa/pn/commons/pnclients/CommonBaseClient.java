@@ -69,7 +69,7 @@ public abstract class CommonBaseClient {
         return enrichBuilder(builder).build();
     }
 
-    public WebClient initWebClient(WebClient.Builder builder, String downstreamClientName) {        
+    public WebClient initWebClient(WebClient.Builder builder, String downstreamClientName) {
         return initWebClient(builder, downstreamClientName, filterFactory);
     }
 
@@ -105,27 +105,6 @@ public abstract class CommonBaseClient {
             return Mono.just(request);
         }
 
-    }
-
-
-    public static String elabExceptionMessage(Throwable x)
-    {
-        try {
-            String message = x.getMessage()==null?"":x.getMessage();
-
-            if(x.getMessage() == null && x instanceof WebClientException we && we.getCause() != null) {
-                message = we.getCause().toString();
-            }
-
-            if (x instanceof WebClientResponseException webClientResponseException)
-            {
-                message += ";" + webClientResponseException.getResponseBodyAsString();
-            }
-            return  message;
-        } catch (Exception e) {
-            log.error("exception reading body", e);
-            return x.getMessage();
-        }
     }
 
     protected WebClient.Builder enrichWithDefaultProps(WebClient.Builder builder){

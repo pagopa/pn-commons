@@ -32,7 +32,7 @@ class CommonBaseClientTest {
         commonBaseClient.setReadTimeoutMillis(8000);
         commonBaseClient.setRetryMaxAttempts(3);
         commonBaseClient.setWireTapActivation(false);
-        
+
         DownstreamCallLoggingFilterFactory mockFilterFactory = Mockito.mock(DownstreamCallLoggingFilterFactory.class);
         commonBaseClient.setFilterFactory(mockFilterFactory);
     }
@@ -60,13 +60,6 @@ class CommonBaseClientTest {
         });
 
 
-    }
-
-    @Test
-    void elabExceptionMessage() {
-        Exception ex = new RuntimeException("test");
-        String res = commonBaseClient.elabExceptionMessage(ex);
-        assertNotNull(res);
     }
 
     @Test
