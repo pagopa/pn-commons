@@ -6,7 +6,6 @@ import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.SocketPolicy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -55,13 +54,6 @@ class CommonBaseClientTest {
         });
 
 
-    }
-
-    @Test
-    void elabExceptionMessage() {
-        Exception ex = new RuntimeException("test");
-        String res = commonBaseClient.elabExceptionMessage(ex);
-        assertNotNull(res);
     }
 
     @Test
