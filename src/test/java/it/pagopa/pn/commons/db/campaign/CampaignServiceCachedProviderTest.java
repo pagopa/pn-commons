@@ -4,6 +4,7 @@ import it.pagopa.pn.commons.db.campaign.entity.CampaignChannel;
 import it.pagopa.pn.commons.db.campaign.entity.CampaignEntity;
 import it.pagopa.pn.commons.db.campaign.entity.CampaignStatus;
 import it.pagopa.pn.commons.db.campaign.entity.WorkflowEntity;
+import it.pagopa.pn.commons.db.campaign.provider.CampaignServiceCachedProvider;
 import it.pagopa.pn.commons.exceptions.InvalidCampaignException;
 import it.pagopa.pn.commons.exceptions.PnCampaignNotFoundException;
 import it.pagopa.pn.commons.utils.qr.models.RecipientTypeInt;
