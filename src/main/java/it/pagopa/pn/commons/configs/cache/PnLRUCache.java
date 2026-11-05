@@ -6,10 +6,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.cache.Cache;
 import org.springframework.cache.support.SimpleValueWrapper;
+import org.springframework.lang.Nullable;
 
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 
 @Slf4j
 public class PnLRUCache<K,V> implements Cache{
@@ -63,6 +66,28 @@ public class PnLRUCache<K,V> implements Cache{
 			throw new IllegalStateException("Cached value is not of required type [" + type.getName() + "]: " + value);
 		}
 		return (T) value;
+	}
+
+	@Nullable
+	@Override
+	public CompletableFuture<?> retrieve(Object key) {
+		Object value = this.cache.get(key);
+		return CompletableFuture.completedFuture(value);
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public <T> CompletableFuture<T> retrieve(Object key, Supplier<CompletableFuture<T>> valueLoader) {
+		synchronized (this.cache) {
+			if (this.cache.containsKey(key)) {
+				return CompletableFuture.completedFuture((T) this.cache.get(key));
+			}
+		}
+		return valueLoader.get().whenComplete((value, ex) -> {
+			if (ex == null && value != null) {
+				this.put(key, value);
+			}
+		});
 	}
 
 	@Override

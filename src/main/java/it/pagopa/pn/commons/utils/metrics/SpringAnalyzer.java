@@ -8,7 +8,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import software.amazon.awssdk.services.cloudwatch.model.Dimension;
 import software.amazon.awssdk.services.cloudwatch.model.MetricDatum;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -73,7 +73,7 @@ public class SpringAnalyzer {
     private MetricDatum createMetricCloudwatch(String metricName) {
         List<String> tag = new ArrayList<>();
         String namespace = "SpringAnalyzer" + "-" + applicationName;
-        MetricsEndpoint.MetricResponse response = this.metricEndpoint.metric(metricName, tag);
+        var response = this.metricEndpoint.metric(metricName, tag);
         if (response == null) {
             log.warn(String.format("[%s] Metric not available", namespace));
         } else {
