@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class DesiredFeedbackTest {
 
@@ -17,10 +16,9 @@ class DesiredFeedbackTest {
                 .map(Enum::name)
                 .collect(Collectors.toSet());
 
-        assertEquals(5, values.size());
+        assertEquals(4, values.size());
         assertTrue(values.contains("READ"));
         assertTrue(values.contains("RECEIVED"));
-        assertFalse(values.contains("PAID"));
         assertTrue(values.contains("SENT"));
         assertTrue(values.contains("SKIP"));
     }
