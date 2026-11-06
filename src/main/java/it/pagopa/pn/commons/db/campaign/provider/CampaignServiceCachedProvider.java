@@ -1,5 +1,6 @@
-package it.pagopa.pn.commons.db.campaign;
+package it.pagopa.pn.commons.db.campaign.provider;
 
+import it.pagopa.pn.commons.db.campaign.CampaignProvider;
 import it.pagopa.pn.commons.db.campaign.dao.CampaignDao;
 import it.pagopa.pn.commons.db.campaign.dao.CampaignEntityDaoDynamo;
 import it.pagopa.pn.commons.db.campaign.entity.CampaignEntity;
@@ -18,7 +19,7 @@ import java.util.Objects;
  * across different Spring Boot versions.
  */
 @Slf4j
-public class CampaignServiceCachedProvider {
+public class CampaignServiceCachedProvider implements CampaignProvider {
 
     private final List<CampaignEntity> cachedCampaigns;
 
