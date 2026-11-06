@@ -16,10 +16,9 @@ class DesiredFeedbackTest {
                 .map(Enum::name)
                 .collect(Collectors.toSet());
 
-        assertEquals(5, values.size());
+        assertEquals(4, values.size());
         assertTrue(values.contains("READ"));
         assertTrue(values.contains("RECEIVED"));
-        assertTrue(values.contains("PAID"));
         assertTrue(values.contains("SENT"));
         assertTrue(values.contains("SKIP"));
     }
