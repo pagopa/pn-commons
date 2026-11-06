@@ -23,6 +23,7 @@ paths:
 components:
   schemas:
     Problem:
+      type: object
       properties:
         type:
           description: URI reference of type definition
@@ -65,6 +66,7 @@ components:
         - status
         - errors
     ProblemError:
+      type: object
       properties:
         code:
           description: Internal code of the error, in human-readable format
