@@ -60,5 +60,8 @@ public class CampaignEntity {
     
     @Getter(onMethod=@__({@DynamoDbAttribute("workflow")}))
     private List<WorkflowEntity> workflow;
+
+    @Getter(onMethod=@__({@DynamoDbAttribute("stopOnPaid")}))
+    private Boolean stopOnPaid;
 }
 
