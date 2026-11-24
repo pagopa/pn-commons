@@ -63,5 +63,8 @@ public class CampaignEntity {
 
     @Getter(onMethod=@__({@DynamoDbAttribute("stopOnPaid")}))
     private Boolean stopOnPaid;
+
+    @Getter(onMethod=@__({@DynamoDbAttribute("contacts")}))
+    private List<ContactEntity> contacts;
 }
 

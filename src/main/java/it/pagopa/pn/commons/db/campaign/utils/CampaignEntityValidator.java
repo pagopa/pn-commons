@@ -2,6 +2,7 @@ package it.pagopa.pn.commons.db.campaign.utils;
 
 
 import it.pagopa.pn.commons.db.campaign.entity.CampaignEntity;
+import it.pagopa.pn.commons.db.campaign.entity.ContactEntity;
 import it.pagopa.pn.commons.db.campaign.entity.WorkflowEntity;
 import org.springframework.util.StringUtils;
 
@@ -24,7 +25,20 @@ public class CampaignEntityValidator {
                 && Objects.nonNull(campaign.getEndDate())
                 && Objects.nonNull(campaign.getStatus())
                 && StringUtils.hasText(campaign.getServiceId())
-                && hasValidWorkflow(campaign.getWorkflow());
+                && hasValidWorkflow(campaign.getWorkflow())&& hasValidContacts(campaign.getContacts());
+    }
+
+    private static boolean hasValidContacts(List<ContactEntity> contacts) {
+        return contacts != null
+                && !contacts.isEmpty()
+                && contacts.stream().allMatch(CampaignEntityValidator::hasContact);
+    }
+
+    private static boolean hasContact(ContactEntity contact) {
+        return contact != null
+                && (StringUtils.hasText(contact.getEmail())
+                || StringUtils.hasText(contact.getPec())
+                || StringUtils.hasText(contact.getPhone()));
     }
 
     private static boolean isValidSenderId(String senderId) {

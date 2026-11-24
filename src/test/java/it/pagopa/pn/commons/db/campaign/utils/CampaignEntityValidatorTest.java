@@ -1,10 +1,6 @@
 package it.pagopa.pn.commons.db.campaign.utils;
 
-import it.pagopa.pn.commons.db.campaign.entity.CampaignChannel;
-import it.pagopa.pn.commons.db.campaign.entity.CampaignEntity;
-import it.pagopa.pn.commons.db.campaign.entity.DesiredFeedback;
-import it.pagopa.pn.commons.db.campaign.entity.CampaignStatus;
-import it.pagopa.pn.commons.db.campaign.entity.WorkflowEntity;
+import it.pagopa.pn.commons.db.campaign.entity.*;
 import it.pagopa.pn.commons.utils.qr.models.RecipientTypeInt;
 import org.junit.jupiter.api.Test;
 
@@ -172,6 +168,86 @@ class CampaignEntityValidatorTest {
         assertTrue(invokeHasValidWorkflowStep(step));
     }
 
+    @Test
+    void shouldRejectNullOrEmptyContacts() {
+        CampaignEntity campaign = validCampaign();
+
+        campaign.setContacts(null);
+        assertFalse(CampaignEntityValidator.isValid(campaign));
+
+        campaign.setContacts(List.of());
+        assertFalse(CampaignEntityValidator.isValid(campaign));
+    }
+
+    @Test
+    void shouldAcceptEachContactTypeOnItsOwn() {
+        List<ContactEntity> contacts = List.of(
+                ContactEntity.builder().email("info@example.org").build(),
+                ContactEntity.builder().pec("pec@example.org").build(),
+                ContactEntity.builder().phone("+390911234567").build()
+        );
+
+        for (ContactEntity contact : contacts) {
+            CampaignEntity campaign = validCampaign();
+            campaign.setContacts(List.of(contact));
+
+            assertTrue(CampaignEntityValidator.isValid(campaign));
+        }
+    }
+
+    @Test
+    void shouldAcceptMultipleValidContacts() {
+        CampaignEntity campaign = validCampaign();
+        campaign.setContacts(List.of(
+                ContactEntity.builder().email("info@example.org").build(),
+                ContactEntity.builder().phone("+390911234567").build()
+        ));
+
+        assertTrue(CampaignEntityValidator.isValid(campaign));
+    }
+
+    @Test
+    void shouldRejectContactWithoutRecapiti() {
+        CampaignEntity campaign = validCampaign();
+        campaign.setContacts(List.of(ContactEntity.builder().build()));
+
+        assertFalse(CampaignEntityValidator.isValid(campaign));
+    }
+
+    @Test
+    void shouldRejectContactWithOnlyBlankRecapiti() {
+        CampaignEntity campaign = validCampaign();
+        campaign.setContacts(List.of(ContactEntity.builder()
+                .email(" ")
+                .pec("")
+                .phone("\t")
+                .build()));
+
+        assertFalse(CampaignEntityValidator.isValid(campaign));
+    }
+
+    @Test
+    void shouldRejectNullContactInList() {
+        CampaignEntity campaign = validCampaign();
+        campaign.setContacts(Arrays.asList(
+                ContactEntity.builder().email("info@example.org").build(),
+                null
+        ));
+
+        assertFalse(CampaignEntityValidator.isValid(campaign));
+    }
+
+    @Test
+    void shouldRejectListContainingAnInvalidContact() {
+        CampaignEntity campaign = validCampaign();
+        campaign.setContacts(List.of(
+                ContactEntity.builder().email("info@example.org").build(),
+                ContactEntity.builder().build()
+        ));
+
+        assertFalse(CampaignEntityValidator.isValid(campaign));
+    }
+
     private CampaignEntity validCampaign() {
         WorkflowEntity workflow = WorkflowEntity.builder()
                 .channel(CampaignChannel.IO)
@@ -194,6 +270,9 @@ class CampaignEntityValidatorTest {
                 .sensitiveContent(false)
                 .stopOnViewed(false)
                 .workflow(List.of(workflow))
+                .contacts(List.of(ContactEntity.builder()
+                        .email("info@example.org")
+                        .build()))
                 .build();
     }
 
