@@ -1,9 +1,6 @@
 package it.pagopa.pn.commons.db.campaign;
 
-import it.pagopa.pn.commons.db.campaign.entity.CampaignChannel;
-import it.pagopa.pn.commons.db.campaign.entity.CampaignEntity;
-import it.pagopa.pn.commons.db.campaign.entity.CampaignStatus;
-import it.pagopa.pn.commons.db.campaign.entity.WorkflowEntity;
+import it.pagopa.pn.commons.db.campaign.entity.*;
 import it.pagopa.pn.commons.db.campaign.provider.CampaignServiceCachedProvider;
 import it.pagopa.pn.commons.exceptions.InvalidCampaignException;
 import it.pagopa.pn.commons.exceptions.PnCampaignNotFoundException;
@@ -120,6 +117,9 @@ class CampaignServiceCachedProviderTest {
                 .sensitiveContent(false)
                 .stopOnViewed(false)
                 .workflow(List.of(workflow))
+                .contacts(List.of(ContactEntity.builder()
+                        .email("info@example.org")
+                        .build()))
                 .build();
     }
 }
