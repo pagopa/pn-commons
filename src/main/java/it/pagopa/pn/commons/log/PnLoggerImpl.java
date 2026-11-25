@@ -13,6 +13,7 @@ import software.amazon.awssdk.services.dynamodb.model.TransactWriteItem;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 class PnLoggerImpl implements PnLogger {
 
@@ -99,6 +100,12 @@ class PnLoggerImpl implements PnLogger {
     public void logInvokationResultDownstreamFailed(String service, String description, Throwable t) {
         String details = elabExceptionMessage(t);
         log.error("[DOWNSTREAM] Service {} returned errors={} details={}", service, description == null ? "<not specified>" : description, details == null ? "<not specified>" : details, t);
+    }
+
+    @Override
+    public void logInvokationResultDownstreamFailed(String service, String description, Throwable t, Function<String, String> maskFun) {
+        String details = elabExceptionMessage(t);
+        log.error("[DOWNSTREAM] Service {} returned errors={} details={}", service, description == null ? "<not specified>" : maskFun.apply(description), details == null ? "<not specified>" : maskFun.apply(details));
     }
 
     @Override
