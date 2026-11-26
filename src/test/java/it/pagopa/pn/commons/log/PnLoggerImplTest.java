@@ -275,12 +275,56 @@ class PnLoggerImplTest {
     }
 
     @Test
+    void logDownstreamFailureMasksDescriptionAndDetails() {
+        RuntimeException exception = new RuntimeException("details: secret");
+
+        fooLogger.logInvokationResultDownstreamFailed(
+                "service",
+                "description: secret",
+                exception,
+                value -> value.replace("secret", "***")
+        );
+
+        assertEquals(1, listAppender.list.size());
+        ILoggingEvent event = listAppender.list.get(0);
+
+        assertEquals(Level.ERROR, event.getLevel());
+        assertEquals(
+                "[DOWNSTREAM] Service service returned errors=description: *** details=details: ***",
+                event.getFormattedMessage()
+        );
+        assertNull(event.getThrowableProxy());
+    }
+
+    @Test
     void logEndingDownstreamProcessFailWhenExceptionNull() {
         //Given
         String str = "processo";
 
         //When
         fooLogger.logInvokationResultDownstreamFailed(str, null, null);
+
+        //Then
+        // JUnit assertions
+        List<ILoggingEvent> logsList = listAppender.list;
+        Assertions.assertEquals("[DOWNSTREAM] Service " + str + " returned errors=<not specified> details=<not specified>", logsList.get(0)
+                .getFormattedMessage());
+        Assertions.assertEquals(Level.ERROR, logsList.get(0)
+                .getLevel());
+    }
+
+    @Test
+    void logEndingDownstreamProcessFailWhenExceptionNull_MuskFunction() {
+        //Given
+        String str = "processo";
+
+        //When
+        fooLogger.logInvokationResultDownstreamFailed(
+                str, null, null,
+                value -> {
+                    throw new AssertionError("La funzione non deve essere invocata");
+                }
+        );
 
         //Then
         // JUnit assertions

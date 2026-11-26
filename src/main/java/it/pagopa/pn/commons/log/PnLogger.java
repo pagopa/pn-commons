@@ -9,6 +9,7 @@ import software.amazon.awssdk.enhanced.dynamodb.Key;
 import software.amazon.awssdk.services.dynamodb.model.TransactWriteItem;
 
 import java.util.List;
+import java.util.function.Function;
 
 public interface PnLogger extends Logger {
 
@@ -176,6 +177,18 @@ public interface PnLogger extends Logger {
      * @param t eventuale eccezione
      */
     void logInvokationResultDownstreamFailed(String service, String description,  Throwable t);
+
+    /**
+     * metodo per loggare l'errore di un invocazione ad un servizio di downstream mascherando i dati sensibili,
+     * senza stampare lo stack trace originale.
+     *
+     * @param service     nome servizio, possibilmente usare quelli definiti in PnLogger.EXTERNAL_SERVICES
+     * @param description eventuale descrizione dell'errore
+     * @param t eventuale eccezione
+     * @param maskFun funzione per mascherare eventuali dati sensibili
+     */
+    void logInvokationResultDownstreamFailed(String service, String description, Throwable t,
+                                             Function<String, String> maskFun);
 
     /**
      * metodo per loggare l'esito di not found per una invocazione ad un servizio di downstream
